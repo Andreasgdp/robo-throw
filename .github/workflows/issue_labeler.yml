@@ -49,7 +49,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - uses: Naturalclar/issue-action@v1.0.0
         with:
-          keywords: '["ui", "UI", "UX", "ux"]'
+          keywords: '["ui", "UI", "Design", "design"]'
           labels: '["Design"]'
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - uses: Naturalclar/issue-action@v1.0.0
