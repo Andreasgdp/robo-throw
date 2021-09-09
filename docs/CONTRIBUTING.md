@@ -1,4 +1,4 @@
-# Contributing to 3rd semesterproject
+# Contributing to robo-throw
 We love your input! we want to make contributing to this project as easy and transparent as possible, whether it's:
 
 - Reporting a bug
