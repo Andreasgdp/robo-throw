@@ -16,12 +16,6 @@ body:
     validations:
       required: true
   - type: textarea
-    id: ux
-    attributes:
-      label: UX
-      description: Design of the feature. If no design is available leave questions for UX here.
-      placeholder: Implement the following design...
-  - type: textarea
     id: acceptance-criteria
     attributes:
       label: Acceptance criteria

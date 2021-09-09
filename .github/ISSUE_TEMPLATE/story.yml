@@ -23,14 +23,6 @@ body:
       description: The user story for the feature.
       placeholder: As a user, I would like to ... so I can ...
   - type: textarea
-    id: ux
-    attributes:
-      label: UX
-      description: Design of the feature. If no design is available leave questions for UX here.
-      placeholder: Implement the following design...
-    validations:
-      required: true
-  - type: textarea
     id: acceptance-criteria
     attributes:
       label: Acceptance criteria
