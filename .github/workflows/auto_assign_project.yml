@@ -18,4 +18,4 @@ jobs:
     - name: Assign issues to repo project
       uses: srggrs/assign-one-project-github-action@1.2.1
       with:
-        project: 'https://github.com/Andreasgdp/3rd-semesterproject/projects/1'
+        project: 'https://github.com/Andreasgdp/robo-throw/projects/1'
