@@ -24,11 +24,6 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - uses: Naturalclar/issue-action@v1.0.0
         with:
-          keywords: '["doc", "documentation","Doc", "Documentation", "docs", "Docs", "doc-string","docstring","Doc-string","DocString","doc string","Doc string"]'
-          labels: '["documentation"]'
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - uses: Naturalclar/issue-action@v1.0.0
-        with:
           keywords: '["general", "General"]'
           labels: '["general"]'
           github-token: "${{ secrets.GITHUB_TOKEN }}"
@@ -46,11 +41,6 @@ jobs:
         with:
           keywords: '["no code", "not coding","No code", "Not coding"]'
           labels: '["not coding"]'
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - uses: Naturalclar/issue-action@v1.0.0
-        with:
-          keywords: '["ui", "UI", "Design", "design"]'
-          labels: '["Design"]'
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - uses: Naturalclar/issue-action@v1.0.0
         with:
