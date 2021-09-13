@@ -14,3 +14,8 @@ add_subdirectory(simulation)
 add_subdirectory(jointPoseGetter)
 
 add_executable(app main.cpp)
+
+# UR-RTDE
+find_package(ur_rtde REQUIRED)
+add_executable(ur_rtde_test main.cpp)
+target_link_libraries(ur_rtde_test PRIVATE ur_rtde::rtde)
