@@ -1,1 +1,0 @@
-# Connection to UR5 robot goes here.

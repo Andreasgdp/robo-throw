@@ -1,1 +1,0 @@
-# Gripper handling goes here
