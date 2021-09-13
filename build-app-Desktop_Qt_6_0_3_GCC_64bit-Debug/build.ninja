@@ -78,8 +78,6 @@ build CMakeFiles/app.dir/main.cpp.o: CXX_COMPILER__app_Debug /git/GitHub/robo-th
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = CMakeFiles/app.dir
   OBJECT_FILE_DIR = CMakeFiles/app.dir
-  TARGET_COMPILE_PDB = CMakeFiles/app.dir/
-  TARGET_PDB = app.pdb
 
 
 # =============================================================================
@@ -94,9 +92,8 @@ build app: CXX_EXECUTABLE_LINKER__app_Debug CMakeFiles/app.dir/main.cpp.o
   OBJECT_DIR = CMakeFiles/app.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/app.dir/
   TARGET_FILE = app
-  TARGET_PDB = app.pdb
+  TARGET_PDB = app.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -141,8 +138,6 @@ build api/CMakeFiles/apiScr.dir/test.cpp.o: CXX_COMPILER__apiScr_Debug /git/GitH
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = api/CMakeFiles/apiScr.dir
   OBJECT_FILE_DIR = api/CMakeFiles/apiScr.dir
-  TARGET_COMPILE_PDB = api/CMakeFiles/apiScr.dir/apiScr.pdb
-  TARGET_PDB = api/libapiScr.pdb
 
 
 # =============================================================================
@@ -157,9 +152,8 @@ build api/libapiScr.a: CXX_STATIC_LIBRARY_LINKER__apiScr_Debug api/CMakeFiles/ap
   OBJECT_DIR = api/CMakeFiles/apiScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = api/CMakeFiles/apiScr.dir/apiScr.pdb
   TARGET_FILE = api/libapiScr.a
-  TARGET_PDB = api/libapiScr.pdb
+  TARGET_PDB = apiScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -204,8 +198,6 @@ build frontend/CMakeFiles/frontendScr.dir/test.cpp.o: CXX_COMPILER__frontendScr_
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = frontend/CMakeFiles/frontendScr.dir
   OBJECT_FILE_DIR = frontend/CMakeFiles/frontendScr.dir
-  TARGET_COMPILE_PDB = frontend/CMakeFiles/frontendScr.dir/frontendScr.pdb
-  TARGET_PDB = frontend/libfrontendScr.pdb
 
 
 # =============================================================================
@@ -220,9 +212,8 @@ build frontend/libfrontendScr.a: CXX_STATIC_LIBRARY_LINKER__frontendScr_Debug fr
   OBJECT_DIR = frontend/CMakeFiles/frontendScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = frontend/CMakeFiles/frontendScr.dir/frontendScr.pdb
   TARGET_FILE = frontend/libfrontendScr.a
-  TARGET_PDB = frontend/libfrontendScr.pdb
+  TARGET_PDB = frontendScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -267,8 +258,6 @@ build gripperHandling/CMakeFiles/gripperScr.dir/test.cpp.o: CXX_COMPILER__grippe
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = gripperHandling/CMakeFiles/gripperScr.dir
   OBJECT_FILE_DIR = gripperHandling/CMakeFiles/gripperScr.dir
-  TARGET_COMPILE_PDB = gripperHandling/CMakeFiles/gripperScr.dir/gripperScr.pdb
-  TARGET_PDB = gripperHandling/libgripperScr.pdb
 
 
 # =============================================================================
@@ -283,9 +272,8 @@ build gripperHandling/libgripperScr.a: CXX_STATIC_LIBRARY_LINKER__gripperScr_Deb
   OBJECT_DIR = gripperHandling/CMakeFiles/gripperScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = gripperHandling/CMakeFiles/gripperScr.dir/gripperScr.pdb
   TARGET_FILE = gripperHandling/libgripperScr.a
-  TARGET_PDB = gripperHandling/libgripperScr.pdb
+  TARGET_PDB = gripperScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -330,8 +318,6 @@ build imageProcessing/CMakeFiles/imageScr.dir/test.cpp.o: CXX_COMPILER__imageScr
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = imageProcessing/CMakeFiles/imageScr.dir
   OBJECT_FILE_DIR = imageProcessing/CMakeFiles/imageScr.dir
-  TARGET_COMPILE_PDB = imageProcessing/CMakeFiles/imageScr.dir/imageScr.pdb
-  TARGET_PDB = imageProcessing/libimageScr.pdb
 
 
 # =============================================================================
@@ -346,9 +332,8 @@ build imageProcessing/libimageScr.a: CXX_STATIC_LIBRARY_LINKER__imageScr_Debug i
   OBJECT_DIR = imageProcessing/CMakeFiles/imageScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = imageProcessing/CMakeFiles/imageScr.dir/imageScr.pdb
   TARGET_FILE = imageProcessing/libimageScr.a
-  TARGET_PDB = imageProcessing/libimageScr.pdb
+  TARGET_PDB = imageScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -393,8 +378,6 @@ build robotConnection/CMakeFiles/robotConnScr.dir/test.cpp.o: CXX_COMPILER__robo
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = robotConnection/CMakeFiles/robotConnScr.dir
   OBJECT_FILE_DIR = robotConnection/CMakeFiles/robotConnScr.dir
-  TARGET_COMPILE_PDB = robotConnection/CMakeFiles/robotConnScr.dir/robotConnScr.pdb
-  TARGET_PDB = robotConnection/librobotConnScr.pdb
 
 
 # =============================================================================
@@ -409,9 +392,8 @@ build robotConnection/librobotConnScr.a: CXX_STATIC_LIBRARY_LINKER__robotConnScr
   OBJECT_DIR = robotConnection/CMakeFiles/robotConnScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = robotConnection/CMakeFiles/robotConnScr.dir/robotConnScr.pdb
   TARGET_FILE = robotConnection/librobotConnScr.a
-  TARGET_PDB = robotConnection/librobotConnScr.pdb
+  TARGET_PDB = robotConnScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -456,8 +438,6 @@ build simulation/CMakeFiles/simScr.dir/test.cpp.o: CXX_COMPILER__simScr_Debug /g
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = simulation/CMakeFiles/simScr.dir
   OBJECT_FILE_DIR = simulation/CMakeFiles/simScr.dir
-  TARGET_COMPILE_PDB = simulation/CMakeFiles/simScr.dir/simScr.pdb
-  TARGET_PDB = simulation/libsimScr.pdb
 
 
 # =============================================================================
@@ -472,9 +452,8 @@ build simulation/libsimScr.a: CXX_STATIC_LIBRARY_LINKER__simScr_Debug simulation
   OBJECT_DIR = simulation/CMakeFiles/simScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = simulation/CMakeFiles/simScr.dir/simScr.pdb
   TARGET_FILE = simulation/libsimScr.a
-  TARGET_PDB = simulation/libsimScr.pdb
+  TARGET_PDB = simScr.a.dbg
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -519,8 +498,6 @@ build jointPoseGetter/CMakeFiles/jointPoseScr.dir/test.cpp.o: CXX_COMPILER__join
   FLAGS = -g -std=gnu++11
   OBJECT_DIR = jointPoseGetter/CMakeFiles/jointPoseScr.dir
   OBJECT_FILE_DIR = jointPoseGetter/CMakeFiles/jointPoseScr.dir
-  TARGET_COMPILE_PDB = jointPoseGetter/CMakeFiles/jointPoseScr.dir/jointPoseScr.pdb
-  TARGET_PDB = jointPoseGetter/libjointPoseScr.pdb
 
 
 # =============================================================================
@@ -535,9 +512,8 @@ build jointPoseGetter/libjointPoseScr.a: CXX_STATIC_LIBRARY_LINKER__jointPoseScr
   OBJECT_DIR = jointPoseGetter/CMakeFiles/jointPoseScr.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = jointPoseGetter/CMakeFiles/jointPoseScr.dir/jointPoseScr.pdb
   TARGET_FILE = jointPoseGetter/libjointPoseScr.a
-  TARGET_PDB = jointPoseGetter/libjointPoseScr.pdb
+  TARGET_PDB = jointPoseScr.a.dbg
 
 # =============================================================================
 # Target aliases.
@@ -636,14 +612,14 @@ build simulation/all: phony simulation/libsimScr.a
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /git/GitHub/robo-throw/app/CMakeLists.txt /git/GitHub/robo-throw/app/api/CMakeLists.txt /git/GitHub/robo-throw/app/frontend/CMakeLists.txt /git/GitHub/robo-throw/app/gripperHandling/CMakeLists.txt /git/GitHub/robo-throw/app/imageProcessing/CMakeLists.txt /git/GitHub/robo-throw/app/jointPoseGetter/CMakeLists.txt /git/GitHub/robo-throw/app/robotConnection/CMakeLists.txt /git/GitHub/robo-throw/app/simulation/CMakeLists.txt /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCCompiler.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCCompilerABI.c /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXCompiler.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXCompilerABI.cpp /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCommonLanguageInclude.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCompilerIdDetection.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCXXCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompileFeatures.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompilerABI.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompilerId.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeFindBinUtils.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeGenericSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeInitializeConfigs.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeLanguageInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeNinjaFindMake.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseImplicitIncludeInfo.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseImplicitLinkInfo.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseLibraryArchitecture.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystem.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInitialize.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCXXCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCompilerCommon.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ADSP-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ARMCC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ARMClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/AppleClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Borland-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/CMakeCommonCompilerMacros.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Clang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Cray-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GHS-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-FindBinUtils.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/HP-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IAR-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Intel-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/MSVC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/NVHPC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/PGI-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/PathScale-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ROCMClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SCO-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/TI-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Watcom-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XL-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/zOS-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Internal/FeatureTesting.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-Determine-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/UnixPaths.cmake /opt/QT_creator/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake CMakeCache.txt CMakeFiles/3.21.1/CMakeCCompiler.cmake CMakeFiles/3.21.1/CMakeCXXCompiler.cmake CMakeFiles/3.21.1/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /git/GitHub/robo-throw/app/CMakeLists.txt /git/GitHub/robo-throw/app/api/CMakeLists.txt /git/GitHub/robo-throw/app/frontend/CMakeLists.txt /git/GitHub/robo-throw/app/gripperHandling/CMakeLists.txt /git/GitHub/robo-throw/app/imageProcessing/CMakeLists.txt /git/GitHub/robo-throw/app/jointPoseGetter/CMakeLists.txt /git/GitHub/robo-throw/app/robotConnection/CMakeLists.txt /git/GitHub/robo-throw/app/simulation/CMakeLists.txt /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCommonLanguageInclude.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeGenericSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeInitializeConfigs.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeLanguageInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInitialize.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/CMakeCommonCompilerMacros.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/UnixPaths.cmake /opt/QT_creator/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake CMakeCache.txt CMakeFiles/3.21.1/CMakeCCompiler.cmake CMakeFiles/3.21.1/CMakeCXXCompiler.cmake CMakeFiles/3.21.1/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /git/GitHub/robo-throw/app/CMakeLists.txt /git/GitHub/robo-throw/app/api/CMakeLists.txt /git/GitHub/robo-throw/app/frontend/CMakeLists.txt /git/GitHub/robo-throw/app/gripperHandling/CMakeLists.txt /git/GitHub/robo-throw/app/imageProcessing/CMakeLists.txt /git/GitHub/robo-throw/app/jointPoseGetter/CMakeLists.txt /git/GitHub/robo-throw/app/robotConnection/CMakeLists.txt /git/GitHub/robo-throw/app/simulation/CMakeLists.txt /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCCompiler.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCCompilerABI.c /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXCompiler.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXCompilerABI.cpp /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCommonLanguageInclude.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCompilerIdDetection.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCXXCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompileFeatures.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompilerABI.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineCompilerId.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeDetermineSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeFindBinUtils.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeGenericSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeInitializeConfigs.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeLanguageInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeNinjaFindMake.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseImplicitIncludeInfo.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseImplicitLinkInfo.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeParseLibraryArchitecture.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystem.cmake.in /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInitialize.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCXXCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeTestCompilerCommon.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ADSP-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ARMCC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ARMClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/AppleClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Borland-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/CMakeCommonCompilerMacros.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Clang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Cray-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GHS-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-FindBinUtils.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/HP-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IAR-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Intel-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/MSVC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/NVHPC-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/PGI-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/PathScale-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/ROCMClang-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SCO-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/TI-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/Watcom-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XL-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/zOS-C-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Internal/FeatureTesting.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-Determine-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/UnixPaths.cmake /opt/QT_creator/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake CMakeCache.txt CMakeFiles/3.21.1/CMakeCCompiler.cmake CMakeFiles/3.21.1/CMakeCXXCompiler.cmake CMakeFiles/3.21.1/CMakeSystem.cmake: phony
+build /git/GitHub/robo-throw/app/CMakeLists.txt /git/GitHub/robo-throw/app/api/CMakeLists.txt /git/GitHub/robo-throw/app/frontend/CMakeLists.txt /git/GitHub/robo-throw/app/gripperHandling/CMakeLists.txt /git/GitHub/robo-throw/app/imageProcessing/CMakeLists.txt /git/GitHub/robo-throw/app/jointPoseGetter/CMakeLists.txt /git/GitHub/robo-throw/app/robotConnection/CMakeLists.txt /git/GitHub/robo-throw/app/simulation/CMakeLists.txt /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCXXInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeCommonLanguageInclude.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeGenericSystem.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeInitializeConfigs.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeLanguageInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInformation.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/CMakeSystemSpecificInitialize.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/CMakeCommonCompilerMacros.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Compiler/GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-C.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU-CXX.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux-GNU.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/Linux.cmake /opt/QT_creator/Tools/CMake/share/cmake-3.21/Modules/Platform/UnixPaths.cmake /opt/QT_creator/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake CMakeCache.txt CMakeFiles/3.21.1/CMakeCCompiler.cmake CMakeFiles/3.21.1/CMakeCXXCompiler.cmake CMakeFiles/3.21.1/CMakeSystem.cmake: phony
 
 
 #############################################
