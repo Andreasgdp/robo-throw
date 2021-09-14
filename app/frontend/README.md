@@ -1,1 +1,0 @@
-# GUI for displaying information and conrolling app
