@@ -5,13 +5,19 @@
 
 using namespace ur_rtde;
 
-RobotConnection::RobotConnection() {
-
+RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP) {
 }
 
-void RobotConnection::connect(std::string IP) {
-    std::cout << "testing\n\n";
+void RobotConnection::connect() {
+    // TODO: Add check to see if already connected and then return if connected.
     // The constructor simply takes the IP address of the Robot
-    RTDEControlInterface rtde_control(IP);
-    RTDEReceiveInterface rtde_recive(IP);
+    RTDEControlInterface rtde_control(this->IP);
+    RTDEReceiveInterface rtde_recive(this->IP);
 }
+
+void RobotConnection::move(const std::vector<double> &jointPoses, double speed, double acceleration)
+{
+    // TODO: Size must be 6
+    this->rtde_control.moveL(jointPoses, speed, acceleration);
+}
+
