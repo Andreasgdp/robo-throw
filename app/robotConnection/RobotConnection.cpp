@@ -10,6 +10,7 @@ RobotConnection::RobotConnection() {
 }
 
 void RobotConnection::connect(std::string IP) {
+    std::cout << "testing\n\n";
     // The constructor simply takes the IP address of the Robot
     RTDEControlInterface rtde_control(IP);
     RTDEReceiveInterface rtde_recive(IP);

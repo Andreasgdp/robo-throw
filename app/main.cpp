@@ -1,12 +1,13 @@
 #include <iostream>
-#include "./api/test.h"
+#include "./robotConnection/RobotConnection.h"
 
 using namespace std;
 
 int main()
 {
-    test a;
-    a.testing();
+    RobotConnection conn;
+
+    conn.connect("127.0.0.1");
     cout << "Hello World!" << endl;
     return 0;
 }

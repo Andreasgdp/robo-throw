@@ -13,9 +13,9 @@ add_subdirectory(robotConnection)
 add_subdirectory(simulation)
 add_subdirectory(jointPoseGetter)
 
-add_executable(app main.cpp)
+File(GLOB_RECURSE SOURCE_FILES */*.cpp)
 
 # UR-RTDE
 find_package(ur_rtde REQUIRED)
-add_executable(ur_rtde_test main.cpp)
-target_link_libraries(ur_rtde_test PRIVATE ur_rtde::rtde)
+add_executable(app main.cpp ${SOURCE_FILES})
+target_link_libraries(app PRIVATE ur_rtde::rtde)
