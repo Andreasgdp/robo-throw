@@ -21,3 +21,9 @@ void RobotConnection::move(const std::vector<double> &jointPoses, double speed, 
     this->rtde_control.moveL(jointPoses, speed, acceleration);
 }
 
+std::vector<double> RobotConnection::getActualJointPoses()
+{
+    return this->rtde_recieve.getActualQ();
+}
+
+

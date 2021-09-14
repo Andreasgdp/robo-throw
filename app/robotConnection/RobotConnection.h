@@ -14,6 +14,7 @@ public:
 
     void connect();
     void move(const std::vector<double> &jointPoses, double speed, double acceleration);
+    std::vector<double> getActualJointPoses();
 
 private:
     std::string IP;
