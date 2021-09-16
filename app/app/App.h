@@ -9,8 +9,7 @@
 class App
 {
 public:
-    App(std::string IP);
-    void initializeApp(const cv::Mat &calibrationImg = cv::Mat());
+    App(std::string IP, const cv::Mat &calibrationImg = cv::Mat());
     void findAndGrabObject(const cv::Mat &objectImg = cv::Mat());
     void throwObject(const std::vector<double> &goalPos);
     void moveHome();
@@ -38,7 +37,7 @@ private:
     bool isImageProvided(const cv::Mat &image);
     bool robotHasMovedToPos(const std::vector<double> &pos);
     void waitForMoveRobot(const std::vector<double> &pos);
-    void setDefaultSpeedAcceleration();
+    void setDefaultPosMovement();
 
 
 };

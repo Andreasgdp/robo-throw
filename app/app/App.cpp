@@ -1,13 +1,10 @@
 #include "App.h"
 
-App::App(std::string IP) : roboConn(IP)
+App::App(std::string IP, const cv::Mat &calibrationImg) : roboConn(IP)
 {
     this->IP = IP;
     this->setDefaultPosMovement();
-}
 
-void App::initializeApp(const cv::Mat &calibrationImg)
-{
     if (!this->roboConn.isConnected()) throw "Connection could not be established with ip: " + this->IP;
 
     if (!this->isImageProvided(calibrationImg)) {
