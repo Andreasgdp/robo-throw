@@ -1,15 +1,19 @@
 #include <iostream>
 #include "./robotConnection/RobotConnection.h"
+#include "./app/App.h"
 
 using namespace std;
 
 int main()
 {
-    RobotConnection conn("127.0.0.1");
-    std::vector<double> test = conn.getActualJointPoses();
+    // TODO: use IP of robot.
+    App app("130.226.87.132");
+    app.initializeApp();
+    app.findAndGrabObject();
 
-    for (size_t i = 0; i < test.size(); i++) {
-        std::cout << test.at(i);
-    }
+    // TODO: define goalPos
+    std::vector<double> goalPos;
+    app.throwObject(goalPos);
+
     return 0;
 }

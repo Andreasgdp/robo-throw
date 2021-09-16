@@ -12,11 +12,18 @@ public:
     App(std::string IP);
     void initializeApp(const cv::Mat &calibrationImg = cv::Mat());
     void findAndGrabObject(const cv::Mat &objectImg = cv::Mat());
+    void throwObject(std::vector<double> goalPos);
+    void moveHome();
 
 
 private:
+    // Member variables
+    //TODO: when all member variables are created, create getters and setters (automatic)
     std::string IP;
     std::vector<double> jointPoses;
+    double speed = 1.0;
+    double acceleration = 1.0;
+    std::vector<double> homeJointPoses;
     ImageProcessing imgProcessor;
     RobotConnection roboConn;
     // add member variable for jointPoseGetter
@@ -26,6 +33,13 @@ private:
     // add member variable for processed image
     // add member variable for object posision
     // add member variable for target pos
+
+    // Functions
+    bool isImageProvided(cv::Mat image);
+    bool robotHasMovedToPos();
+    void waitForMoveRobot();
+    void setDefaultSpeedAcceleration();
+
 
 };
 

@@ -83,4 +83,14 @@ bool RobotConnection::isProtectiveStopped()
     return this->rtde_recieve.isProtectiveStopped();
 }
 
+const std::vector<double> &RobotConnection::getHomeJointPos() const
+{
+    return homeJointPos;
+}
+
+void RobotConnection::setHomeJointPos(const std::vector<double> &newHomeJointPos)
+{
+    homeJointPos = newHomeJointPos;
+}
+
 
