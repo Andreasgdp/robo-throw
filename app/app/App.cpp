@@ -3,8 +3,7 @@
 App::App(std::string IP) : roboConn(IP)
 {
     this->IP = IP;
-    this->homeJointPoses = this->roboConn.getHomeJointPos();
-    this->setDefaultSpeedAcceleration();
+    this->setDefaultPosMovement();
 }
 
 void App::initializeApp(const cv::Mat &calibrationImg)
@@ -64,7 +63,7 @@ void App::throwObject(const std::vector<double> &goalPos)
 
 void App::moveHome()
 {
-    this->setDefaultSpeedAcceleration();
+    this->setDefaultPosMovement();
     // simulate move (handle err by calculating new joint poses)
     // calculate and simulate until a valid move is made (implement timeout and throw err)
     this->roboConn.moveL(this->homeJointPoses, this->speed, this->acceleration);
@@ -89,8 +88,9 @@ void App::waitForMoveRobot(const std::vector<double> &pos)
     }
 }
 
-void App::setDefaultSpeedAcceleration()
+void App::setDefaultPosMovement()
 {
+    this->homeJointPoses = this->roboConn.getHomeJointPos();
     this->speed = this->roboConn.getDefaultSpeed();
     this->acceleration = this->roboConn.getDefaultAcceleration();
 }
