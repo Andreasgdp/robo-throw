@@ -4,6 +4,7 @@ App::App(std::string IP) : roboConn(IP)
 {
     this->IP = IP;
     this->homeJointPoses = this->roboConn.getHomeJointPos();
+    this->setDefaultSpeedAcceleration();
 }
 
 void App::initializeApp(const cv::Mat &calibrationImg)
