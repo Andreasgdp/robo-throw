@@ -8,13 +8,6 @@ using namespace ur_rtde;
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP) {
 }
 
-void RobotConnection::connect() {
-    if (!this->isConnected()) {
-        RTDEControlInterface rtde_control(this->IP);
-        RTDEReceiveInterface rtde_recive(this->IP);
-    }
-}
-
 void RobotConnection::moveL(const std::vector<double> &jointPoses, double speed, double acceleration)
 {
     if (jointPoses.size() != 6) throw "jointPoses Vector must be of size 6";
@@ -30,17 +23,19 @@ void RobotConnection::disconnect()
 {
     if (this->isConnected()) {
         this->rtde_control.disconnect();
+        this->rtde_recieve.disconnect();
     }
 }
 
 bool RobotConnection::isConnected()
 {
-    return this->rtde_control.isConnected();
+    return this->rtde_control.isConnected() && this->rtde_recieve.isConnected();
 }
 
 void RobotConnection::reconnect()
 {
     this->rtde_control.reconnect();
+    this->rtde_recieve.reconnect();
 }
 
 bool RobotConnection::setPayload(double mass, const std::vector<double> &cog)
