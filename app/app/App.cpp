@@ -67,7 +67,7 @@ void App::moveHome()
     this->waitForMoveRobot(this->homeJointPoses);
 }
 
-bool App::isImageProvided(cv::Mat image)
+bool App::isImageProvided(const cv::Mat &image)
 {
     return !(image.cols == 0 && image.rows == 0);
 }

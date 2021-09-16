@@ -35,7 +35,7 @@ private:
     // add member variable for target pos
 
     // Functions
-    bool isImageProvided(cv::Mat image);
+    bool isImageProvided(const cv::Mat &image);
     bool robotHasMovedToPos(const std::vector<double> &pos);
     void waitForMoveRobot(const std::vector<double> &pos);
     void setDefaultSpeedAcceleration();
