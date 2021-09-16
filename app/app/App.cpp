@@ -32,7 +32,8 @@ void App::findAndGrabObject(const cv::Mat &objectImg)
 
     // use jointPoseGetter to calculate and set jointposes, speed, acceleration for grabbing object
 
-    // simulate move (handle err outside App by maybe returning something from findAndGrabObject)
+    // simulate move (handle err by calculating new joint poses)
+    // calculate and simulate until a valid move is made (implement timeout and throw err)
 
     // TODO figure out best values for speed and acceleration.
     this->roboConn.moveL(this->jointPoses, this->speed, this->acceleration);
@@ -48,7 +49,8 @@ void App::throwObject(const std::vector<double> &goalPos)
 
     // use jointPoseGetter to get joint poses, speed and acceleration for throwing object
 
-    // simulate move (handle err outside App by maybe returning something from throwObject)
+    // simulate move (handle err by calculating new joint poses)
+    // calculate and simulate until a valid move is made (implement timeout and throw err)
 
     this->roboConn.moveL(this->jointPoses, this->speed, this->acceleration);
 
@@ -63,7 +65,8 @@ void App::throwObject(const std::vector<double> &goalPos)
 void App::moveHome()
 {
     this->setDefaultSpeedAcceleration();
-    // simulate move (handle err outside App by maybe returning something from moveHome)
+    // simulate move (handle err by calculating new joint poses)
+    // calculate and simulate until a valid move is made (implement timeout and throw err)
     this->roboConn.moveL(this->homeJointPoses, this->speed, this->acceleration);
     this->waitForMoveRobot(this->homeJointPoses);
 }
