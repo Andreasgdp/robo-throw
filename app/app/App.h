@@ -36,8 +36,8 @@ private:
 
     // Functions
     bool isImageProvided(cv::Mat image);
-    bool robotHasMovedToPos();
-    void waitForMoveRobot();
+    bool robotHasMovedToPos(std::vector<double> pos);
+    void waitForMoveRobot(std::vector<double> pos);
     void setDefaultSpeedAcceleration();
 
 

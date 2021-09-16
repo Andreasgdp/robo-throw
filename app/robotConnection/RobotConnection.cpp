@@ -93,4 +93,24 @@ void RobotConnection::setHomeJointPos(const std::vector<double> &newHomeJointPos
     homeJointPos = newHomeJointPos;
 }
 
+double RobotConnection::getDefaultSpeed() const
+{
+    return defaultSpeed;
+}
+
+void RobotConnection::setDefaultSpeed(double newDefaultSpeed)
+{
+    defaultSpeed = newDefaultSpeed;
+}
+
+double RobotConnection::getDefaultAcceleration() const
+{
+    return defaultAcceleration;
+}
+
+void RobotConnection::setDefaultAcceleration(double newDefaultAcceleration)
+{
+    defaultAcceleration = newDefaultAcceleration;
+}
+
 

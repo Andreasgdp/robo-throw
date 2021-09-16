@@ -46,12 +46,20 @@ public:
     const std::vector<double> &getHomeJointPos() const;
     void setHomeJointPos(const std::vector<double> &newHomeJointPos);
 
+    double getDefaultSpeed() const;
+    void setDefaultSpeed(double newDefaultSpeed);
+
+    double getDefaultAcceleration() const;
+    void setDefaultAcceleration(double newDefaultAcceleration);
+
 private:
     std::string IP;
     ur_rtde::RTDEControlInterface rtde_control;
     ur_rtde::RTDEReceiveInterface rtde_recieve;
     // TODO: find good values for home pos
     std::vector<double> homeJointPos = {0, 0, 0, 0, 0, 0};
+    double defaultSpeed = 1;
+    double defaultAcceleration = 1;
 };
 
 #endif // ROBOTCONNECTION_H
