@@ -41,7 +41,7 @@ void App::findAndGrabObject(const cv::Mat &objectImg)
     // use gripperHandling to grab object (wait for confirmed grip)
 }
 
-void App::throwObject(std::vector<double> goalPos)
+void App::throwObject(const std::vector<double> &goalPos)
 {
     this->moveHome();
 
@@ -72,13 +72,13 @@ bool App::isImageProvided(cv::Mat image)
     return !(image.cols == 0 && image.rows == 0);
 }
 
-bool App::robotHasMovedToPos(std::vector<double> pos)
+bool App::robotHasMovedToPos(const std::vector<double> &pos)
 {
     // TODO: make sure they are able to be compared
     return this->roboConn.getActualJointPoses() == pos;
 }
 
-void App::waitForMoveRobot(std::vector<double> pos)
+void App::waitForMoveRobot(const std::vector<double> &pos)
 {
     while (!this->robotHasMovedToPos(pos)){
         // Implement a timeout feature. Throw error if timeout.

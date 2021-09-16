@@ -12,7 +12,7 @@ public:
     App(std::string IP);
     void initializeApp(const cv::Mat &calibrationImg = cv::Mat());
     void findAndGrabObject(const cv::Mat &objectImg = cv::Mat());
-    void throwObject(std::vector<double> goalPos);
+    void throwObject(const std::vector<double> &goalPos);
     void moveHome();
 
 
@@ -36,8 +36,8 @@ private:
 
     // Functions
     bool isImageProvided(cv::Mat image);
-    bool robotHasMovedToPos(std::vector<double> pos);
-    void waitForMoveRobot(std::vector<double> pos);
+    bool robotHasMovedToPos(const std::vector<double> &pos);
+    void waitForMoveRobot(const std::vector<double> &pos);
     void setDefaultSpeedAcceleration();
 
 
