@@ -38,6 +38,8 @@ body:
       label: Steps to reproduce
       description: What steps do you take to reproduce the bug?
       placeholder: Go to the website, click on the button, and then click on the button again...
+      value: |
+        1. 
     validations:
       required: true
   - type: textarea
