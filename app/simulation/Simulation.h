@@ -2,16 +2,22 @@
 #define SIMULATION_H
 
 #include "opencv2/opencv.hpp"
+#include "../robotConnection/RobotConnection.h"
 
+
+/*
+    @brief Class to take possible commands to robot and simulate them
+    to ensure they are possible before actually sending them to a
+    real robot.
+*/
 class Simulation
 {
 public:
-    Simulation();
-    cv::Mat loadImage(std::string imageFileName, std::string imageFileType);
-    void showImage(cv::Mat image, std::string windowName = "Window");
+    Simulation(std::string IP);
+
 
 private:
-    // TODO: Add member varible for main
+    RobotConnection roboConn;
 };
 
 #endif // SIMULATION_H

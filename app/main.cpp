@@ -8,10 +8,8 @@ int main()
 {
     // TODO: use IP of robot.
     App app("130.226.87.132");
-    app.initializeApp();
+    app.calibrateCam();
     app.findAndGrabObject();
-
-    // TODO: define goalPos
     std::vector<double> goalPos;
     app.throwObject(goalPos);
 

@@ -1,26 +1,37 @@
 #include "App.h"
 
-App::App(std::string IP, const cv::Mat &calibrationImg) : roboConn(IP)
+App::App(std::string IP, bool localEnv) : roboConn(IP), simulator("127.0.0.1")
 {
-    this->IP = IP;
+    this->localEnv = localEnv;
+    // Sets the ip of the "robot" to the ip provided or to 127.0.0.1 if in local environment
+    this->IP = (!this->localEnv) ? IP : "127.0.0.1";
+
     this->setDefaultPosMovement();
 
     if (!this->roboConn.isConnected()) throw "Connection could not be established with ip: " + this->IP;
 
-    if (!this->isImageProvided(calibrationImg)) {
+    this->moveHome();
+}
+
+void App::calibrateCam() {
+    cv::Mat calibrationImg;
+
+    if (this->localEnv) {
+        calibrationImg = this->getLocalCalibrationImg();
+    } else {
         // Use imageProcessing to get image from camera
     }
 
     // use imageProcessing to calibrate camera
-
-    // setup simulator
-
-    this->moveHome();
 }
 
-void App::findAndGrabObject(const cv::Mat &objectImg)
+void App::findAndGrabObject()
 {
-    if (!this->isImageProvided(objectImg)) {
+    cv::Mat objectImg;
+
+    if (this->localEnv) {
+        objectImg = this->getLocalObjectImg();
+    } else {
         // Use imageProcessing to get image from camera
     }
 
@@ -67,12 +78,7 @@ void App::moveHome()
     this->waitForMoveRobot(this->homeJointPoses);
 }
 
-bool App::isImageProvided(const cv::Mat &image)
-{
-    return !(image.cols == 0 && image.rows == 0);
-}
-
-bool App::robotHasMovedToPos(const std::vector<double> &pos)
+bool App::hasMovedToPos(const std::vector<double> &pos)
 {
     // TODO: make sure they are able to be compared
     return this->roboConn.getActualJointPoses() == pos;
@@ -80,7 +86,7 @@ bool App::robotHasMovedToPos(const std::vector<double> &pos)
 
 void App::waitForMoveRobot(const std::vector<double> &pos)
 {
-    while (!this->robotHasMovedToPos(pos)){
+    while (!this->hasMovedToPos(pos)){
         // Implement a timeout feature. Throw error if timeout.
     }
 }
@@ -90,4 +96,20 @@ void App::setDefaultPosMovement()
     this->homeJointPoses = this->roboConn.getHomeJointPos();
     this->speed = this->roboConn.getDefaultSpeed();
     this->acceleration = this->roboConn.getDefaultAcceleration();
+}
+
+cv::Mat App::getLocalCalibrationImg()
+{
+    // TODO: select a random local calibration image
+    std::string imageFileName = "";
+    std::string imageFileType = "";
+    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
+}
+
+cv::Mat App::getLocalObjectImg()
+{
+    // TODO: select a random local object image
+    std::string imageFileName = "";
+    std::string imageFileType = "";
+    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
 }
