@@ -28,14 +28,14 @@ body:
       label: Sub Tasks
       description: Sub tasks that is contained in this Epic
       value: |
-        - [ ] 
+        - [ ]
     validations:
       required: true
   - type: textarea
     id: comments-questions
     attributes:
       label: Comments / questions
-      description: Any comments or questions relating the story.
+      description: Any comments or questions relating the epic.
       placeholder: Should we devide this into sub-tasks?
   - type: textarea
     id: dor-dod
@@ -51,7 +51,6 @@ body:
             ```
             - Acceptance criteria written and reviewed by QA, PM and SE
             - Behaviour scenarios written
-            - Signed off UX design
             - Estimated and appropriately scoped
             ```
 
@@ -65,7 +64,6 @@ body:
             ```
             - Test complete
                 - Merged to master
-                - Unit tests on all new code (80% coverage)
                 - Integration tests for endpoints / web sockets
                 - End-to-end or integration tests verifying acceptance criteria
             - Code complete
@@ -76,7 +74,7 @@ body:
             - Verified by QA
                 - Functionally manually verified on a setup like the actual setup
                 - QA verifies test coverage aligns with master test plan
-            - Verified by UX and product owner / verified by the team
+            - Verified by product owner / verified by the team
             - Documentation of tech debt
             - Persistent technical documentation updated / written
                 - Ready is updated / written
