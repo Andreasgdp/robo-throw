@@ -29,7 +29,7 @@ body:
       description: The criteria for which the story will be accepted in a Pull Request.
       placeholder: The implementation should have ...
       value: |
-        - [ ] 
+        - [ ]
     validations:
       required: true
   - type: textarea
@@ -52,7 +52,6 @@ body:
             ```
             - Acceptance criteria written and reviewed by QA, PM and SE
             - Behaviour scenarios written
-            - Signed off UX design
             - Estimated and appropriately scoped
             ```
 
@@ -66,7 +65,6 @@ body:
             ```
             - Test complete
                 - Merged to master
-                - Unit tests on all new code (80% coverage)
                 - Integration tests for endpoints / web sockets
                 - End-to-end or integration tests verifying acceptance criteria
             - Code complete
@@ -77,7 +75,7 @@ body:
             - Verified by QA
                 - Functionally manually verified on a setup like the actual setup
                 - QA verifies test coverage aligns with master test plan
-            - Verified by UX and product owner / verified by the team
+            - Verified by product owner / verified by the team
             - Documentation of tech debt
             - Persistent technical documentation updated / written
                 - Ready is updated / written
