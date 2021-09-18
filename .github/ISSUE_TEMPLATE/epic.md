@@ -12,8 +12,11 @@ labels: 'Epic'
 <!-- MAJOR -->
 <!-- MINOR -->
 
+
+
 ### Description
 <!-- Description of the Epic -->
+
 
 
 ### Sub Tasks
@@ -22,8 +25,10 @@ labels: 'Epic'
 - [ ] 
 
 
+
 ### Comments / questions
 <!-- Any comments or questions relating the epic. -->
+
 
 
 ### Definition of ready/done (DOR/DOD) [DONT CHANGE THE CONTENT]

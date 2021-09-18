@@ -17,11 +17,16 @@ labels: 'MINOR'
 - [ ] 
 
 
+
 ### Comments / questions
 <!-- Any comments or questions relating the feature. -->
 
 
+
 ### Definition of ready/done (DOR/DOD) [DONT CHANGE THE CONTENT]
+
+
+
 
 #### Definition of ready
 - [ ] DOR
