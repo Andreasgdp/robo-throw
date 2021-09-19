@@ -31,7 +31,7 @@ void ImageProcessing::loadImage() {
 cv::Mat ImageProcessing::loadLocalImage(std::string imageFileName, std::string imageFileType) {
     // Read the image file given the file path
     // TODO: Change cv::IMREAD_COLOR if needed for the project
-    cv::Mat image = cv::imread("../app/simulation/images/" + imageFileName + "." + imageFileType, cv::IMREAD_COLOR);
+    cv::Mat image = cv::imread("../app/imageProcessing/images/" + imageFileName + "." + imageFileType, cv::IMREAD_COLOR);
 
     // Error Handling
     if (image.empty()) throw "Image File Not Found";
