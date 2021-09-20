@@ -16,6 +16,15 @@ sudo apt install librtde librtde-dev
 sudo apt-get install libboost-all-dev
 ```
 
+## Robotics Library
+Install the following in your ubuntu system
+
+```
+sudo apt-add-repository ppa:roblib/ppa
+sudo apt-get update
+sudo apt-get install librl librl-demos librl-examples librl-dev 
+```
+
 ## URSim
 Carefully follow the following steps to install URSim.
 
