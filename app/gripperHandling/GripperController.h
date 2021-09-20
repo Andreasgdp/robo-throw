@@ -13,11 +13,6 @@ public:
 
 private:
     rl::hal::WeissWsg50 gripper;
-    std::string address;
-    unsigned short int port;
-    float acceleration;
-    float forceLimit;
-    unsigned int period;
 };
 
 #endif // GRIPPERCONTROLLER_H
