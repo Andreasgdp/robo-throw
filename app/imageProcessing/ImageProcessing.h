@@ -15,24 +15,15 @@ public:
     void calibrate(cv::Mat frame);
     std::vector<cv::Mat> loadImagePC();
     void getBoardCorners(std::vector<cv::Mat> images, std::vector<std::vector<cv::Point2f>>& foundCorners);
+    void showImage(cv::Mat image, std::string windowName = "Window");
     void run();
 };
 
 #endif // IMAGEPROCESSING_H
 
-#ifndef IMAGEPROCESSING_H
-#define IMAGEPROCESSING_H
-#include "opencv2/opencv.hpp"
-#include "iostream"
 
 
-class ImageProcessing
-{
-public:
-    ImageProcessing();
-    void loadImage();
-    cv::Mat loadLocalImage(std::string imageFileName, std::string imageFileType);
-    void showImage(cv::Mat image, std::string windowName = "Window");
-};
 
-#endif // IMAGEPROCESSING_H
+
+
+
