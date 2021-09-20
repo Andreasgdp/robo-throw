@@ -33,7 +33,6 @@ public:
     */
     void moveHome();
 
-
 private:
     // Member variables
     //TODO: when all member variables are created, create getters and setters (automatic)
@@ -62,8 +61,6 @@ private:
     void setDefaultPosMovement();
     cv::Mat getLocalCalibrationImg();
     cv::Mat getLocalObjectImg();
-
-
 };
 
 #endif // APP_H

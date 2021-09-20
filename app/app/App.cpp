@@ -8,17 +8,22 @@ App::App(std::string IP, bool localEnv) : roboConn(IP), simulator("127.0.0.1")
 
     this->setDefaultPosMovement();
 
-    if (!this->roboConn.isConnected()) throw "Connection could not be established with ip: " + this->IP;
+    if (!this->roboConn.isConnected())
+        throw "Connection could not be established with ip: " + this->IP;
 
     this->moveHome();
 }
 
-void App::calibrateCam() {
+void App::calibrateCam()
+{
     cv::Mat calibrationImg;
 
-    if (this->localEnv) {
+    if (this->localEnv)
+    {
         calibrationImg = this->getLocalCalibrationImg();
-    } else {
+    }
+    else
+    {
         // Use imageProcessing to get image from camera
     }
 
@@ -29,9 +34,12 @@ void App::findAndGrabObject()
 {
     cv::Mat objectImg;
 
-    if (this->localEnv) {
+    if (this->localEnv)
+    {
         objectImg = this->getLocalObjectImg();
-    } else {
+    }
+    else
+    {
         // Use imageProcessing to get image from camera
     }
 
@@ -86,7 +94,8 @@ bool App::hasMovedToPos(const std::vector<double> &pos)
 
 void App::waitForMoveRobot(const std::vector<double> &pos)
 {
-    while (!this->hasMovedToPos(pos)){
+    while (!this->hasMovedToPos(pos))
+    {
         // Implement a timeout feature. Throw error if timeout.
     }
 }
