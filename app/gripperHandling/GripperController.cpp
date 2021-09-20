@@ -3,5 +3,4 @@
 
 GripperController::GripperController()
 {
-    this->gripper.close();
 }

@@ -6,6 +6,7 @@
 #include "../imageProcessing/ImageProcessing.h"
 #include "../robotConnection/RobotConnection.h"
 #include "../simulation/Simulation.h"
+#include "../gripperHandling/GripperController.h"
 
 class App
 {
@@ -50,9 +51,9 @@ private:
     Simulation simulator;
     std::vector<double> goalPos;
     std::vector<double> objectPos;
+    GripperController gripper;
 
     // add member variable for jointPoseGetter
-    // add member variable for gripperHandling
     // add member variable for api
 
     // Functions
