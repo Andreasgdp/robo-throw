@@ -46,20 +46,14 @@ void ImageProcessing::showImage(cv::Mat image, std::string windowName) {
     cv::waitKey(0);
 }
 
-
-
-
-
-
-
-std::vector<cv::Mat> ImageProcessing::loadImagePC(){
+cv::Mat ImageProcessing::loadImagePC(){
     //cv::namedWindow("Output",1);
-    std::vector<cv::Mat> pics;
-            cv::Mat pic = cv::imread("/home/robot/Desktop/RoboTrow/robo-throw/app/imageProcessing/table.jpg",-1);
-    pics.push_back(pic);
+    //std::vector<cv::Mat> pics;
+            cv::Mat pic = cv::imread("../app/imageProcessing/images/table.jpg",-1);
+    //pics.push_back(pic);
     //cv::imshow("output",pic);
     //cv::waitKey(0);
-    return pics;
+    return pic;
 }
 
 void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<std::vector<cv::Point2f> > &foundCorners){
@@ -98,10 +92,13 @@ void ImageProcessing::calibrate(cv::Mat frame)
 
 void ImageProcessing::run(){
     //tmp function to run shit
+    std::vector<cv::Mat> pitchers;
     std::vector<std::vector<cv::Point2f>> corners, rejektedCorners;
     ImageProcessing imp;
 
-    imp.getBoardCorners(imp.loadImagePC(),corners);
+    pitchers.push_back(imp.loadImagePC());
+
+    imp.getBoardCorners(pitchers,corners);
 }
 
 

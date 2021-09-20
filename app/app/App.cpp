@@ -112,7 +112,7 @@ cv::Mat App::getLocalCalibrationImg()
     // TODO: select a random local calibration image
     std::string imageFileName = "";
     std::string imageFileType = "";
-    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
+    return this->imgProcessor.loadImagePC();
 }
 
 cv::Mat App::getLocalObjectImg()
@@ -120,5 +120,5 @@ cv::Mat App::getLocalObjectImg()
     // TODO: select a random local object image
     std::string imageFileName = "";
     std::string imageFileType = "";
-    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
+    return this->imgProcessor.loadImagePC();
 }
