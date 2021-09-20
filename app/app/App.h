@@ -11,7 +11,7 @@
 class App
 {
 public:
-    App(std::string IP, bool localEnv = false);
+    App(std::string IP, std::string gripperIP = "192.168.1.20",  bool localEnv = false);
 
     /*
         @brief Calibrates the camera based on an image of a calibration board.
