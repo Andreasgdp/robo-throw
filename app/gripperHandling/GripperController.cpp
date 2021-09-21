@@ -1,7 +1,7 @@
 #include "GripperController.h"
 
 GripperController::GripperController(
-        const ::std::string &address,
+        const std::string &address,
         const unsigned short int &port,
         const float &acceleration,
         const float &forceLimit,
