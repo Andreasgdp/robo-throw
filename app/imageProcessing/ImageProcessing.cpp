@@ -2,6 +2,8 @@
 
 ImageProcessing::ImageProcessing(){}
 
+const cv::Size BoardSize(6,9);
+
 void ImageProcessing::loadImage() {
     // open the first webcam plugged in the computer
     cv::VideoCapture camera(0);
@@ -46,12 +48,12 @@ void ImageProcessing::showImage(cv::Mat image, std::string windowName) {
     cv::waitKey(0);
 }
 
-cv::Mat ImageProcessing::loadImagePC(){
+cv::Mat ImageProcessing::loadImagePC(std::string number){
     //cv::namedWindow("Output",1);
     //std::vector<cv::Mat> pics;
-            cv::Mat pic = cv::imread("../app/imageProcessing/images/table.jpg",-1);
+            cv::Mat pic = cv::imread("../app/imageProcessing/images/image-00"+ number +".jpg",-1);
     //pics.push_back(pic);
-    //cv::imshow("output",pic);
+    //cv::imshow("output",pic);˝
     //cv::waitKey(0);
     return pic;
 }
@@ -62,7 +64,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<s
         //goes through vector of images (pointers to)
         std::vector<cv::Point2f> pointBuf;
         //vector storing checkerboard corners
-        bool found = cv::findChessboardCorners(*iter,cv::Size(17,24),pointBuf,cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE );
+        bool found = cv::findChessboardCorners(*iter,BoardSize,pointBuf,cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE );
         //finds board corners using inbuild opencv function
         //Size(17,24) refers to the number of interctions between squares on the checkerboard, vertical/horizontal
         //CALIB_CB_ADAPTIVE_THRESH - converts image to black and white
@@ -70,7 +72,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<s
         if(found){
             //if any corners are found, this will save and show them
             foundCorners.push_back(pointBuf);
-            cv::drawChessboardCorners(*iter,cv::Size(17,24),pointBuf,found);
+            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
             cv::imshow("looking for corners",*iter);
             cv::waitKey(0);
         }
@@ -80,7 +82,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<s
 void ImageProcessing::calibrate(cv::Mat frame)
 {
     const float squareEdgeLength = 0.02; //meters - Stores the side lengths from calibration checker board - 0.02 = placeholder
-    const cv::Size checkerboardDimentions = cv::Size(17,24);
+    const cv::Size checkerboardDimentions = BoardSize;
     //17x24
 
 
@@ -95,8 +97,10 @@ void ImageProcessing::run(){
     std::vector<cv::Mat> pitchers;
     std::vector<std::vector<cv::Point2f>> corners, rejektedCorners;
     ImageProcessing imp;
+    for(int i =1; i<6;i++){
+        pitchers.push_back(imp.loadImagePC(std::to_string(i)));
+    }
 
-    pitchers.push_back(imp.loadImagePC());
 
     imp.getBoardCorners(pitchers,corners);
 }

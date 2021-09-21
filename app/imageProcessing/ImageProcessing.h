@@ -13,7 +13,7 @@ public:
     ImageProcessing();
     void loadImage();
     void calibrate(cv::Mat frame);
-    cv::Mat loadImagePC();
+    cv::Mat loadImagePC(std::string numbner);
     void getBoardCorners(std::vector<cv::Mat> images, std::vector<std::vector<cv::Point2f>>& foundCorners);
     void showImage(cv::Mat image, std::string windowName = "Window");
     void run();
