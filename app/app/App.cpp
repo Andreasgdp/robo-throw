@@ -11,23 +11,14 @@ App::App(std::string IP, bool localEnv) : roboConn(IP), simulator("127.0.0.1")
     if (!this->roboConn.isConnected())
         throw "Connection could not be established with ip: " + this->IP;
 
+    this->calibrateCam();
+
     this->moveHome();
 }
 
 void App::calibrateCam()
 {
-    cv::Mat calibrationImg;
-
-    if (this->localEnv)
-    {
-        calibrationImg = this->getLocalCalibrationImg();
-    }
-    else
-    {
-        // Use imageProcessing to get image from camera
-    }
-
-    // use imageProcessing to calibrate camera
+    this->imgProcessor.calibrate();
 }
 
 void App::findAndGrabObject()
