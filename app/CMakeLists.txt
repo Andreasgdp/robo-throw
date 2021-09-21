@@ -11,7 +11,12 @@ File(GLOB_RECURSE HEADER_FILES */*.h)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+#Robotics Library (gripper). HAL is the subpart of the library where WeissWsg50 is located.
+find_package(RL COMPONENTS HAL REQUIRED)
+
 # UR-RTDE
 find_package(ur_rtde REQUIRED)
 add_executable(app main.cpp ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS})
+
+#Link libraries
+target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${RL_LIBRARIES})

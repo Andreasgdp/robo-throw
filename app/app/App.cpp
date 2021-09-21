@@ -1,10 +1,10 @@
 #include "App.h"
 
-App::App(std::string IP, bool localEnv) : roboConn(IP), simulator("127.0.0.1")
+App::App(std::string robotIP, std::string gripperIP, bool localEnv) : roboConn(robotIP), simulator("127.0.0.1"), gripper(gripperIP)
 {
     this->localEnv = localEnv;
     // Sets the ip of the "robot" to the ip provided or to 127.0.0.1 if in local environment
-    this->IP = (!this->localEnv) ? IP : "127.0.0.1";
+    this->IP = (!this->localEnv) ? robotIP : "127.0.0.1";
 
     this->setDefaultPosMovement();
 
