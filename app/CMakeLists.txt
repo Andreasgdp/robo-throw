@@ -11,15 +11,10 @@ File(GLOB_RECURSE HEADER_FILES */*.h)
 # Opencv
 find_package(OpenCV REQUIRED)
 
-#include_directories(${OpenCV_INCLUDE_DIRS})
-
 # pylon
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
 find_package(Pylon)
 include_directories(${Pylon_INCLUDE_DIRS})
-
-
-
 
 # UR-RTDE
 find_package(ur_rtde REQUIRED)

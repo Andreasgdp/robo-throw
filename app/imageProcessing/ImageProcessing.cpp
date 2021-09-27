@@ -113,12 +113,9 @@ void ImageProcessing::run(){
     imp.getBoardCorners(pitchers,corners);
 }
 
-void ImageProcessing::pylonPic(){
+std::vector<cv::Mat> ImageProcessing::pylonPic(){
     int myExposure = 30000;
     std::vector<cv::Mat> imgVector;
-
-    // The exit code of the sample application.
-    int exitCode = 0;
 
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
@@ -151,7 +148,6 @@ void ImageProcessing::pylonPic(){
 
         // Create an OpenCV image.
         cv::Mat openCvImage;
-
 
         // Set exposure to manual
         GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
@@ -186,9 +182,7 @@ void ImageProcessing::pylonPic(){
         // This smart pointer will receive the grab result data.
         Pylon::CGrabResultPtr ptrGrabResult;
 
-        // image grabbing loop
-        int frame = 1;
-        while ( camera.IsGrabbing() && imgVector.size()<5)
+        while ( camera.IsGrabbing() && imgVector.size()<31)
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -196,21 +190,11 @@ void ImageProcessing::pylonPic(){
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             {
-                // Access the image data.
-                //cout << "SizeX: " << ptrGrabResult->GetWidth() << endl;
-                //cout << "SizeY: " << ptrGrabResult->GetHeight() << endl;
-
                 // Convert the grabbed buffer to a pylon image.
                 formatConverter.Convert(pylonImage, ptrGrabResult);
 
                 // Create an OpenCV image from a pylon image.
                 openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
-
-
-
-                //////////////////////////////////////////////////////
-                //////////// Here your code begins ///////////////////
-                //////////////////////////////////////////////////////
 
                 // Create an OpenCV display window.
                 cv::namedWindow( "myWindow", cv::WINDOW_NORMAL); // other options: CV_AUTOSIZE, CV_FREERATIO
@@ -218,30 +202,13 @@ void ImageProcessing::pylonPic(){
                 // Display the current image in the OpenCV display window.
                 cv::imshow( "myWindow", openCvImage);
 
-                // Detect key press and quit if 'q' is pressed
-                int keyPressed = cv::waitKey(1);
-
-                if(keyPressed == 'p'){
+                if(cv::waitKey(1) == 'p'){              // take picture
                     imgVector.push_back(openCvImage);
-                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
-                }
-
-                if(keyPressed == 'q'){ //quit
-                    std::cout << "Shutting down camera..." << std::endl;
+                    cv::imshow( "myWindow0", openCvImage);
+                } else if(cv::waitKey(1) == 'q'){       //quit
                     camera.Close();
-                    std::cout << "Camera successfully closed." << std::endl;
                     break;
                 }
-
-                ////////////////////////////////////////////////////
-                //////////// Here your code ends ///////////////////
-                ////////////////////////////////////////////////////
-
-
-
-
-                frame++;
-
             }
             else
             {
@@ -255,10 +222,9 @@ void ImageProcessing::pylonPic(){
         // Error handling.
         std::cerr << "An exception occurred." << std::endl
         << e.GetDescription() << std::endl;
-        exitCode = 1;
     }
 
-
+    return imgVector;
 
 }
 
