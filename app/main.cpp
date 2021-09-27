@@ -8,8 +8,10 @@ int main()
 {
 
     ImageProcessing imageprocessing;
-    imageprocessing.run();
-    //imageprocessing.loadImagePC();
+    imageprocessing.pylonPic();
+    //imageprocessing.run();
+
+    //imageprocessing.showImage(imageprocessing.loadImage(),"test");
     //imageprocessing.calibrate(imageprocessing.loadImagePC());
 //    RobotConnection conn("127.0.0.1");
 //    std::vector<double> test = conn.getActualJointPoses();
