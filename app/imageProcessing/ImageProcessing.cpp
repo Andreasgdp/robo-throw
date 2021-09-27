@@ -115,6 +115,7 @@ void ImageProcessing::run(){
 
 void ImageProcessing::pylonPic(){
     int myExposure = 30000;
+    std::vector<cv::Mat> imgVector;
 
     // The exit code of the sample application.
     int exitCode = 0;
@@ -187,7 +188,7 @@ void ImageProcessing::pylonPic(){
 
         // image grabbing loop
         int frame = 1;
-        while ( camera.IsGrabbing())
+        while ( camera.IsGrabbing() && imgVector.size()<5)
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -219,6 +220,12 @@ void ImageProcessing::pylonPic(){
 
                 // Detect key press and quit if 'q' is pressed
                 int keyPressed = cv::waitKey(1);
+
+                if(keyPressed == 'p'){
+                    imgVector.push_back(openCvImage);
+                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
+                }
+
                 if(keyPressed == 'q'){ //quit
                     std::cout << "Shutting down camera..." << std::endl;
                     camera.Close();
