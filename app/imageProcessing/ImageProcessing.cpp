@@ -1,9 +1,6 @@
 #include "ImageProcessing.h"
 
-
 ImageProcessing::ImageProcessing(){}
-
-const cv::Size BoardSize(6,9);
 
 cv::Mat ImageProcessing::loadImage() {
     // open the first webcam plugged in the computer
@@ -50,17 +47,20 @@ void ImageProcessing::showImage(cv::Mat image, std::string windowName) {
     cv::waitKey(0);
 }
 
-cv::Mat ImageProcessing::loadImagePC(std::string number){
-    //cv::namedWindow("Output",1);
-    //std::vector<cv::Mat> pics;
-            cv::Mat pic = cv::imread("../app/imageProcessing/images/image-00"+ number +".jpg",-1);
-    //pics.push_back(pic);
-    //cv::imshow("output",pic);˝
-    //cv::waitKey(0);
-    return pic;
+std::vector<cv::Mat> ImageProcessing::loadImagePC(){
+    std::vector<cv::Mat> temp;
+
+    for (unsigned i = 1; i < 6; i++) {
+        cv::Mat pic = cv::imread("../app/imageProcessing/images/image-00"+ std::to_string(i) +".jpg",-1);
+        temp.push_back(pic);
+    }
+
+
+    return temp;
 }
 
-void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<std::vector<cv::Point2f> > &foundCorners){
+void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
+    std::vector<std::vector<cv::Point2f>> corners, rejectedCorners;
 
     for(std::vector<cv::Mat>::iterator iter = images.begin(); iter != images.end(); iter++){
         //goes through vector of images (pointers to)
@@ -73,7 +73,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<s
         //CALIB_CB_NORMALIZE_IMAGE Not sure what it dose - opencv themselves says "Normalize the image gamma with equalizeHist before applying fixed or adaptive thresholding."
         if(found){
             //if any corners are found, this will save and show them
-            foundCorners.push_back(pointBuf);
+            corners.push_back(pointBuf);
             cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
             cv::imshow("looking for corners",*iter);
             cv::waitKey(0);
@@ -83,34 +83,9 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images, std::vector<s
 
 void ImageProcessing::calibrate()
 {
-    const float squareEdgeLength = 0.02; //meters - Stores the side lengths from calibration checker board - 0.02 = placeholder
-    const cv::Size checkerboardDimentions = BoardSize;
-    //17x24
-
-    //tmp function to run shit
-    std::vector<cv::Mat> pitchers;
-    std::vector<std::vector<cv::Point2f>> corners, rejektedCorners;
-    ImageProcessing imp;
-    for(int i =1; i<6;i++){
-        pitchers.push_back(imp.loadImagePC(std::to_string(i)));
-    }
+    this->getBoardCorners(this->loadImagePC());
 
 
-    imp.getBoardCorners(pitchers,corners);
-
-}
-
-void ImageProcessing::run(){
-    //tmp function to run shit
-    std::vector<cv::Mat> pitchers;
-    std::vector<std::vector<cv::Point2f>> corners, rejektedCorners;
-    ImageProcessing imp;
-    for(int i =1; i<6;i++){
-        pitchers.push_back(imp.loadImagePC(std::to_string(i)));
-    }
-
-
-    imp.getBoardCorners(pitchers,corners);
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){

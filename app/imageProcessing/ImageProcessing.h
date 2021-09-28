@@ -14,11 +14,12 @@ public:
     ImageProcessing();
     cv::Mat loadImage();
     void calibrate();
-    cv::Mat loadImagePC(std::string numbner);
-    void getBoardCorners(std::vector<cv::Mat> images, std::vector<std::vector<cv::Point2f>>& foundCorners);
+    std::vector<cv::Mat> loadImagePC();
+    void getBoardCorners(std::vector<cv::Mat> images);
     void showImage(cv::Mat image, std::string windowName = "Window");
-    void run();
     std::vector<cv::Mat> pylonPic();
+private:
+    const cv::Size BoardSize{6,9};
 };
 
 #endif // IMAGEPROCESSING_H

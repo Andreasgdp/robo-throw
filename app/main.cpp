@@ -8,9 +8,8 @@ int main()
 {
 
     ImageProcessing imageprocessing;
-    imageprocessing.pylonPic();
+    imageprocessing.calibrate();
     //imageprocessing.run();
-
     //imageprocessing.showImage(imageprocessing.loadImage(),"test");
     //imageprocessing.calibrate(imageprocessing.loadImagePC());
 //    RobotConnection conn("127.0.0.1");
