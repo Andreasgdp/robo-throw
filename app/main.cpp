@@ -6,12 +6,24 @@ using namespace std;
 
 int main()
 {
-    // TODO: use IP of robot.
-    App app("130.226.87.132");
-    app.calibrateCam();
-    app.findAndGrabObject();
-    std::vector<double> goalPos;
-    app.throwObject(goalPos);
+    cout << "hello!" << endl;
+//    // TODO: use IP of robot.
+//    App app("130.226.87.132");
+//    app.calibrateCam();
+//    app.findAndGrabObject();
+//    std::vector<double> goalPos;
+//    app.throwObject(goalPos);
+
+    RobotConnection conn("192.168.100.49");
+    vector<double> test = conn.getActualJointPoses();
+
+    for (auto& elm: test) {
+        cout << elm  << ", ";
+    }
+
+    vector<double> jointPoses = {1.74947, -1.3914, 1.09235, -2.86513, -1.58442, 0.0157585};
+
+    conn.moveJ(jointPoses);
 
     return 0;
 }
