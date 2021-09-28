@@ -8,47 +8,79 @@ class GripperController
 public:
     //TODO: Go over the default values and make them relevant to this project.
     GripperController(
-            const std::string &address="192.168.1.20",
+            const std::string &address="192.168.100.10",
             const unsigned short int &port=1000,
             const float &acceleration=3.0f,
-            const float &forceLimit=40.0f,
+            const float &forceLimit=10.0f,
             const unsigned int &period=10);
+
+    ~GripperController();
+
+    /*
+     * @brief Conncects to the gripper
+     */
+    void connect();
+
+    /*
+     * @brief Disconnect from the gripper
+     */
+    void disconnect();
+
+    /*
+     * @brief Close the gripper and stop on block
+     */
     void close();
+
     /*
-     * @param Closes the gripper
+     * @brief Opens the gripper
+     * @param The speed the gripper opens with
      */
-    void open();
+    void open(const float &speed = 0.05f);
+
     /*
-     * @param Opens the gripper
+     * @brief Move gripper to home posistion, fully opened
      */
-    rl::hal::WeissWsg50::GraspingState getGraspingState();
+    void moveHome();
+
     /*
-     * @param Gets the graspingstate
-     * @return Graspingstate
+     * @brief Gets the state of the gripper
+     * @return the name of the grasping state
+     */
+    std::string getGraspingState();
+
+    /*
+     * @brief Sets the acceleration
      */
     void setAcceleration(const float &acceleration);
-    /*
-     * @param Sets the acceleration
-     */
-    float getAcceleration();
+
     /*
      * @return Acceleration of the gripper
      */
-    void setForceLimit(const float &force);
+    float getAcceleration();
+
     /*
-     * @param Sets the forcelimit of the gripper
+     * @brief Sets the forcelimit of the gripper
      */
-    float getForceLimit();
+    void setForceLimit(const float &force);
+
     /*
      * @return Forcelimit of the gripper
      */
-    void setSoftLimits(const float &limitMinus, const float &limitPlus);
+    float getForceLimit();
+
     /*
-     * @param Sets the softlimits of the gripper
+     * @brief Sets the softlimits of the gripper
      */
+    void setSoftLimits(const float &limitMinus, const float &limitPlus);
 
 private:
-    rl::hal::WeissWsg50 gripper;
+    rl::hal::WeissWsg50 _gripper;
+
+    /*
+     * @brief Gets the graspingstate
+     * @return Graspingstate as integer
+     */
+    rl::hal::WeissWsg50::GraspingState _getGraspingState();
 };
 
 #endif // GRIPPERCONTROLLER_H
