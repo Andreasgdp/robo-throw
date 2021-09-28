@@ -5,13 +5,15 @@
 
 using namespace ur_rtde;
 
-RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP) {
+RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
+{
 }
 
-void RobotConnection::moveL(const std::vector<double> &jointPoses, double speed, double acceleration)
+void RobotConnection::moveJ(const std::vector<double> &jointPoses, double speed, double acceleration)
 {
-    if (jointPoses.size() != 6) throw "jointPoses Vector must be of size 6";
-    this->rtde_control.moveL(jointPoses, speed, acceleration);
+    if (jointPoses.size() != 6)
+        throw "jointPoses Vector must be of size 6";
+    this->rtde_control.moveJ(jointPoses, speed, acceleration);
 }
 
 std::vector<double> RobotConnection::getActualJointPoses()
@@ -21,7 +23,8 @@ std::vector<double> RobotConnection::getActualJointPoses()
 
 void RobotConnection::disconnect()
 {
-    if (this->isConnected()) {
+    if (this->isConnected())
+    {
         this->rtde_control.disconnect();
         this->rtde_recieve.disconnect();
     }
@@ -65,12 +68,12 @@ bool RobotConnection::isJointsWithinSafetyLimits(const std::vector<double> &q)
 
 std::vector<double> RobotConnection::getTCPOffset()
 {
-    return this->getTCPOffset();
+    return this->rtde_control.getTCPOffset();
 }
 
 std::vector<double> RobotConnection::getForwardKinematics(const std::vector<double> &q, const std::vector<double> &tcp_offset)
 {
-    return this->getForwardKinematics(q, tcp_offset);
+    return this->rtde_control.getForwardKinematics(q, tcp_offset);
 }
 
 std::vector<double> RobotConnection::getInverseKinematics(const std::vector<double> &x, const std::vector<double> &qnear, double max_position_error, double max_orientation_error)
@@ -113,4 +116,7 @@ void RobotConnection::setDefaultAcceleration(double newDefaultAcceleration)
     defaultAcceleration = newDefaultAcceleration;
 }
 
-
+RobotConnection::~RobotConnection()
+{
+    this->disconnect();
+}

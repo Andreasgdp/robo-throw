@@ -51,7 +51,7 @@ void App::findAndGrabObject()
     // calculate and simulate until a valid move is made (implement timeout and throw err)
 
     // TODO figure out best values for speed and acceleration.
-    this->roboConn.moveL(this->jointPoses, this->speed, this->acceleration);
+    this->roboConn.moveJ(this->jointPoses, this->speed, this->acceleration);
 
     this->waitForMoveRobot(this->jointPoses);
 
@@ -67,7 +67,7 @@ void App::throwObject(const std::vector<double> &goalPos)
     // simulate move (handle err by calculating new joint poses)
     // calculate and simulate until a valid move is made (implement timeout and throw err)
 
-    this->roboConn.moveL(this->jointPoses, this->speed, this->acceleration);
+    this->roboConn.moveJ(this->jointPoses, this->speed, this->acceleration);
 
     // This wait may need to be more specific for the throw in order to time the release of object.
     this->waitForMoveRobot(this->jointPoses);
@@ -82,7 +82,7 @@ void App::moveHome()
     this->setDefaultPosMovement();
     // simulate move (handle err by calculating new joint poses)
     // calculate and simulate until a valid move is made (implement timeout and throw err)
-    this->roboConn.moveL(this->homeJointPoses, this->speed, this->acceleration);
+    this->roboConn.moveJ(this->homeJointPoses, this->speed, this->acceleration);
     this->waitForMoveRobot(this->homeJointPoses);
 }
 
