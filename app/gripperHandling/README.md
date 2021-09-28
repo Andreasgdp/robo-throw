@@ -17,6 +17,8 @@
 ## Gripper Control Panel
 - The grippers control panel can be accesed by establishing a connection and entering the grippers IP in google.
 - For the gripper to work properly, go to settings and turn off "Use text based interface".
+![image](https://user-images.githubusercontent.com/45763482/135037809-a19bb1fe-807f-46bd-b086-82fcbaa4fcec.png)
+
 
 ## IP Adresses of the hardware this semester (3. semester)
 - Cell #1
@@ -26,8 +28,8 @@
   - UR: 192.168.100.53
   - WSG: 192.168.100.10
  - Cell #3
-  - UR: 192.168.100.53
-  - WSG: 192.168.100.10
+   - UR: 192.168.100.53
+   - WSG: 192.168.100.10
 - Cell #4
   - UR: 192.168.100.49
   - WSG: 192.168.100.10
