@@ -18,8 +18,10 @@ public:
     void getBoardCorners(std::vector<cv::Mat> images);
     void showImage(cv::Mat image, std::string windowName = "Window");
     std::vector<cv::Mat> pylonPic();
+
 private:
     const cv::Size BoardSize{6,9};
+    std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
 };
 
 #endif // IMAGEPROCESSING_H
