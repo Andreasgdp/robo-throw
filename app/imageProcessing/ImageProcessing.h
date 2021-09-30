@@ -1,4 +1,4 @@
-#ifndef IMAGEPROCESSING_H
+﻿#ifndef IMAGEPROCESSING_H
 #define IMAGEPROCESSING_H
 #include "opencv2/opencv.hpp"
 #include "iostream"
@@ -20,6 +20,7 @@ public:
     std::vector<cv::Mat> pylonPic();
 private:
     const cv::Size BoardSize{6,9};
+    std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
 };
 
 #endif // IMAGEPROCESSING_H
