@@ -84,7 +84,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
         //CALIB_CB_ADAPTIVE_THRESH - converts image to black and white
         //CALIB_CB_NORMALIZE_IMAGE Not sure what it dose - opencv themselves says "Normalize the image gamma with equalizeHist before applying fixed or adaptive thresholding."
         if(found){
-            foundCorners.push_back(corners);
+
             //if any corners are found, this will save and show them
             //            foundCorners.push_back(pointBuf);
             //            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
@@ -92,7 +92,8 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
             //            cv::waitKey(0);
 
             cv::cornerSubPix(tmpimg, corners,cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
-            //Q.push_back(obj);
+            Q.push_back(obj);
+            foundCorners.push_back(corners);
 
 
             cv::drawChessboardCorners(tmpimg,BoardSize,corners,found);
