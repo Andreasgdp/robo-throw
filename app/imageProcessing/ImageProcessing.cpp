@@ -19,12 +19,12 @@ cv::Mat ImageProcessing::loadImage() {
     camera >> frame;
 
     // display the frame until you press a key
-//    while (1) {
-//        // show the image on the window
-//        cv::imshow("Webcam", frame);
-//        // wait (10ms) for a key to be pressed
-//        if (cv::waitKey(10) >= 0)
-//            break;
+    //    while (1) {
+    //        // show the image on the window
+    //        cv::imshow("Webcam", frame);
+    //        // wait (10ms) for a key to be pressed
+    //        if (cv::waitKey(10) >= 0)
+    //            break;
     //}
     return frame;
 }
@@ -60,6 +60,7 @@ std::vector<cv::Mat> ImageProcessing::loadImagePC(){
 }
 
 void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
+<<<<<<< HEAD
     std::vector<std::vector<cv::Point2f>> foundCorners, rejectedCorners;
 
     std::vector<cv::Point3f> corners;
@@ -70,18 +71,35 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
                 obj.push_back(cv::Point3f(j,i,0));
             }
         }
+=======
+    std::vector<std::vector<cv::Point2f>> foundCorners;
+    std::vector<cv::Point2f> corners;
+    std::vector<cv::Point3f> obj;
+>>>>>>> issue-17--Story-Implement-camera-calibration
 
-    for(std::vector<cv::Mat>::iterator iter = images.begin(); iter != images.end(); iter++){
+
+
+    //    for (int i=0;i<BoardSize.height ;i++ ) {
+//        for (int j=0;j<BoardSize.width ;j++ ) {
+
+//            obj.push_back(cv::Point3f(j,i,0));
+//        }
+//    }
+
+    for(int i = 0; i<5; i++){
         //goes through vector of images (pointers to)
-        std::vector<cv::Point2f> pointBuf;
+
+        cv::Mat tmpimg = images[i];
         //vector storing checkerboard corners
-        bool found = cv::findChessboardCorners(*iter,BoardSize,pointBuf,cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE );
+        bool found = cv::findChessboardCorners(tmpimg,BoardSize,corners,cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE );
         //finds board corners using inbuild opencv function
         //Size(17,24) refers to the number of interctions between squares on the checkerboard, vertical/horizontal
         //CALIB_CB_ADAPTIVE_THRESH - converts image to black and white
         //CALIB_CB_NORMALIZE_IMAGE Not sure what it dose - opencv themselves says "Normalize the image gamma with equalizeHist before applying fixed or adaptive thresholding."
         if(found){
+            foundCorners.push_back(corners);
             //if any corners are found, this will save and show them
+<<<<<<< HEAD
 //            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
 //            cv::imshow("looking for corners",*iter);
 //            cv::waitKey(0);
@@ -91,6 +109,20 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
                         cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
                         cv::imshow("looking for corners",*iter);
                         cv::waitKey(0);
+=======
+            //            foundCorners.push_back(pointBuf);
+            //            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
+            //            cv::imshow("looking for corners",*iter);
+            //            cv::waitKey(0);
+
+            cv::cornerSubPix(tmpimg, corners,cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
+            //Q.push_back(obj);
+
+
+            cv::drawChessboardCorners(tmpimg,BoardSize,corners,found);
+            cv::imshow("looking for corners",tmpimg);
+            cv::waitKey(0);
+>>>>>>> issue-17--Story-Implement-camera-calibration
         }
     }
 }
@@ -210,7 +242,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
     {
         // Error handling.
         std::cerr << "An exception occurred." << std::endl
-        << e.GetDescription() << std::endl;
+                  << e.GetDescription() << std::endl;
     }
 
     return imgVector;
