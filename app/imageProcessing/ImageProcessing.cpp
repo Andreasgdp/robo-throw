@@ -60,9 +60,22 @@ std::vector<cv::Mat> ImageProcessing::loadImagePC(){
 }
 
 void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
+<<<<<<< HEAD
+    std::vector<std::vector<cv::Point2f>> foundCorners, rejectedCorners;
+
+    std::vector<cv::Point3f> corners;
+
+        for (int i=0;i<BoardSize.height ;i++ ) {
+            for (int j=0;j<BoardSize.width ;j++ ) {
+                std::vector<cv::Point3f> obj;
+                obj.push_back(cv::Point3f(j,i,0));
+            }
+        }
+=======
     std::vector<std::vector<cv::Point2f>> foundCorners;
     std::vector<cv::Point2f> corners;
     std::vector<cv::Point3f> obj;
+>>>>>>> issue-17--Story-Implement-camera-calibration
 
 
 
@@ -86,6 +99,17 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
         if(found){
 
             //if any corners are found, this will save and show them
+<<<<<<< HEAD
+//            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
+//            cv::imshow("looking for corners",*iter);
+//            cv::waitKey(0);
+            cv::cornerSubPix(images, pointBuf, cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
+                        Q.push_back(corners);
+
+                        cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
+                        cv::imshow("looking for corners",*iter);
+                        cv::waitKey(0);
+=======
             //            foundCorners.push_back(pointBuf);
             //            cv::drawChessboardCorners(*iter,BoardSize,pointBuf,found);
             //            cv::imshow("looking for corners",*iter);
@@ -99,6 +123,7 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
             cv::drawChessboardCorners(tmpimg,BoardSize,corners,found);
             cv::imshow("looking for corners",tmpimg);
             cv::waitKey(0);
+>>>>>>> issue-17--Story-Implement-camera-calibration
         }
     }
 }
