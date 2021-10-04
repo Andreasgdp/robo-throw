@@ -1,4 +1,4 @@
-﻿#ifndef IMAGEPROCESSING_H
+#ifndef IMAGEPROCESSING_H
 #define IMAGEPROCESSING_H
 #include "opencv2/opencv.hpp"
 #include "iostream"
@@ -18,6 +18,7 @@ public:
     void getBoardCorners(std::vector<cv::Mat> images);
     void showImage(cv::Mat image, std::string windowName = "Window");
     std::vector<cv::Mat> pylonPic();
+    void getCornersV2();
 
 private:
     const cv::Size BoardSize{6,9};

@@ -9,6 +9,7 @@ int main()
 
     ImageProcessing imageprocessing;
     imageprocessing.calibrate();
+
     //imageprocessing.run();
     //imageprocessing.showImage(imageprocessing.loadImage(),"test");
     //imageprocessing.calibrate(imageprocessing.loadImagePC());
