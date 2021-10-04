@@ -72,12 +72,13 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
 
 void ImageProcessing::calibrate()
 {
-    for (size_t i = 0; i < this->pylonPic().size(); i++) {
+    std::vector<cv::Mat> tempPic = this->pylonPic();
+
+    for (size_t i = 0; i < tempPic.size(); i++) {
         cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", this->pylonPic().at(i));
     }
 
-
-    this->getCornersV2();
+    //this->getCornersV2();
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -211,7 +212,7 @@ void ImageProcessing::getCornersV2()
 {
 
     std::vector<cv::String> fileNames;
-    cv::glob("../app/imageProcessing/images/image-00*.jpg", fileNames, false);
+    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
     cv::Size patternSize(6, 9);
     std::vector<std::vector<cv::Point2f>> q(fileNames.size());
 
