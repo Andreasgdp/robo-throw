@@ -21,6 +21,7 @@ public:
     void getCornersV2();
 
 private:
+    int _sim = true;
     const cv::Size BoardSize{6,9};
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
 };
