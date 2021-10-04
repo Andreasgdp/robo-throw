@@ -72,10 +72,15 @@ void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
 
 void ImageProcessing::calibrate()
 {
+    this->pylonPic();
     std::vector<cv::Mat> tempPic = this->pylonPic();
 
-    for (size_t i = 0; i < tempPic.size(); i++) {
-        cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", this->pylonPic().at(i));
+    std::cout << tempPic.size() << std::endl; // debugger v2
+
+
+    for (unsigned int i = 0; i < tempPic.size(); i++) {
+        cv::imshow( "myWindow1", tempPic[i]); // debugger v2
+        cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", tempPic[i]);
     }
 
     //this->getCornersV2();
@@ -152,7 +157,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             // This smart pointer will receive the grab result data.
             Pylon::CGrabResultPtr ptrGrabResult;
 
-            while ( camera.IsGrabbing() && imgVector.size()<31)
+            while ( camera.IsGrabbing() && imgVector.size()<5)
             {
                 // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
                 camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -196,7 +201,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 
         return imgVector;
 
-    } else if(_sim == true) {
+    } else {
         cv::Mat openCvImage;
 
         for (int i = 1; i <= 5; i++) {
@@ -205,7 +210,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
         }
         return imgVector;
     }
-
 }
 
 void ImageProcessing::getCornersV2()
