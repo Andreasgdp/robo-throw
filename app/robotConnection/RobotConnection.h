@@ -11,8 +11,9 @@ class RobotConnection
 {
 public:
     RobotConnection(std::string IP);
+    ~RobotConnection();
 
-    void moveL(const std::vector<double> &jointPoses, double speed, double acceleration);
+    void moveJ(const std::vector<double> &jointPoses, double speed = 0.3, double acceleration = 0.3);
     std::vector<double> getActualJointPoses();
     void disconnect();
     bool isConnected();

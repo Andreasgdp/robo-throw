@@ -6,12 +6,13 @@
 #include "../imageProcessing/ImageProcessing.h"
 #include "../robotConnection/RobotConnection.h"
 #include "../simulation/Simulation.h"
+#include "../gripperHandling/GripperController.h"
 
 
 class App
 {
 public:
-    App(std::string IP, bool localEnv = false);
+    App(std::string IP, std::string gripperIP = "192.168.1.20",  bool localEnv = false);
 
     /*
         @brief Calibrates the camera based on an image of a calibration board.
@@ -51,9 +52,9 @@ private:
     Simulation simulator;
     std::vector<double> goalPos;
     std::vector<double> objectPos;
+    GripperController gripper;
 
     // add member variable for jointPoseGetter
-    // add member variable for gripperHandling
     // add member variable for api
 
     // Functions

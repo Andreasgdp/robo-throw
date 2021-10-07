@@ -10,6 +10,10 @@ File(GLOB_RECURSE HEADER_FILES */*.h)
 
 # Opencv
 find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+#Robotics Library (gripper). HAL is the subpart of the library where WeissWsg50 is located.
+find_package(RL COMPONENTS HAL REQUIRED)
 
 # pylon
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
@@ -19,9 +23,6 @@ include_directories(${Pylon_INCLUDE_DIRS})
 # UR-RTDE
 find_package(ur_rtde REQUIRED)
 add_executable(app main.cpp ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(app ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES})
 
-
-
-
-
+#Link libraries
+target_link_libraries(app ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES})
