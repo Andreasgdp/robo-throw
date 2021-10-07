@@ -2,74 +2,6 @@
 
 ImageProcessing::ImageProcessing(){}
 
-cv::Mat ImageProcessing::loadImage() {
-    // open the first webcam plugged in the computer
-    cv::VideoCapture camera(0);
-    if (!camera.isOpened()) {
-        std::cerr << "ERROR: Could not open camera" << std::endl;
-    }
-
-    // create a window to display the images from the webcam
-    cv::namedWindow("Webcam");
-
-    // this will contain the image from the webcam
-    cv::Mat frame;
-
-    // capture the next frame from the webcam
-    camera >> frame;
-
-    return frame;
-}
-
-void ImageProcessing::showImage(cv::Mat image, std::string windowName) {
-    // Show Image inside a window with the window name provided
-    cv::imshow("Image show", image);
-
-    // Wait for any keystroke
-    cv::waitKey(0);
-}
-
-std::vector<cv::Mat> ImageProcessing::loadImagePC(){
-    std::vector<cv::Mat> temp;
-
-    for (unsigned i = 1; i < 6; i++) {
-        cv::Mat pic = cv::imread("../app/imageProcessing/images/image-00"+ std::to_string(i) +".jpg",-1);
-        temp.push_back(pic);
-    }
-
-
-    return temp;
-}
-
-void ImageProcessing::getBoardCorners(std::vector<cv::Mat> images){
-    std::vector<std::vector<cv::Point2f>> foundCorners;
-    std::vector<cv::Point2f> corners;
-    std::vector<cv::Point3f> obj;
-
-
-    for(int i = 0; i<5; i++){
-        //goes through vector of images (pointers to)
-
-        std::vector<cv::Mat> tmpimg = images[i];
-        //vector storing checkerboard corners
-        bool found = cv::findChessboardCorners(tmpimg,BoardSize,corners,cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE );
-
-        //finds board corners using inbuild opencv function
-        if(found){
-
-
-            cv::cornerSubPix(tmpimg, corners,cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
-            Q.push_back(obj);
-            foundCorners.push_back(corners);
-
-
-            cv::drawChessboardCorners(tmpimg,BoardSize,corners,found);
-            cv::imshow("looking for corners",tmpimg);
-            cv::waitKey(0);
-        }
-    }
-}
-
 void ImageProcessing::calibrate()
 {
     this->pylonPic();
@@ -83,7 +15,7 @@ void ImageProcessing::calibrate()
         cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", tempPic[i]);
     }
 
-    //this->getCornersV2();
+    this->getCornersV2();
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
