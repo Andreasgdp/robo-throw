@@ -19,7 +19,7 @@ sq5 = sin(q5);
 cq6 = cos(q6);
 sq6 = sin(q6);
 
-%ROTATION MATRICES
+%ROTATION
 A1 = [  cq1   0  sq1 0
         sq1   0 -cq1 0
         0     1   0    0.08916
@@ -44,6 +44,61 @@ A6 = [  cq6 -sq6   0  0
         sq6  cq6   0  0
         0     0    1  0.0823
         0     0    0  1];
+
+%{
+A1 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A2 = [  2 2 2 2
+        2  2 2 2
+        2     2      2  2
+        2     2      2  2];
+A3 = [  3 3 3 3
+        3  3 3 3
+        3     3      3  3
+        3     3      3  3];
+A4 = [  4   4  4   4
+        4   4 4   4
+        4     4   4    4
+        4     4   4    4];
+A5 = [  5   5 5   5
+        5   5  5   5
+        5    5   5    5
+        5     5   5    5];
+A6 = [  6 6   6  6
+        6  6   6  6
+        6     6    6  6
+        6     6    6  6];
+%}
+
+%{
+A1 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A2 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A3 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A4 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A5 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+A6 = [  1   1  1 1
+        1   1 1 1
+        1     1   1    1
+        1     1   1    1];
+%}
+    
 %FORWARD KINEMATICS    
 T = A1*A2*A3*A4*A5*A6;
 
@@ -90,7 +145,39 @@ J(4:6,4) = R1*R2*R3*k;
 J(4:6,5) = R1*R2*R3*R4*k;
 J(4:6,6) = R1*R2*R3*R4*R5*k;
 
+%disp(J);
 
-disp(J);
+J_I = inv(J);
+%disp(J_I);
+   
+%res = simplify(J * inv(J));
+%disp(res);
 
+symbols.q1 = q1;
+symbols.q2 = q2;
+symbols.q3 = q3;
+symbols.q4 = q4;
+symbols.q5 = q5;
+symbols.q6 = q6;
+
+params.q1 = 1;
+params.q2 = 1;
+params.q3 = 1;
+params.q4 = 1;
+params.q5 = 1;
+params.q6 = 1;
+
+res = inverseJacobian(J_I, symbols, params);
+disp(eval(simplify(res)));
+
+
+function out = inverseJacobian(J_I, symbols, params)
+    M1 = subs(J_I, symbols.q1, params.q1);
+    M2 = subs(M1, symbols.q2, params.q2);
+    M3 = subs(M2, symbols.q3, params.q3);
+    M4 = subs(M3, symbols.q4, params.q4);
+    M5 = subs(M4, symbols.q5, params.q5);
+    M6 = subs(M5, symbols.q6, params.q6);
+    out = M6;
+end
     
