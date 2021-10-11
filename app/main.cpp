@@ -1,18 +1,18 @@
 #include <iostream>
-#include "./robotConnection/RobotConnection.h"
-#include "./app/App.h"
-#include "./gripperHandling/GripperController.h"
+#include <eigen3/Eigen/Dense>
 #include "./jointPoseGetter/JointPoseGetter.h"
 
 
 using namespace std;
+using namespace Eigen;
+
+typedef Matrix<float, 6, 6> Matrix6f;
 
 int main()
 {
     JointPoseGetter j;
 
-    vector<vector<double>> test = j.jacobian(1, 1, 1, 1, 1, 1);
-    j.showJacobian();
+    cout << j.jacobian(1, 1, 1, 1, 1, 1).inverse() << endl;
 
     return 0;
 }

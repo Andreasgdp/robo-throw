@@ -1,5 +1,9 @@
 #include "opencv2/opencv.hpp"
 #include <vector>
+#include <eigen3/Eigen/Dense>
+
+typedef Eigen::Matrix<float, 6, 6> Matrix6f;
+
 
 class JointPoseGetter
 {
@@ -8,9 +12,9 @@ private:
 public:
 	JointPoseGetter(/* args */);
 	~JointPoseGetter();
-    std::vector<std::vector<double>> jacobian(double q1, double q2, double q3, double q4, double q5, double q6);
-    void showJacobian();
+    Matrix6f jacobian(double q1, double q2, double q3, double q4, double q5, double q6);
+    Matrix6f jacobianInverse(double q1, double q2, double q3, double q4, double q5, double q6);
+
 private:
-    std::vector<std::vector<double>> j;
 };
 

@@ -5,9 +5,10 @@ using namespace std;
 Simulation::Simulation(std::string IP) : roboConn(IP) {
 }
 
-void Simulation::calibrateCam()
+bool Simulation::calibrateCam()
 {
     this->imgProc.calibrate();
+    return false;
 }
 
 bool Simulation::moveSuccess(const std::vector<double> &jointPoses, double speed, double acceleration)
