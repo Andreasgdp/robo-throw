@@ -13,7 +13,6 @@ void ImageProcessing::calibrate()
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
     std::vector<cv::Mat> imgVector;
 
-    if (_sim == false) {
         int myExposure = 30000;
 
         // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
@@ -129,24 +128,16 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 
         return imgVector;
 
-    } else {
-        cv::Mat openCvImage;
 
-        for (int i = 1; i <= 5; i++) {
-            cv::Mat pic = cv::imread("../app/imageProcessing/images/image-00" + std::to_string(i) + ".jpg",-1);
-            imgVector.push_back(pic);
-        }
-        return imgVector;
-    }
 }
 
-void ImageProcessing::getCornersV2()
+void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 {
 
-    std::vector<cv::String> fileNames;
-    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
+//    std::vector<cv::String> fileNames;
+//    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
     cv::Size patternSize(6, 9);
-    std::vector<std::vector<cv::Point2f>> q(fileNames.size());
+    std::vector<std::vector<cv::Point2f>> q(imgVec.size());
 
     std::vector<std::vector<cv::Point3f>> Q;
     // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
@@ -164,11 +155,11 @@ void ImageProcessing::getCornersV2()
     std::vector<cv::Point2f> imgPoint;
     // Detect feature points
     std::size_t i = 0;
-    for (auto const &f : fileNames) {
-        std::cout << std::string(f) << std::endl;
+    for (auto const &f : imgVec) {
+        //std::cout << std::string(f) << std::endl;
 
         // 2. Read in the image an call cv::findChessboardCorners()
-        cv::Mat img = cv::imread(fileNames[i]);
+        cv::Mat img = imgVec[i];
         cv::Mat gray;
 
         cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
@@ -215,10 +206,10 @@ void ImageProcessing::getCornersV2()
                                 mapX, mapY);
 
     // Show lens corrected images
-    for (auto const &f : fileNames) {
-        std::cout << std::string(f) << std::endl;
+    for (auto const &f : imgVec) {
+        //std::cout << std::string(f) << std::endl;
 
-        cv::Mat img = cv::imread(f, cv::IMREAD_COLOR);
+        cv::Mat img = imgVec[i];
 
         cv::Mat imgUndistorted;
 
@@ -231,6 +222,21 @@ void ImageProcessing::getCornersV2()
     }
 
 
+}
+
+std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
+{
+    std::vector<cv::Mat> imgVec;
+    std::vector<cv::String> fileNames;
+    cv::glob("../app/imageProcessing/images/image-00*.jpg", fileNames, false);
+
+    for(int i = 0; i<fileNames.size();i++){
+
+        imgVec.push_back(cv::imread(fileNames[i]));
+        //cv::imshow( "myWindow" +std::to_string(i), imgVec[i]);
+        //cv::waitKey(0);
+    }
+    return imgVec;
 }
 
 
