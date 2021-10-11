@@ -5,17 +5,9 @@ ImageProcessing::ImageProcessing(){}
 void ImageProcessing::calibrate()
 {
     this->pylonPic();
-    std::vector<cv::Mat> tempPic = this->pylonPic();
-
-    std::cout << tempPic.size() << std::endl; // debugger v2
 
 
-    for (unsigned int i = 0; i < tempPic.size(); i++) {
-        cv::imshow( "myWindow1", tempPic[i]); // debugger v2
-        cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", tempPic[i]);
-    }
 
-    this->getCornersV2();
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -122,6 +114,10 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
                 }
             }
+            for (unsigned int i = 0; i < imgVector.size(); i++) {
+                cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
+            }
+
 
         }
         catch (GenICam::GenericException &e)
