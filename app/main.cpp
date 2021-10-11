@@ -8,7 +8,7 @@ int main()
 {
 
     ImageProcessing imageprocessing;
-    imageprocessing.getCornersV2(imageprocessing.pylonPic());
+    imageprocessing.calibrate();
     //imageprocessing.run();
     //imageprocessing.showImage(imageprocessing.loadImage(),"test");
     //imageprocessing.calibrate(imageprocessing.loadImagePC());

@@ -4,7 +4,8 @@ ImageProcessing::ImageProcessing(){}
 
 void ImageProcessing::calibrate()
 {
-    this->pylonPic();
+
+    this->getCornersV2(this->pylonPic());
 
 
 
@@ -101,7 +102,11 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     cv::imshow( "myWindow", openCvImage);
 
                     if(cv::waitKey(1) == 'p'){              // take picture
-                        imgVector.push_back(openCvImage);
+                        cv::Mat tmp=openCvImage.clone();
+                        imgVector.push_back(tmp);
+                        if(imgVector.size()>=5){
+                            camera.Close();
+                        }
                         cv::imshow( "myWindow0", openCvImage);
                     } else if(cv::waitKey(1) == 'q'){       //quit
                         camera.Close();
@@ -113,9 +118,9 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
                 }
             }
-            for (unsigned int i = 0; i < imgVector.size(); i++) {
-                cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
-            }
+//            for (unsigned int i = 0; i < imgVector.size(); i++) {
+//                cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
+//            }
 
 
         }
@@ -136,7 +141,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
 //    std::vector<cv::String> fileNames;
 //    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
-    cv::Size patternSize(6, 9);
+    //cv::Size patternSize(6, 9);
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
 
     std::vector<std::vector<cv::Point3f>> Q;
@@ -146,8 +151,8 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     //int checkerBoard[2] = {6,9};
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
-    for(int i = 1; i<=patternSize.height; i++){
-        for(int j = 1; j<=patternSize.width; j++){
+    for(int i = 1; i<=BoardSize.height; i++){
+        for(int j = 1; j<=BoardSize.width; j++){
             objp.push_back(cv::Point3f(j,i,0));
         }
     }
@@ -164,7 +169,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
         cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
 
-        bool patternFound = cv::findChessboardCorners(gray, patternSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+        bool patternFound = cv::findChessboardCorners(gray, BoardSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
 
         // 2. Use cv::cornerSubPix() to refine the found corner detections
         if(patternFound){
@@ -173,7 +178,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
         }
 
         // Display
-        cv::drawChessboardCorners(img, patternSize, q[i], patternFound);
+        cv::drawChessboardCorners(img, BoardSize, q[i], patternFound);
         cv::imshow("chessboard detection", img);
         cv::waitKey(0);
 
@@ -228,7 +233,7 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
 {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
-    cv::glob("../app/imageProcessing/images/image-00*.jpg", fileNames, false);
+    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
 
     for(int i = 0; i<fileNames.size();i++){
 
