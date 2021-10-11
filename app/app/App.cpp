@@ -11,23 +11,16 @@ App::App(std::string robotIP, std::string gripperIP, bool localEnv) : roboConn(r
     if (!this->roboConn.isConnected())
         throw "Connection could not be established with ip: " + this->IP;
 
+    this->calibrateCam();
+
     this->moveHome();
 }
 
 void App::calibrateCam()
 {
-    cv::Mat calibrationImg;
-
-    if (this->localEnv)
-    {
-        calibrationImg = this->getLocalCalibrationImg();
-    }
-    else
-    {
-        // Use imageProcessing to get image from camera
-    }
-
-    // use imageProcessing to calibrate camera
+    bool camCalibrated = this->simulator.calibrateCam();
+    if (!camCalibrated) throw "Couldn't calibrate cam";
+    this->imgProcessor.calibrate();
 }
 
 void App::findAndGrabObject()
@@ -48,7 +41,9 @@ void App::findAndGrabObject()
     // use jointPoseGetter to calculate and set jointposes, speed, acceleration for grabbing object
 
     // simulate move (handle err by calculating new joint poses)
+    bool moveSuccess = this->simulator.moveSuccess(this->jointPoses, this->speed, this->acceleration);
     // calculate and simulate until a valid move is made (implement timeout and throw err)
+    if (!moveSuccess) throw "Simulation failed when trying to grab object";
 
     // TODO figure out best values for speed and acceleration.
     this->roboConn.moveJ(this->jointPoses, this->speed, this->acceleration);
@@ -64,8 +59,11 @@ void App::throwObject(const std::vector<double> &goalPos)
 
     // use jointPoseGetter to get joint poses, speed and acceleration for throwing object
 
-    // simulate move (handle err by calculating new joint poses)
+    bool moveSuccess = this->simulator.moveSuccess(this->jointPoses, this->speed, this->acceleration);
     // calculate and simulate until a valid move is made (implement timeout and throw err)
+    if (!moveSuccess) throw "Simulation failed when trying to throw object";
+
+    // TODO add simulation of throwing the object
 
     this->roboConn.moveJ(this->jointPoses, this->speed, this->acceleration);
 
@@ -82,6 +80,8 @@ void App::moveHome()
     this->setDefaultPosMovement();
     // simulate move (handle err by calculating new joint poses)
     // calculate and simulate until a valid move is made (implement timeout and throw err)
+    bool moveSuccess = this->simulator.moveSuccess(this->homeJointPoses, this->speed, this->acceleration);
+    if (!moveSuccess) throw "Simulation failed when trying to move home";
     this->roboConn.moveJ(this->homeJointPoses, this->speed, this->acceleration);
     this->waitForMoveRobot(this->homeJointPoses);
 }
@@ -112,7 +112,7 @@ cv::Mat App::getLocalCalibrationImg()
     // TODO: select a random local calibration image
     std::string imageFileName = "";
     std::string imageFileType = "";
-    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
+    //return this->imgProcessor.loadImagePC();
 }
 
 cv::Mat App::getLocalObjectImg()
@@ -120,5 +120,5 @@ cv::Mat App::getLocalObjectImg()
     // TODO: select a random local object image
     std::string imageFileName = "";
     std::string imageFileType = "";
-    return this->imgProcessor.loadLocalImage(imageFileName, imageFileType);
+    //return this->imgProcessor.loadImagePC();
 }
