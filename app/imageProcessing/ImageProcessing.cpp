@@ -4,15 +4,15 @@ ImageProcessing::ImageProcessing(){}
 
 void ImageProcessing::calibrate()
 {
-
-    this->getCornersV2(this->pylonPic());
+    std::vector<cv::Mat> tmp;
+    this->pylonPic(this->getCornersV2(this->pylonPic(tmp)));
 
 
 
 
 }
 
-std::vector<cv::Mat> ImageProcessing::pylonPic(){
+std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration){
     std::vector<cv::Mat> imgVector;
 
     int myExposure = 20000;
@@ -95,25 +95,32 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 
                 // Create an OpenCV image from a pylon image.
                 openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
-
+                if(isCalib){
+                    cv::Mat mapX = calibration[0].clone();
+                    cv::Mat mapY = calibration[1].clone();
+                    cv::Mat imgUndistorted;
+                    cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+                    cv::imshow( "Undistorted image", imgUndistorted);
+                }
                 // Create an OpenCV display window.
                 //cv::namedWindow( "myWindow", cv::WINDOW_NORMAL); // other options: CV_AUTOSIZE, CV_FREERATIO
 
                 // Display the current image in the OpenCV display window.
-                cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
-
-                if(cv::waitKey(1) == 'p'){              // take picture
-                    cv::Mat tmp=openCvImage.clone();
-                    imgVector.push_back(tmp);
-                    cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                    if(imgVector.size()>=imgAmt){
-                        camera.Close();
+                if(!isCalib){
+                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
+                    if(cv::waitKey(1) == 'p'){              // take picture
+                        cv::Mat tmp=openCvImage.clone();
+                        imgVector.push_back(tmp);
+                        cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
+                        if(imgVector.size()>=imgAmt){
+                            camera.Close();
+                        }
+                        if(showimg){
+                            cv::imshow( "myWindow0", openCvImage);
+                        }
                     }
-                    if(showimg){
-                        cv::imshow( "myWindow0", openCvImage);
-                    }
 
-                } else if(cv::waitKey(1) == 'q'){       //quit
+                }  if(cv::waitKey(1) == 'q'){       //quit
                     camera.Close();
                     break;
                 }
@@ -123,9 +130,9 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                 std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
             }
         }
-        for (unsigned int i = 0; i < imgVector.size(); i++) {
-            cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
-        }
+//        for (unsigned int i = 0; i < imgVector.size(); i++) {
+//            cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
+//        }
 
 
     }
@@ -135,13 +142,13 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
     }
-
+    isCalib = !isCalib;
     return imgVector;
 
 
 }
 
-void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
+std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 {
     //    std::vector<cv::Mat> tsttmpvec;
     //    for(int i = 0;i<imgVec.size();i++){
@@ -237,8 +244,10 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
         }
 
     }
-
-
+    std::vector<cv::Mat> calibration;
+    calibration.push_back(mapX);
+    calibration.push_back(mapY);
+    return calibration;
 }
 
 std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
