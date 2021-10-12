@@ -5,7 +5,7 @@ ImageProcessing::ImageProcessing(){}
 void ImageProcessing::calibrate()
 {
 
-    this->getCornersV2(this->pylonPic());
+    this->getCornersV2(this->loadLoaclimg());
 
 
 
@@ -14,7 +14,7 @@ void ImageProcessing::calibrate()
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
     std::vector<cv::Mat> imgVector;
 
-        int myExposure = 30000;
+        int myExposure = 20000;
 
         // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
         // is initialized during the lifetime of this object.
@@ -138,6 +138,10 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 
 void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 {
+//    std::vector<cv::Mat> tsttmpvec;
+//    for(int i = 0;i<imgVec.size();i++){
+//        tsttmpvec.push_back(imgVec[i].clone());
+//    }
 
 //    std::vector<cv::String> fileNames;
 //    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
@@ -193,7 +197,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     std::vector<double> stdIntrinsics, stdExtrinsics, perViewErrors;
     int flags = cv::CALIB_FIX_ASPECT_RATIO + cv::CALIB_FIX_K3 +
             cv::CALIB_ZERO_TANGENT_DIST + cv::CALIB_FIX_PRINCIPAL_POINT;
-    cv::Size frameSize(1280,800);
+    cv::Size frameSize(1080,1440);
 
     std::cout << "Calibrating..." << std::endl;
     // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
@@ -211,15 +215,15 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
                                 mapX, mapY);
 
     // Show lens corrected images
-    for (auto const &f : imgVec) {
+    for (int i = 0; i<=imgVec.size();i++) {
         //std::cout << std::string(f) << std::endl;
 
-        cv::Mat img = imgVec[i];
-
+        cv::Mat img2 = imgVec[i].clone();
+//std::cout<<"test"<<std::endl;
         cv::Mat imgUndistorted;
 
         // 5. Remap the image using the precomputed interpolation maps.
-        cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+        cv::remap(img2, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
 
         // Display
         cv::imshow("undistorted image", imgUndistorted);
@@ -233,7 +237,7 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
 {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
-    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
+    cv::glob("../app/imageProcessing/images/image-00*.jpg", fileNames, false);
 
     for(int i = 0; i<fileNames.size();i++){
 
