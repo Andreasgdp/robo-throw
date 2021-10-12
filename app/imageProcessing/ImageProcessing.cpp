@@ -5,7 +5,7 @@ ImageProcessing::ImageProcessing(){}
 void ImageProcessing::calibrate()
 {
 
-    this->getCornersV2(this->loadLoaclimg());
+    this->getCornersV2(this->pylonPic());
 
 
 
@@ -81,7 +81,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             // This smart pointer will receive the grab result data.
             Pylon::CGrabResultPtr ptrGrabResult;
 
-            while ( camera.IsGrabbing() && imgVector.size()<5)
+            while ( camera.IsGrabbing() && imgVector.size()<10)
             {
                 // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
                 camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -104,7 +104,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     if(cv::waitKey(1) == 'p'){              // take picture
                         cv::Mat tmp=openCvImage.clone();
                         imgVector.push_back(tmp);
-                        if(imgVector.size()>=5){
+                        if(imgVector.size()>=10){
                             camera.Close();
                         }
                         cv::imshow( "myWindow0", openCvImage);
@@ -118,9 +118,9 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
                 }
             }
-//            for (unsigned int i = 0; i < imgVector.size(); i++) {
-//                cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
-//            }
+            for (unsigned int i = 0; i < imgVector.size(); i++) {
+                cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
+            }
 
 
         }
@@ -197,7 +197,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     std::vector<double> stdIntrinsics, stdExtrinsics, perViewErrors;
     int flags = cv::CALIB_FIX_ASPECT_RATIO + cv::CALIB_FIX_K3 +
             cv::CALIB_ZERO_TANGENT_DIST + cv::CALIB_FIX_PRINCIPAL_POINT;
-    cv::Size frameSize(1080,1440);
+    cv::Size frameSize(1440,1080);
 
     std::cout << "Calibrating..." << std::endl;
     // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
@@ -211,23 +211,25 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
     // Precompute lens correction interpolation
     cv::Mat mapX, mapY;
-    cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1,
-                                mapX, mapY);
-
+    cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1, mapX, mapY);
+    int j =0;
     // Show lens corrected images
-    for (int i = 0; i<=imgVec.size();i++) {
+    for (auto const &f : imgVec) {
+
         //std::cout << std::string(f) << std::endl;
 
-        cv::Mat img2 = imgVec[i].clone();
+        cv::Mat img2 = imgVec[j].clone();
 //std::cout<<"test"<<std::endl;
         cv::Mat imgUndistorted;
 
         // 5. Remap the image using the precomputed interpolation maps.
         cv::remap(img2, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+        cv::imwrite("../app/imageProcessing/images/Lesbian_Ish" + std::to_string(j) + ".jpg", imgUndistorted);
 
         // Display
         cv::imshow("undistorted image", imgUndistorted);
         cv::waitKey(0);
+        j++;
     }
 
 
