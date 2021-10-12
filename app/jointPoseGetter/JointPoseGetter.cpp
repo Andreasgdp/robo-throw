@@ -2,6 +2,7 @@
 #include "cmath"
 
 using namespace std;
+using namespace Eigen;
 
 JointPoseGetter::JointPoseGetter(/* args */)
 {
@@ -28,4 +29,41 @@ Matrix6d JointPoseGetter::jacobianInverse(double q1, double q2, double q3, doubl
 {
     Matrix6d jacobian = this->jacobian(q1, q2, q3, q4, q5, q6);
     return jacobian.inverse();
+}
+
+vector<VectorXd> JointPoseGetter::getJointPoses(VectorXd startJointPoses, Vector3d startPos, Vector3d goalPos, int totalSteps)
+{
+    vector<VectorXd> jointPoses;
+
+    // Direction vector
+    Vector3d r = goalPos - startPos;
+
+    double stepSize = (1 / totalSteps);
+    int firstStep = 1;
+
+    jointPoses.push_back(this->calcNextJointPoses(startPos, r, stepSize, firstStep, startJointPoses));
+
+    for (int currentStep = 2; currentStep < totalSteps; currentStep++) {
+        jointPoses.push_back(this->calcNextJointPoses(startPos, r, stepSize, firstStep, jointPoses.at(currentStep-1)));
+    }
+
+    return jointPoses;
+}
+
+VectorXd JointPoseGetter::calcNextJointPoses(Vector3d startPos, Vector3d r, double stepSize, int firstStep, VectorXd lastPos)
+{
+    // nextPos is the path of movement.
+    Vector3d nextPos = startPos + (stepSize * firstStep) * r;
+    VectorXd posRot(6);
+    // Rotation needs to be set to a resonable value from robot.
+    posRot << nextPos[0], nextPos[1], nextPos[2], 1, 1, 1;
+    VectorXd nextJointPoses = this->jacobianInverse(
+                lastPos[0],
+                lastPos[1],
+                lastPos[2],
+                lastPos[3],
+                lastPos[4],
+                lastPos[5])
+                * posRot;
+    return nextJointPoses;
 }
