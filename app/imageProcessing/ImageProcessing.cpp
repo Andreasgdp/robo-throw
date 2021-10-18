@@ -13,9 +13,9 @@ void ImageProcessing::calibrate()
     std::cin>> hCalib;
 
     if(hCalib=="y"){
-        this->getCornersV2(this->pylonPic());
+        preCalib = false;
     } else if(hCalib=="n"){
-        this->getCornersV2(this->loadLoaclimg());
+        preCalib = true;
     }
     if(preCalib){
         this->getCornersV2(this->loadLoaclimg());
@@ -25,8 +25,6 @@ void ImageProcessing::calibrate()
     imgAmt = 5;
     std::cout<<this->pylonPic().size()<<std::endl;
 
-    _imgAmt = 1;
-    this->pylonPic();
 
 
 
@@ -42,7 +40,8 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
     // is initialized during the lifetime of this object.
     Pylon::PylonAutoInitTerm autoInitTerm;
 
-    try {
+    try
+    {
         // Create an instant camera object with the camera device found first.
         Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
 
@@ -102,7 +101,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
         // This smart pointer will receive the grab result data.
         Pylon::CGrabResultPtr ptrGrabResult;
 
-        while ( camera.IsGrabbing() && imgVector.size()<_imgAmt)
+        while ( camera.IsGrabbing() && imgVector.size()<imgAmt)
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -147,9 +146,8 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                         cv::Mat tmp=openCvImage.clone();
                         imgVector.push_back(tmp);
                         cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                        if(imgVector.size()>=_imgAmt){
+                        if(imgVector.size()>=imgAmt){
                             camera.Close();
-                            break;
                         }
                     }
             }
@@ -176,8 +174,12 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     }
 
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
-    std::vector<std::vector<cv::Point3f>> Q;
 
+    std::vector<std::vector<cv::Point3f>> Q;
+    // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
+    // fields with a size of 15x15mm
+
+    //int checkerBoard[2] = {6,9};
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
     for(int i = 1; i<=BoardSize.height; i++){
@@ -260,7 +262,8 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     _calibrationMat.push_back(mapY);
 }
 
-std::vector<cv::Mat> ImageProcessing::loadLoaclimg() {
+std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
+{
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
     cv::glob("../app/imageProcessing/images/calibration*.jpg", fileNames, false);
