@@ -1,23 +1,18 @@
 #include <iostream>
 #include "./robotConnection/RobotConnection.h"
-#include "./imageProcessing/ImageProcessing.h"
+#include "./app/App.h"
+#include "./gripperHandling/GripperController.h"
+#include "./jointPoseGetter/JointPoseGetter.h"
+
 
 using namespace std;
 
 int main()
 {
+    JointPoseGetter j;
 
-    ImageProcessing imageprocessing;
-    imageprocessing.calibrate();
-    //imageprocessing.run();
-    //imageprocessing.showImage(imageprocessing.loadImage(),"test");
-    //imageprocessing.calibrate(imageprocessing.loadImagePC());
-//    RobotConnection conn("127.0.0.1");
-//    std::vector<double> test = conn.getActualJointPoses();
+    vector<vector<double>> test = j.jacobian(1, 1, 1, 1, 1, 1);
+    j.showJacobian();
 
-
-    //    for (size_t i = 0; i < test.size(); i++) {
-//        std::cout << test.at(i);
-    //}
     return 0;
 }

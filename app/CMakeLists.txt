@@ -25,4 +25,4 @@ find_package(ur_rtde REQUIRED)
 add_executable(app main.cpp ${SOURCE_FILES} ${HEADER_FILES})
 
 #Link libraries
-target_link_libraries(app ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES})
+target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES})
