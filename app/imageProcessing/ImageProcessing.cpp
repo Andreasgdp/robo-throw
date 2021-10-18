@@ -2,9 +2,7 @@
 
 ImageProcessing::ImageProcessing(){}
 
-void ImageProcessing::calibrate()
-{
-    std::vector<cv::Mat> tmp;
+void ImageProcessing::calibrate() {
     std::string hCalib;
 
 
@@ -12,21 +10,17 @@ void ImageProcessing::calibrate()
     std::cin>> hCalib;
 
     if(hCalib=="y"){
-        preCalib = false;
+        this->getCornersV2(this->pylonPic());
     } else if(hCalib=="n"){
-        preCalib = true;
+        this->getCornersV2(this->loadLoaclimg());
     }
 
-
-    this->pylonPic(this->getCornersV2(this->pylonPic(tmp)));
-
-
-
-
+    _imgAmt = 1;
+    this->pylonPic();
 
 }
 
-std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration){
+std::vector<cv::Mat> ImageProcessing::pylonPic(){
     std::vector<cv::Mat> imgVector;
 
     int myExposure = 20000;
@@ -35,8 +29,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
     // is initialized during the lifetime of this object.
     Pylon::PylonAutoInitTerm autoInitTerm;
 
-    try
-    {
+    try {
         // Create an instant camera object with the camera device found first.
         Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
 
@@ -96,7 +89,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
         // This smart pointer will receive the grab result data.
         Pylon::CGrabResultPtr ptrGrabResult;
 
-        while ( camera.IsGrabbing() && imgVector.size()<imgAmt)
+        while ( camera.IsGrabbing() && imgVector.size()<_imgAmt)
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
@@ -110,45 +103,47 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
 
                 // Create an OpenCV image from a pylon image.
                 openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
-                if(preCalib){
-                    calibration = this->getCornersV2(this->loadLoaclimg());
-                    preCalib=!preCalib;
-                }
-                if(isCalib){
+
+                cv::Mat imgUndistorted;
+                if(_calibValues.size()>0){
 
                     cv::Mat mapX, mapY;
 
-                    mapX = calibration[0].clone();
-                    mapY = calibration[1].clone();
+                    mapX = _calibValues[0].clone();
+                    mapY = _calibValues[1].clone();
 
-                    cv::Mat imgUndistorted;
                     cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-//                    cv::Rect iCrop(10, 10, 900, 1000);
-//                    cv::Mat cropImg = imgUndistorted(iCrop);
+                    //                    cv::Rect iCrop(10, 10, 900, 1000);
+                    //                    cv::Mat cropImg = imgUndistorted(iCrop);
                     cv::imshow( "Undistorted image", imgUndistorted);
                 }
                 // Create an OpenCV display window.
                 //cv::namedWindow( "myWindow", cv::WINDOW_NORMAL); // other options: CV_AUTOSIZE, CV_FREERATIO
 
                 // Display the current image in the OpenCV display window.
-                if(!isCalib){
-
+                if (_calibValues.size() < 1)
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
-                    if(cv::waitKey(1) == 'p'){              // take picture
+
+                while (true) {
+                    if(cv::waitKey(1) == 'p' && _calibValues.size() == 0){              // take picture
                         cv::Mat tmp=openCvImage.clone();
                         imgVector.push_back(tmp);
                         cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                        if(imgVector.size()>=imgAmt){
+                        if(imgVector.size()>=_imgAmt){
                             camera.Close();
+                            break;
                         }
                         if(showimg){
                             cv::imshow( "myWindow0", openCvImage);
                         }
+                    } else if (_imgAmt == 1 && _calibValues.size() > 0){       // take calibrated picture
+                        cv::Mat tmp=imgUndistorted.clone();
+                        imgVector.push_back(tmp);
+                        if(imgVector.size()>=_imgAmt){
+                            camera.Close();
+                            break;
+                        }
                     }
-
-                }  if(cv::waitKey(1) == 'q'){       //quit
-                    camera.Close();
-                    break;
                 }
             }
             else
@@ -156,9 +151,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
                 std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
             }
         }
-        //        for (unsigned int i = 0; i < imgVector.size(); i++) {
-        //            cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
-        //        }
 
 
     }
@@ -168,26 +160,21 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
     }
-
+    cv::destroyWindow( "Undistorted image" );
     return imgVector;
 
 
 }
 
-std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
-{
+void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec) {
 
     for(int i = 0; i<imgVec.size();i++){
         cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
     }
 
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
-
     std::vector<std::vector<cv::Point3f>> Q;
-    // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
-    // fields with a size of 15x15mm
 
-    //int checkerBoard[2] = {6,9};
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
     for(int i = 1; i<=BoardSize.height; i++){
@@ -261,8 +248,6 @@ std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
         // 5. Remap the image using the precomputed interpolation maps.
         cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
 
-
-
         // Display
         if(showimg){
             cv::imshow("undistorted image", imgUndistorted);
@@ -270,15 +255,12 @@ std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
         }
 
     }
-    std::vector<cv::Mat> calibration;
     isCalib=!isCalib;
-    calibration.push_back(mapX);
-    calibration.push_back(mapY);
-    return calibration;
+    _calibValues.push_back(mapX);
+    _calibValues.push_back(mapY);
 }
 
-std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
-{
+std::vector<cv::Mat> ImageProcessing::loadLoaclimg() {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
     cv::glob("../app/imageProcessing/images/calibration*.jpg", fileNames, false);

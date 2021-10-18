@@ -13,8 +13,8 @@ class ImageProcessing
 public:
     ImageProcessing();
     void calibrate();
-    std::vector<cv::Mat> pylonPic(std::vector<cv::Mat> calibration);
-    std::vector<cv::Mat> getCornersV2(std::vector<cv::Mat> imgVec);
+    std::vector<cv::Mat> pylonPic();
+    void getCornersV2(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLoaclimg();
 
 
@@ -24,8 +24,9 @@ private:
     bool isCalib = false;
     bool preCalib = false;
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
-    int imgAmt = 10; // Ammount of images to take
+    int _imgAmt = 10; // Ammount of images to take
     bool showimg = false; //show images at every step
+    std::vector<cv::Mat> _calibValues;
 };
 
 #endif // IMAGEPROCESSING_H
