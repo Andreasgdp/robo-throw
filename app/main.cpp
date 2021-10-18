@@ -9,10 +9,9 @@ using namespace std;
 
 int main()
 {
-    JointPoseGetter j;
+    ImageProcessing imageprocessing;
 
-    vector<vector<double>> test = j.jacobian(1, 1, 1, 1, 1, 1);
-    j.showJacobian();
+    imageprocessing.calibrate();
 
     return 0;
 }
