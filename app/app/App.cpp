@@ -18,9 +18,9 @@ App::App(std::string robotIP, std::string gripperIP, bool localEnv) : roboConn(r
 
 void App::calibrateCam()
 {
-    bool camCalibrated = this->simulator.calibrateCam();
-    if (!camCalibrated) throw "Couldn't calibrate cam";
-    this->imgProcessor.calibrate();
+//    bool camCalibrated = this->simulator.calibrateCam();
+//    if (!camCalibrated) throw "Couldn't calibrate cam";
+//    this->imgProcessor.calibrate();
 }
 
 void App::findAndGrabObject()

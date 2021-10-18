@@ -21,8 +21,8 @@ public:
 private:
     int _sim = false;
     const cv::Size BoardSize{6,9};
-    bool isCalib = false;
-    bool preCalib = false;
+
+    bool autoImg = false;
 
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
     int imgAmt = 10; // Ammount of images to take

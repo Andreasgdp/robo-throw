@@ -121,12 +121,13 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     mapY = _calibrationMat[1].clone();
                     cv::Mat imgUndistorted;
                     cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-
-                    if(showimg){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), imgUndistorted);}
-                    if(cv::waitKey(1) == 'p' || !showimg){
+                    cv::Mat grayUndist;
+                    cv::cvtColor(imgUndistorted, grayUndist, cv::COLOR_RGB2GRAY);
+                    if(!autoImg ){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), grayUndist);}
+                    if(cv::waitKey(1) == 'p' || autoImg){
                         cv::Mat tmp=imgUndistorted.clone();
                         imgVector.push_back(tmp);
-                        if(showimg){cv::destroyWindow("Undistorted image"+std::to_string(imgVector.size()-1));}
+                        if(showimg || !autoImg){cv::destroyWindow("Undistorted image"+std::to_string(imgVector.size()-1));}
                         if(imgVector.size()>=imgAmt){
                             camera.Close();
                             break;
@@ -135,9 +136,9 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                 }
                 //If not calibrated take X amount op pics
                 else{
-                    cv::Rect iCrop(10, 10, 900, 600);
-                    cv::Mat cropImg = openCvImage(iCrop);
-                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), cropImg);}
+//                    cv::Rect iCrop(100, 10, 900, 600);
+//                    cv::Mat cropImg = openCvImage(iCrop);
+                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
                     if(cv::waitKey(1) == 'p'){
                         cv::Mat tmp=openCvImage.clone();
                         imgVector.push_back(tmp);
@@ -253,7 +254,6 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
             cv::waitKey(0);
         }
     }
-    isCalib=!isCalib;
     _calibrationMat.push_back(mapX);
     _calibrationMat.push_back(mapY);
 }
@@ -268,7 +268,6 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
         //cv::imshow( "myWindow" +std::to_string(i), imgVec[i]);
         //cv::waitKey(0);
     }
-    isCalib=true;
     return imgVec;
 }
 
