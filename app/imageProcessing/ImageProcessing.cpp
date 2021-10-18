@@ -13,17 +13,13 @@ void ImageProcessing::calibrate()
     std::cin>> hCalib;
 
     if(hCalib=="y"){
-        preCalib = false;
-    } else if(hCalib=="n"){
-        preCalib = true;
-    }
-    if(preCalib){
-        this->getCornersV2(this->loadLoaclimg());
-    }else{
         this->getCornersV2(this->pylonPic());
+    } else if(hCalib=="n"){
+        this->getCornersV2(this->loadLoaclimg());
     }
-    imgAmt = 5;
-    std::cout<<this->pylonPic().size()<<std::endl;
+    imgAmt = 1;
+    this->pylonPic();
+
 
 
 
