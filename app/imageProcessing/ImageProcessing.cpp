@@ -2,6 +2,7 @@
 
 ImageProcessing::ImageProcessing(){}
 
+    this->pylonPic();
 void ImageProcessing::calibrate()
 {
     std::vector<cv::Mat> tmp;
