@@ -5,7 +5,21 @@ ImageProcessing::ImageProcessing(){}
 void ImageProcessing::calibrate()
 {
     std::vector<cv::Mat> tmp;
+    std::string hCalib;
+
+
+    std::cout<<"Run new calibration? [y/n]";
+    std::cin>> hCalib;
+
+    if(hCalib=="y"){
+        preCalib = false;
+    } else if(hCalib=="n"){
+        preCalib = true;
+    }
+
+
     this->pylonPic(this->getCornersV2(this->pylonPic(tmp)));
+
 
 
 
@@ -90,16 +104,27 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             {
+
                 // Convert the grabbed buffer to a pylon image.
                 formatConverter.Convert(pylonImage, ptrGrabResult);
 
                 // Create an OpenCV image from a pylon image.
                 openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                if(preCalib){
+                    calibration = this->getCornersV2(this->loadLoaclimg());
+                    preCalib=!preCalib;
+                }
                 if(isCalib){
-                    cv::Mat mapX = calibration[0].clone();
-                    cv::Mat mapY = calibration[1].clone();
+
+                    cv::Mat mapX, mapY;
+
+                    mapX = calibration[0].clone();
+                    mapY = calibration[1].clone();
+
                     cv::Mat imgUndistorted;
                     cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+//                    cv::Rect iCrop(10, 10, 900, 1000);
+//                    cv::Mat cropImg = imgUndistorted(iCrop);
                     cv::imshow( "Undistorted image", imgUndistorted);
                 }
                 // Create an OpenCV display window.
@@ -107,6 +132,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
 
                 // Display the current image in the OpenCV display window.
                 if(!isCalib){
+
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);
                     if(cv::waitKey(1) == 'p'){              // take picture
                         cv::Mat tmp=openCvImage.clone();
@@ -130,9 +156,9 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
                 std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
             }
         }
-//        for (unsigned int i = 0; i < imgVector.size(); i++) {
-//            cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
-//        }
+        //        for (unsigned int i = 0; i < imgVector.size(); i++) {
+        //            cv::imwrite("../app/imageProcessing/images/Gay_Ish" + std::to_string(i) + ".jpg", imgVector.at(i));
+        //        }
 
 
     }
@@ -142,7 +168,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
     }
-    isCalib = !isCalib;
+
     return imgVector;
 
 
@@ -150,14 +176,11 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(std::vector<cv::Mat> calibration)
 
 std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 {
-    //    std::vector<cv::Mat> tsttmpvec;
-    //    for(int i = 0;i<imgVec.size();i++){
-    //        tsttmpvec.push_back(imgVec[i].clone());
-    //    }
 
-    //    std::vector<cv::String> fileNames;
-    //    cv::glob("../app/imageProcessing/images/Gay_Ish*.jpg", fileNames, false);
-    //cv::Size patternSize(6, 9);
+    for(int i = 0; i<imgVec.size();i++){
+        cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
+    }
+
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
 
     std::vector<std::vector<cv::Point3f>> Q;
@@ -225,6 +248,8 @@ std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     cv::Mat mapX, mapY;
     cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1, mapX, mapY);
     // Show lens corrected images
+    cv::imwrite("../app/imageProcessing/images/mapX.jpg", mapX);
+    cv::imwrite("../app/imageProcessing/images/mapY.jpg", mapY);
     for (auto const &f : imgVec) {
 
         //std::cout << std::string(f) << std::endl;
@@ -235,7 +260,8 @@ std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
         // 5. Remap the image using the precomputed interpolation maps.
         cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-        //cv::imwrite("../app/imageProcessing/images/Lesbian_Ish" + std::to_string(j) + ".jpg", imgUndistorted);
+
+
 
         // Display
         if(showimg){
@@ -245,6 +271,7 @@ std::vector<cv::Mat> ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
     }
     std::vector<cv::Mat> calibration;
+    isCalib=!isCalib;
     calibration.push_back(mapX);
     calibration.push_back(mapY);
     return calibration;
@@ -254,7 +281,7 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
 {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
-    cv::glob("../app/imageProcessing/images/image-00*.jpg", fileNames, false);
+    cv::glob("../app/imageProcessing/images/calibration*.jpg", fileNames, false);
 
     for(int i = 0; i<fileNames.size();i++){
 
@@ -262,6 +289,7 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
         //cv::imshow( "myWindow" +std::to_string(i), imgVec[i]);
         //cv::waitKey(0);
     }
+    isCalib=true;
     return imgVec;
 }
 
