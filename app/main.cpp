@@ -24,7 +24,7 @@ int main()
     Vector3d P_world3 = {0.5, 0.3, 0.205};
 
     vector<Vector3d> P_world;
-    P_world.insert(P_world.end(), {P_world1, P_world2});
+    P_world.insert(P_world.end(), {P_world1, P_world2, P_world3});
 
 
     CoordinateTranslator CoordTrans(P_robot, P_world);
