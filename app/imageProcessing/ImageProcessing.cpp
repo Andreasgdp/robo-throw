@@ -163,6 +163,33 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
     return imgVector;
 }
 
+std::vector<cv::Mat> ImageProcessing::ballDetection() {
+    cv::Mat src = this->pylonPic().at(0);
+
+    cv::Mat gray;
+    cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+
+    std::vector<cv::Vec3f> circles;
+    HoughCircles(gray, circles, cv::HOUGH_GRADIENT, 1,
+                 gray.rows/16,  // change this value to detect circles with different distances to each other
+                 100, 30, 1, 30 // change the last two parameters
+                 // (min_radius & max_radius) to detect larger circles
+                 );
+
+    for( size_t i = 0; i < circles.size(); i++ )
+    {
+        cv::Vec3i c = circles[i];
+        cv::Point center = cv::Point(c[0], c[1]);
+        // circle center
+        circle( gray, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
+        // circle outline
+        int radius = c[2];
+        circle( gray, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
+    }
+
+    return gray;
+}
+
 void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 {
 
