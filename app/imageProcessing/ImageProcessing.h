@@ -14,6 +14,7 @@ public:
     ImageProcessing();
     void calibrate();
     std::vector<cv::Mat> pylonPic();
+    std::vector<cv::Mat> ballDetection();
     void getCornersV2(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLoaclimg();
 
