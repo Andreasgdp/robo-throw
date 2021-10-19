@@ -5,22 +5,35 @@ ImageProcessing::ImageProcessing(){}
 void ImageProcessing::calibrate()
 {
     std::vector<cv::Mat> tmp;
+    cv::Mat tmp2;
 
     std::string hCalib;
 
 
-    std::cout<<"Run new calibration? [y/n]";
-    std::cin>> hCalib;
+//    std::cout<<"Run new calibration? [y/n]";
+//    std::cin>> hCalib;
 
-    if(hCalib=="y"){
-        this->getCornersV2(this->pylonPic());
-    } else if(hCalib=="n"){
-        this->getCornersV2(this->loadLoaclimg());
+//    if(hCalib=="y"){
+//        this->getCornersV2(this->pylonPic());
+//    } else if(hCalib=="n"){
+//        this->getCornersV2(this->loadLoaclimg());
+//    }
+//    imgAmt = 1;
+//    this->pylonPic();
+
+
+    this->getCornersV2(this->loadLoaclimg());
+    cv::Mat mapX, mapY;
+    mapX = _calibrationMat[0].clone();
+    mapY = _calibrationMat[1].clone();
+
+
+    tmp = this->loadLoaclimg();
+    for(size_t i=0;i<tmp.size()-1;i++){
+        cv::Mat imgUndistorted;
+        cv::remap(tmp[i], imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+        this->cropImg(imgUndistorted);
     }
-    imgAmt = 1;
-    this->pylonPic();
-
-
 
 
 
@@ -121,12 +134,12 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     mapY = _calibrationMat[1].clone();
                     cv::Mat imgUndistorted;
                     cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-                    cv::Mat grayUndist;
-                    cv::cvtColor(imgUndistorted, grayUndist, cv::COLOR_RGB2GRAY);
-                    if(!autoImg ){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), grayUndist);}
+                    cv::Mat crop = this->cropImg(imgUndistorted).clone();
+
+                    if(!autoImg ){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), crop);}
                     if(cv::waitKey(1) == 'p' || autoImg){
-                        cv::Mat tmp=imgUndistorted.clone();
-                        imgVector.push_back(tmp);
+                        //cv::Mat tmp=imgUndistorted.clone();
+                        imgVector.push_back(crop);
                         if(showimg || !autoImg){cv::destroyWindow("Undistorted image"+std::to_string(imgVector.size()-1));}
                         if(imgVector.size()>=imgAmt){
                             camera.Close();
@@ -136,17 +149,17 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                 }
                 //If not calibrated take X amount op pics
                 else{
-//                    cv::Rect iCrop(100, 10, 900, 600);
-//                    cv::Mat cropImg = openCvImage(iCrop);
+                    //                    cv::Rect iCrop(100, 10, 900, 600);
+                    //                    cv::Mat cropImg = openCvImage(iCrop);
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
-                    if(cv::waitKey(1) == 'p'){
-                        cv::Mat tmp=openCvImage.clone();
-                        imgVector.push_back(tmp);
-                        cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                        if(imgVector.size()>=imgAmt){
-                            camera.Close();
-                        }
+                if(cv::waitKey(1) == 'p'){
+                    cv::Mat tmp=openCvImage.clone();
+                    imgVector.push_back(tmp);
+                    cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
+                    if(imgVector.size()>=imgAmt){
+                        camera.Close();
                     }
+                }
             }
             else
             {
@@ -161,48 +174,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                   << e.GetDescription() << std::endl;
     }
     return imgVector;
-}
-
-cv::Point ImageProcessing::ballDetection() {
-    cv::Mat src = this->pylonPic().at(0);
-    std::vector<cv::Point> points;
-
-    cv::Mat gray;
-    cvtColor(src, gray, cv::COLOR_BGR2GRAY);
-
-    std::vector<cv::Vec3f> circles;
-    HoughCircles(gray, circles, cv::HOUGH_GRADIENT, 1,
-                 gray.rows/16,  // change this value to detect circles with different distances to each other
-                 100, 30, 1, 30); // change the last two parameters
-    // (min_radius & max_radius) to detect larger circles
-
-    for( size_t i = 0; i < circles.size(); i++ ) {
-        cv::Vec3i c = circles[i];
-        cv::Point center = cv::Point(c[0], c[1]);
-        // Store points
-        points.push_back(center);
-
-        // circle center
-        circle( gray, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
-        // circle outline
-        int radius = c[2];
-        circle( gray, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
-
-        cv::imshow("showImage" + std::to_string(i), src);
-        cv::waitKey();
-        cv::destroyWindow("showImage" + std::to_string(i));
-    }
-
-    if(points.size() > 1) {
-        std::cout << "Put in the correct picture number: ";
-        std::string input;
-        std::cin >> input;
-        std::cout << "Picture number " + input + " have been selected" << std::endl;
-
-        return points.at(std::stoi(input));
-    } else
-        return points.at(0);
-
 }
 
 void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
@@ -271,6 +242,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
     float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
 
+
     std::cout << "Reprojection error = " << error << "\nK =\n"
               << K << "\nk=\n"
               << k << std::endl;
@@ -311,6 +283,35 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
         //cv::waitKey(0);
     }
     return imgVec;
+}
+
+
+cv::Mat ImageProcessing::cropImg(cv::Mat img)
+{
+//    cv::imshow("Image", img);
+//    cv::waitKey(0);
+//    cv::destroyAllWindows();
+
+    cv::Mat crop = img(cv::Range(375,1080),cv::Range(395,1073)).clone(); // Slicing to crop the image
+
+    //Display the cropped image
+    imshow("Cropped Image", crop);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+    return crop;
+}
+
+void ImageProcessing::cordConvert(cv::Point imgPos)
+{
+    float x, y;
+    int xWith = 705, yWith = 678;
+    int realX = 80; //cm
+    float lengthPerPixel = realX/xWith;
+    x = imgPos.x*lengthPerPixel;
+    y = imgPos.y*lengthPerPixel;
+
+
+    std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
 }
 
 

@@ -14,16 +14,19 @@ public:
     ImageProcessing();
     void calibrate();
     std::vector<cv::Mat> pylonPic();
-    cv::Point ballDetection();
     void getCornersV2(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLoaclimg();
+
+    cv::Mat cropImg(cv::Mat img);
+    void cordConvert(cv::Point imgPos) ;
 
 
 private:
     int _sim = false;
     const cv::Size BoardSize{6,9};
+    int _camHeight = 139, _camWith =80; //cm
 
-    bool autoImg = false;
+    bool autoImg = false; //
 
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
     int imgAmt = 10; // Ammount of images to take
