@@ -10,30 +10,31 @@ void ImageProcessing::calibrate()
     std::string hCalib;
 
 
-//    std::cout<<"Run new calibration? [y/n]";
-//    std::cin>> hCalib;
+    std::cout<<"Run new calibration? [y/n]";
+    std::cin>> hCalib;
 
-//    if(hCalib=="y"){
-//        this->getCornersV2(this->pylonPic());
-//    } else if(hCalib=="n"){
-//        this->getCornersV2(this->loadLoaclimg());
-//    }
-//    imgAmt = 1;
-//    this->pylonPic();
-
-
-    this->getCornersV2(this->loadLoaclimg());
-    cv::Mat mapX, mapY;
-    mapX = _calibrationMat[0].clone();
-    mapY = _calibrationMat[1].clone();
-
-
-    tmp = this->loadLoaclimg();
-    for(size_t i=0;i<tmp.size()-1;i++){
-        cv::Mat imgUndistorted;
-        cv::remap(tmp[i], imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-        this->cropImg(imgUndistorted);
+    if(hCalib=="y"){
+        this->getCornersV2(this->pylonPic());
+    } else if(hCalib=="n"){
+        this->getCornersV2(this->loadLoaclimg());
     }
+    imgAmt = 1;
+    cv::Mat imgtmp = this->pylonPic().at(0);
+    cv::Point p = this->ballDetection(imgtmp);
+    this->cordConvert(p);
+
+//    this->getCornersV2(this->loadLoaclimg());
+//    cv::Mat mapX, mapY;
+//    mapX = _calibrationMat[0].clone();
+//    mapY = _calibrationMat[1].clone();
+
+
+//    tmp = this->loadLoaclimg();
+//    for(size_t i=0;i<tmp.size()-1;i++){
+//        cv::Mat imgUndistorted;
+//        cv::remap(tmp[i], imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+//        this->cropImg(imgUndistorted);
+//    }
 
 
 
@@ -176,8 +177,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
     return imgVector;
 }
 
-cv::Point ImageProcessing::ballDetection() {
-    cv::Mat src = this->pylonPic().at(0);
+cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     std::vector<cv::Point> points;
 
     cv::Mat gray;
@@ -201,7 +201,7 @@ cv::Point ImageProcessing::ballDetection() {
         int radius = c[2];
         circle( gray, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
 
-        cv::imshow("showImage" + std::to_string(i), src);
+        cv::imshow("showImage" + std::to_string(i), gray);
         cv::waitKey();
         cv::destroyWindow("showImage" + std::to_string(i));
     }
@@ -337,17 +337,17 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img)
     cv::Mat crop = img(cv::Range(375,1080),cv::Range(395,1073)).clone(); // Slicing to crop the image
 
     //Display the cropped image
-    imshow("Cropped Image", crop);
-    cv::waitKey(0);
-    cv::destroyAllWindows();
+//    imshow("Cropped Image", crop);
+//    cv::waitKey(0);
+//    cv::destroyAllWindows();
     return crop;
 }
 
 void ImageProcessing::cordConvert(cv::Point imgPos)
 {
     float x, y;
-    int xWith = 705, yWith = 678;
-    int realX = 80; //cm
+    float xWith = 705, yWith = 678;
+    float realX = 80; //cm
     float lengthPerPixel = realX/xWith;
     x = imgPos.x*lengthPerPixel;
     y = imgPos.y*lengthPerPixel;
