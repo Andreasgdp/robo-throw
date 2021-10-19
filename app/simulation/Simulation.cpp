@@ -5,7 +5,7 @@ using namespace std;
 Simulation::Simulation(std::string IP) : roboConn(IP) {
 }
 
-void Simulation::calibrateCam()
+bool Simulation::calibrateCam()
 {
     this->imgProc.calibrate();
 }
