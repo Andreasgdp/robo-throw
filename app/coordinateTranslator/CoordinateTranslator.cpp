@@ -63,6 +63,10 @@ Matrix4d CoordinateTranslator::constructTransformationMatrix(Matrix3d rotationMa
     return H;
 }
 
+void CoordinateTranslator::computeInverseTransformationMatrix() {
+    _inverseTransformationMatrix = _transformationMatrix.inverse();
+}
+
 void CoordinateTranslator::calibrateRobotToTable() {
     setNumberOfPoints();
     Vector3d robotCentroid = computeCentroid(_robotPointSet);
@@ -73,10 +77,14 @@ void CoordinateTranslator::calibrateRobotToTable() {
 
     Matrix4d H = constructTransformationMatrix(rotationMatrix, translationMatrix);
     _transformationMatrix = H;
+    computeInverseTransformationMatrix();
 }
 
-const Eigen::Matrix4d &CoordinateTranslator::getTransformationMatrix() {
-    return _transformationMatrix;
+Vector3d CoordinateTranslator::computeRobotPointCoords(double x, double y, double z) {
+    Vector4d inputPoint = {x, y, z, 1};
+    Vector4d robotPoint4d = _inverseTransformationMatrix * inputPoint;
+    Vector3d robotPoint3d = {robotPoint4d(0), robotPoint4d(1), robotPoint4d(2)};
+    return robotPoint3d;
 }
 
 
