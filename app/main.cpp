@@ -9,6 +9,9 @@
 using namespace std;
 using namespace Eigen;
 
+Eigen::Matrix4d CoordinateTranslator::_transformationMatrix;
+Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
+
 int main()
 {
     // Calibration points in robot and world frame
