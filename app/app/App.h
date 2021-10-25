@@ -43,23 +43,23 @@ private:
     bool localEnv;
 
     std::string IP;
-    std::vector<double> jointPoses;
+    Eigen::VectorXd jointPoses;
     double speed = 1.0;
     double acceleration = 1.0;
-    std::vector<double> homeJointPoses;
+    Eigen::VectorXd homeJointPoses;
     ImageProcessing imgProcessor;
     RobotConnection roboConn;
     Simulation simulator;
-    std::vector<double> goalPos;
-    std::vector<double> objectPos;
+    Eigen::VectorXd goalPos;
+    Eigen::VectorXd objectPos;
     GripperController gripper;
 
     // add member variable for jointPoseGetter
     // add member variable for api
 
     // Functions
-    bool hasMovedToPos(const std::vector<double> &pos);
-    void waitForMoveRobot(const std::vector<double> &pos);
+    bool hasMovedToPos(const Eigen::VectorXd &pos);
+    void waitForMoveRobot(const Eigen::VectorXd &pos);
     void setDefaultPosMovement();
     cv::Mat getLocalCalibrationImg();
     cv::Mat getLocalObjectImg();

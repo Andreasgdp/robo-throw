@@ -2,64 +2,46 @@
 #include <eigen3/Eigen/Dense>
 #include "./jointPoseGetter/JointPoseGetter.h"
 #include <vector>
+#include "./robotConnection/RobotConnection.h"
+#include <math.h>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace Eigen;
 
 int main()
 {
+    RobotConnection r("127.0.0.1");
+//    RobotConnection r("192.168.100.30");
     JointPoseGetter j;
 
-    vector<VectorXd> jointPoses;
+    VectorXd dx(6);
+    dx << 0.04, 0, 0, 0, 0, 0;
 
-    // These should be paramaters to the function
-    // TODO get current joint poses (startJointPoses) given as a parameter
-    VectorXd startJointPoses(6);
-    startJointPoses << 1, 2, 3, 4, 5, 6;
-    Vector3d startPos(1, 1, 1);
-    Vector3d goalPos(3, 3, 3);
-    int totalSteps = 1;
+    VectorXd q_end(6);
+    q_end << -0.136581,-0.217782,1.655361,-0.485521, 2.96964, -0.775282;
+    r.moveJ(q_end, 1, 1);
+    VectorXd x_end = r.getActualTCPPose();
+    this_thread::sleep_for(chrono::milliseconds(1000));
 
-    Vector3d r = goalPos - startPos;
+    VectorXd dq_end = j.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
+    cout << "expected joint poses:  \n" << q_end << endl;
 
-    double stepSize = (1 / totalSteps);
-    int firstStep = 1;
+    VectorXd q_start = q_end + (dq_end * -3);
+    r.moveJ(q_start, 1, 1);
 
-    // nextPos is the path of movement.
-    Vector3d nextPos = startPos + (stepSize * firstStep) * r;
-    VectorXd posRot(6);
-    // Rotation needs to be set to a resonable value from robot.
-    posRot << nextPos[0], nextPos[1], nextPos[2], 1, 1, 1;
-    VectorXd nextJointPoses = j.jacobianInverse(
-                startJointPoses[0],
-                startJointPoses[1],
-                startJointPoses[2],
-                startJointPoses[3],
-                startJointPoses[4],
-                startJointPoses[5])
-                * posRot;
+    this_thread::sleep_for(chrono::milliseconds(1000));
 
-    jointPoses.push_back(nextJointPoses);
+    vector<VectorXd> test = j.getJointVelocities(q_start, q_end, dx);
 
-
-
-    for (int currentStep = 2; currentStep < totalSteps; currentStep++) {
-        // nextPos is the path of movement.
-        nextPos = startPos + (stepSize * currentStep) * r;
-        // Rotation needs to be set to a resonable value from robot.
-        posRot << nextPos[0], nextPos[1], nextPos[2], 1, 1, 1;
-        VectorXd nextJointPoses = j.jacobianInverse(
-                    jointPoses.at(currentStep-1)[0],
-                    jointPoses.at(currentStep-1)[1],
-                    jointPoses.at(currentStep-1)[2],
-                    jointPoses.at(currentStep-1)[3],
-                    jointPoses.at(currentStep-1)[4],
-                    jointPoses.at(currentStep-1)[5])
-                    * posRot;
-
-        jointPoses.push_back(nextJointPoses);
+    for (int i = 0; i < test.size(); i++)
+    {
+        r.speedJ(test.at(i), 40);
+        this_thread::sleep_for(chrono::milliseconds(8));
     }
-
+    cout << "actual:  \n" << r.getActualJointPoses() << endl;
+    r.speedStop(10);
 
     return 0;
 }

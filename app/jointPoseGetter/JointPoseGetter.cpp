@@ -31,39 +31,38 @@ Matrix6d JointPoseGetter::jacobianInverse(double q1, double q2, double q3, doubl
     return jacobian.inverse();
 }
 
-vector<VectorXd> JointPoseGetter::getJointPoses(VectorXd startJointPoses, Vector3d startPos, Vector3d goalPos, int totalSteps)
+VectorXd JointPoseGetter::linearFitFunction(double t, double startTime, const VectorXd &dq_end,const VectorXd &dq_start, double endTime)
 {
-    vector<VectorXd> jointPoses;
-
-    // Direction vector
-    Vector3d r = goalPos - startPos;
-
-    double stepSize = (1 / totalSteps);
-    int firstStep = 1;
-
-    jointPoses.push_back(this->calcNextJointPoses(startPos, r, stepSize, firstStep, startJointPoses));
-
-    for (int currentStep = 2; currentStep < totalSteps; currentStep++) {
-        jointPoses.push_back(this->calcNextJointPoses(startPos, r, stepSize, firstStep, jointPoses.at(currentStep-1)));
-    }
-
-    return jointPoses;
+    // Find slope of each joint velocity based on start, end and delta-time
+    VectorXd next_dq(6);
+    double dq1 = ((dq_end[0] - dq_start[0])/(endTime - startTime)) * t;
+    double dq2 = ((dq_end[1] - dq_start[1])/(endTime - startTime)) * t;
+    double dq3 = ((dq_end[2] - dq_start[2])/(endTime - startTime)) * t;
+    double dq4 = ((dq_end[3] - dq_start[3])/(endTime - startTime)) * t;
+    double dq5 = ((dq_end[4] - dq_start[4])/(endTime - startTime)) * t;
+    double dq6 = ((dq_end[5] - dq_start[5])/(endTime - startTime)) * t;
+    next_dq << dq1, dq2, dq3, dq4, dq5, dq6;
+    return next_dq;
 }
 
-VectorXd JointPoseGetter::calcNextJointPoses(Vector3d startPos, Vector3d r, double stepSize, int firstStep, VectorXd lastPos)
+vector<VectorXd> JointPoseGetter::getJointVelocities(const VectorXd &q_start, const VectorXd &q_end,const VectorXd &dx)
 {
-    // nextPos is the path of movement.
-    Vector3d nextPos = startPos + (stepSize * firstStep) * r;
-    VectorXd posRot(6);
-    // Rotation needs to be set to a resonable value from robot.
-    posRot << nextPos[0], nextPos[1], nextPos[2], 1, 1, 1;
-    VectorXd nextJointPoses = this->jacobianInverse(
-                lastPos[0],
-                lastPos[1],
-                lastPos[2],
-                lastPos[3],
-                lastPos[4],
-                lastPos[5])
-                * posRot;
-    return nextJointPoses;
+    VectorXd dq_end = this->jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
+
+    VectorXd dq_start(6);
+    dq_start << 0, 0, 0, 0, 0, 0;
+
+    double startTime = 0;
+    double endTime = 4;
+
+    double stepSize = 0.008;
+    int totalSteps = endTime/stepSize;
+    cout << "total steps: " << totalSteps << endl;
+
+    vector<VectorXd> jointVelocities;
+    for(int step = 0; step <= totalSteps; step++) {
+        jointVelocities.push_back(linearFitFunction(step * stepSize, startTime, dq_end, dq_start, endTime));
+    }
+
+    return jointVelocities;
 }
