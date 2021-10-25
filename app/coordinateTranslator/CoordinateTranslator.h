@@ -15,15 +15,15 @@ public:
     void setNumberOfPoints();
     Eigen::Vector3d computeCentroid(const std::vector<Eigen::Vector3d> &pointSet);
     std::vector<Eigen::Vector3d> computeZeroCentroidPointSet(const std::vector<Eigen::Vector3d> &pointSet, const Eigen::Vector3d &centroid);
-    Eigen::JacobiSVD<Eigen::Matrix3d> computeSVD(const std::vector<Eigen::Vector3d> &robotPointSet, const std::vector<Eigen::Vector3d> &worldPointSet, const unsigned int &computationOptions = Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::JacobiSVD<Eigen::Matrix3d> computeSVD(const std::vector<Eigen::Vector3d> &robotPointSet, const std::vector<Eigen::Vector3d> &worldPointSet, unsigned int computationOptions = Eigen::ComputeFullU | Eigen::ComputeFullV);
     Eigen::Matrix3d computeRotationMatrix(const Eigen::JacobiSVD<Eigen::Matrix3d> &svd);
     Eigen::Vector3d computeTranslationMatrix(const Eigen::Matrix3d &rotationMatrix, const Eigen::Vector3d &robotPointSetCentroid, const Eigen::Vector3d &worldPointSetCentroid);
-    Eigen::Matrix4d constructTransformationMatrix(const Eigen::Matrix3d &rotationMatrix, const Eigen::Vector3d &translationVector, const Eigen::RowVector3d &shear = {0, 0, 0}, const double &scale = 1);
+    Eigen::Matrix4d constructTransformationMatrix(const Eigen::Matrix3d &rotationMatrix, const Eigen::Vector3d &translationVector, const Eigen::RowVector3d &shear = {0, 0, 0}, double scale = 1);
     void computeInverseTransformationMatrix();
     void calibrateRobotToTable();
 
     // Computation of the point seen from {W} to {R}
-    Eigen::Vector3d computeRobotPointCoords(const double &x, const double &y, const double &z);
+    Eigen::Vector3d computeRobotPointCoords(double x, double y, double z);
 
 
 private:

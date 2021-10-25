@@ -37,7 +37,7 @@ vector<Vector3d> CoordinateTranslator::computeZeroCentroidPointSet(const vector<
     return q;
 }
 
-JacobiSVD<Matrix3d> CoordinateTranslator::computeSVD(const vector<Vector3d> &robotPointSet, const vector<Vector3d> &worldPointSet, const unsigned int &computationOptions) {
+JacobiSVD<Matrix3d> CoordinateTranslator::computeSVD(const vector<Vector3d> &robotPointSet, const vector<Vector3d> &worldPointSet, unsigned int computationOptions) {
     Matrix3d sum;
     sum << 0, 0, 0, 0, 0, 0, 0, 0, 0;
     for (int i = 0; i < _numberOfPoints; i++) {
@@ -55,7 +55,7 @@ Vector3d CoordinateTranslator::computeTranslationMatrix(const Matrix3d &rotation
     return worldPointSetCentroid - rotationMatrix * robotPointSetCentroid;
 }
 
-Matrix4d CoordinateTranslator::constructTransformationMatrix(const Matrix3d &rotationMatrix, const Vector3d &translationVector, const RowVector3d &shear, const double &scale) {
+Matrix4d CoordinateTranslator::constructTransformationMatrix(const Matrix3d &rotationMatrix, const Vector3d &translationVector, const RowVector3d &shear, double scale) {
     Matrix4d H;
     H << rotationMatrix.coeff(0, 0), rotationMatrix.coeff(0, 1), rotationMatrix.coeff(0, 2), translationVector(0),
          rotationMatrix.coeff(1, 0), rotationMatrix.coeff(1, 1), rotationMatrix.coeff(1, 2), translationVector(1),
@@ -80,7 +80,7 @@ void CoordinateTranslator::calibrateRobotToTable() {
     computeInverseTransformationMatrix();
 }
 
-Vector3d CoordinateTranslator::computeRobotPointCoords(const double &x, const double &y, const double &z) {
+Vector3d CoordinateTranslator::computeRobotPointCoords(double x, double y, double z) {
     Vector4d inputPoint = {x, y, z, 1};
     Vector4d robotPoint4d = _inverseTransformationMatrix * inputPoint;
     Vector3d robotPoint3d = {robotPoint4d(0), robotPoint4d(1), robotPoint4d(2)};
