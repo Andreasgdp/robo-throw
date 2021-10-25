@@ -20,25 +20,9 @@ void ImageProcessing::calibrate()
     }
     imgAmt = 1;
     cv::Mat imgtmp = this->pylonPic().at(0);
+//    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
     cv::Point p = this->ballDetection(imgtmp);
     this->cordConvert(p);
-
-//    this->getCornersV2(this->loadLoaclimg());
-//    cv::Mat mapX, mapY;
-//    mapX = _calibrationMat[0].clone();
-//    mapY = _calibrationMat[1].clone();
-
-
-//    tmp = this->loadLoaclimg();
-//    for(size_t i=0;i<tmp.size()-1;i++){
-//        cv::Mat imgUndistorted;
-//        cv::remap(tmp[i], imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-//        this->cropImg(imgUndistorted);
-//    }
-
-
-
-
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -180,14 +164,15 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     std::vector<cv::Point> points;
 
+//    cv::Mat crop = src(cv::Range(375,1080),cv::Range(395,1073)).clone(); // for simulation
     cv::Mat gray;
+    cv::Mat median_blur;
+
     cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+    cv::medianBlur(gray, median_blur, 5);
 
     std::vector<cv::Vec3f> circles;
-    HoughCircles(gray, circles, cv::HOUGH_GRADIENT, 1,
-                 gray.rows/16,  // change this value to detect circles with different distances to each other
-                 100, 30, 1, 30); // change the last two parameters
-    // (min_radius & max_radius) to detect larger circles
+    HoughCircles(median_blur, circles, cv::HOUGH_GRADIENT, 1, median_blur.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
 
     for( size_t i = 0; i < circles.size(); i++ ) {
         cv::Vec3i c = circles[i];
@@ -196,12 +181,12 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         points.push_back(center);
 
         // circle center
-        circle( gray, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
+        circle( median_blur, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
         // circle outline
         int radius = c[2];
-        circle( gray, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
+        circle( median_blur, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
 
-        cv::imshow("showImage" + std::to_string(i), gray);
+        cv::imshow("showImage" + std::to_string(i), median_blur);
         cv::waitKey();
         cv::destroyWindow("showImage" + std::to_string(i));
     }
