@@ -163,35 +163,30 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 
 cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     std::vector<cv::Point> points;
-
-//    cv::Mat crop = src(cv::Range(375,1080),cv::Range(395,1073)).clone(); // for simulation
-    cv::Mat gray;
-    cv::Mat median_blur;
-
-    cvtColor(src, gray, cv::COLOR_BGR2GRAY);
-    cv::medianBlur(gray, median_blur, 5);
+    std::vector<cv::Mat> bufferImages;
+    cv::Mat src_grey;
+    cvtColor(src, src_grey, cv::COLOR_BGR2GRAY);
+    cv::medianBlur(src_grey, src_grey, 5);
 
     std::vector<cv::Vec3f> circles;
-    HoughCircles(median_blur, circles, cv::HOUGH_GRADIENT, 1, median_blur.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
 
     for( size_t i = 0; i < circles.size(); i++ ) {
         cv::Vec3i c = circles[i];
         cv::Point center = cv::Point(c[0], c[1]);
-        // Store points
         points.push_back(center);
-
-        // circle center
-        circle( median_blur, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
-        // circle outline
-        int radius = c[2];
-        circle( median_blur, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
-
-        cv::imshow("showImage" + std::to_string(i), median_blur);
-        cv::waitKey();
-        cv::destroyWindow("showImage" + std::to_string(i));
+        circle( src_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
+        circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
+        bufferImages.push_back(src_grey.clone());
     }
 
     if(points.size() > 1) {
+        for (unsigned int i = 0; i < bufferImages.size(); i++) {
+            cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
+            cv::waitKey();
+            cv::destroyWindow("showImage" + std::to_string(i));
+        }
+
         std::cout << "Put in the correct picture number: ";
         std::string input;
         std::cin >> input;
@@ -202,7 +197,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         return points.at(0);
     } else {
         std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound" + std::to_string(0), median_blur);
+        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);
         cv::waitKey();
 
         return cv::Point(-1, -1);
