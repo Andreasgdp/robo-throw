@@ -10,19 +10,39 @@ void ImageProcessing::calibrate()
     std::string hCalib;
 
 
-    std::cout<<"Run new calibration? [y/n]";
-    std::cin>> hCalib;
+    //    std::cout<<"Run new calibration? [y/n]";
+    //    std::cin>> hCalib;
 
-    if(hCalib=="y"){
-        this->getCornersV2(this->pylonPic());
-    } else if(hCalib=="n"){
-        this->getCornersV2(this->loadLoaclimg());
-    }
+    //    if(hCalib=="y"){
+    //        this->getCornersV2(this->pylonPic());
+    //    } else if(hCalib=="n"){
+    //        this->getCornersV2(this->loadLoaclimg());
+    //    }
+
     imgAmt = 1;
-    cv::Mat imgtmp = this->pylonPic().at(0);
-//    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
-    cv::Point p = this->ballDetection(imgtmp);
-    this->cordConvert(p);
+
+    cv::Mat tmpla = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
+
+    this->getCornersV2(this->loadLoaclimg());
+
+    this->lortePis(this->pylonPic()[0]);
+
+    //    this->getCornersV2(this->loadLoaclimg());
+    //    cv::Mat mapX, mapY;
+    //    mapX = _calibrationMat[0].clone();
+    //    mapY = _calibrationMat[1].clone();
+
+
+    //    tmp = this->loadLoaclimg();
+    //    for(size_t i=0;i<tmp.size()-1;i++){
+    //        cv::Mat imgUndistorted;
+    //        cv::remap(tmp[i], imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+    //        this->cropImg(imgUndistorted);
+    //    }
+
+
+
+
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -119,12 +139,12 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     mapY = _calibrationMat[1].clone();
                     cv::Mat imgUndistorted;
                     cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-                    cv::Mat crop = this->cropImg(imgUndistorted).clone();
+                    //cv::Mat crop = this->cropImg(imgUndistorted).clone();
 
-                    if(!autoImg ){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), crop);}
+                    if(!autoImg ){cv::imshow( "Undistorted image"+std::to_string(imgVector.size()), imgUndistorted);}
                     if(cv::waitKey(1) == 'p' || autoImg){
                         //cv::Mat tmp=imgUndistorted.clone();
-                        imgVector.push_back(crop);
+                        imgVector.push_back(imgUndistorted);
                         if(showimg || !autoImg){cv::destroyWindow("Undistorted image"+std::to_string(imgVector.size()-1));}
                         if(imgVector.size()>=imgAmt){
                             camera.Close();
@@ -164,7 +184,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
 cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     std::vector<cv::Point> points;
 
-//    cv::Mat crop = src(cv::Range(375,1080),cv::Range(395,1073)).clone(); // for simulation
+    //    cv::Mat crop = src(cv::Range(375,1080),cv::Range(395,1073)).clone(); // for simulation
     cv::Mat gray;
     cv::Mat median_blur;
 
@@ -315,17 +335,111 @@ std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
 
 cv::Mat ImageProcessing::cropImg(cv::Mat img)
 {
-//    cv::imshow("Image", img);
-//    cv::waitKey(0);
-//    cv::destroyAllWindows();
+    //    cv::imshow("Image", img);
+    //    cv::waitKey(0);
+    //    cv::destroyAllWindows();
 
     cv::Mat crop = img(cv::Range(375,1080),cv::Range(395,1073)).clone(); // Slicing to crop the image
 
     //Display the cropped image
-//    imshow("Cropped Image", crop);
-//    cv::waitKey(0);
-//    cv::destroyAllWindows();
+    //    imshow("Cropped Image", crop);
+    //    cv::waitKey(0);
+    //    cv::destroyAllWindows();
     return crop;
+}
+
+cv::Mat ImageProcessing::cornerDetection(cv::Mat image)
+{
+    cv::Mat img, crop, gray, out, outNorm, outNormSc;
+    //cv::imwrite("../app/imageProcessing/images/fuck_shit.jpg",notimg);
+    //img = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
+    //cv::Mat crop = img(cv::Range(300,600),cv::Range(300,1150)).clone();
+    //first range top/bottom, seckond left/right
+
+    img=image.clone();
+
+    //MANUAL THRESHOLDING - RGB
+    crop = img(cv::Range(400,800),cv::Range(500,900)).clone();
+    cv::Mat imgMod = img.clone();
+    //cv::vec3b m = cv::mean(crop);
+    uchar deviation = 30;
+
+    long avrgTmp1=0, avrgTmp2=0, avrgTmp3=0;
+    long iter=1;
+
+    for (int r = 0; r < crop.rows; r++) {
+        for (int c = 0; c < crop.cols; c++) {
+            avrgTmp1 = avrgTmp1+crop.at<cv::Vec3b>(r,c)[0];
+            avrgTmp2 = avrgTmp2+crop.at<cv::Vec3b>(r,c)[1];
+            avrgTmp3 = avrgTmp3+crop.at<cv::Vec3b>(r,c)[2];
+            iter++;
+        }
+    }
+    avrgTmp1=avrgTmp1/iter;
+    avrgTmp2=avrgTmp2/iter;
+    avrgTmp3=avrgTmp3/iter;
+
+
+    for (int r = 0; r < imgMod.rows; r++) {
+        for (int c = 0; c < imgMod.cols; c++) {
+
+
+            if(imgMod.at<cv::Vec3b>(r,c)[0] > avrgTmp1 + deviation){imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
+                imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;
+                imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;}
+
+            else if(imgMod.at<cv::Vec3b>(r,c)[1] > avrgTmp2 + deviation){imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;
+                imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
+                imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;}
+
+            else if(imgMod.at<cv::Vec3b>(r,c)[2] > avrgTmp3 + deviation){imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;
+                imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
+                imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;}
+        }
+    }
+    cv::imshow("bin", imgMod);
+    cv::waitKey();
+
+
+    //MANUAL THRESHOLDING - GRAY
+    cv::cvtColor(imgMod, gray, cv::COLOR_BGR2GRAY);
+
+    crop = gray(cv::Range(400,800),cv::Range(500,900)).clone();
+    cv::Mat grayMod = gray.clone();
+    cv::Scalar m = cv::mean(crop);
+
+    for (int r = 0; r < gray.rows; r++) {
+        for (int c = 0; c < gray.cols; c++) {
+            if(gray.at<uchar>(r,c)> m[0]+deviation){grayMod.at<uchar>(r,c) = 255;}
+            else if(gray.at<uchar>(r,c)< m[0]-deviation){grayMod.at<uchar>(r,c) = 255;}
+            else{grayMod.at<uchar>(r,c)=0;}
+
+
+        }
+    }
+    cv::imshow("bin", grayMod);
+    cv::waitKey();
+
+
+    //    cv::Mat tmpMat;
+    //    out =  cv::Mat::zeros(grayMod.size(), CV_32FC1);
+    //    cv::cornerHarris(grayMod, out, 3, 3, 0.02);
+
+    //    cv::normalize(out, outNorm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
+    //    cv::convertScaleAbs(outNorm, outNormSc);
+
+    //    for (int j = 0; j < outNorm.rows; j++) {
+    //        for (int i = 0; i < outNorm.cols; i++) {
+    //            if ((int)outNorm.at<float>(j, i) >150) {
+    //                circle(img, cv::Point(i, j), 4, cv::Scalar(0, 0, 255), 2, 8, 0);
+    //            }
+    //        }
+    //    }
+    //    cv::imshow("Output Harris", img);
+    //    cv::waitKey();
+
+
+    return grayMod;
 }
 
 void ImageProcessing::cordConvert(cv::Point imgPos)
@@ -340,6 +454,113 @@ void ImageProcessing::cordConvert(cv::Point imgPos)
 
     std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
 }
+
+void ImageProcessing::lastStand(cv::Mat img)
+{
+    cv::Mat image, gray, crop;
+    cv::Mat output, output_norm, output_norm_scaled;
+    //    image = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
+    image = img.clone();
+    crop = image(cv::Range(350,700),cv::Range(300,1100)).clone();
+
+    //cv::cvtColor(crop, gray, cv::COLOR_BGR2GRAY);
+
+
+    // Detecting corners using the goodFeaturesToTrack built in function
+    std::vector<cv::Point2f> corners;
+    goodFeaturesToTrack(crop,
+                        corners,
+                        100,            // Max corners to detect
+                        0.1,           // Minimal quality of corners
+                        10,             // Minimum Euclidean distance between the returned corners
+                        cv::Mat(),          // Optional region of interest
+                        10,              // Size of an average block for computing a derivative covariation matrix over each pixel neighbothood
+                        false,          // Use Harri Detector or cornerMinEigenVal - Like when you create your own
+                        0.04);          // Free parameter for the Harris detector
+
+
+    // Drawing a circle around corners
+    for (size_t i = 0; i < corners.size(); i++){
+        circle(crop, corners[i], 4, cv::Scalar(0, 255, 0), 2, 8, 0);
+    }
+
+    // Displaying the result
+    cv::imshow("Output Shi-Tomasi", crop);
+    cv::waitKey();
+
+
+
+
+}
+
+int ImageProcessing::lortePis(cv::Mat img)
+{
+    using namespace cv;
+    using namespace std;
+
+    vector<Mat> results;
+
+    //cv::Mat ref  = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
+    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenLeft.jpg").clone();
+    cv::Mat ref = img(cv::Range(300,750),cv::Range(250,1150)).clone();
+
+
+    cv::Mat res;
+
+//    if(ref.empty() || tpl.empty())
+//    {
+//        cout << "Error reading file(s)!" << endl;
+//        return -1;
+//    }
+
+    Mat gref, gtpl;
+
+
+
+    cvtColor(ref, gref, COLOR_BGR2GRAY);
+    cvtColor(tpl, gtpl, COLOR_BGR2GRAY);
+
+    const int low_canny = 60;
+    Canny(gref, gref, low_canny, low_canny*3);
+    Canny(gtpl, gtpl, low_canny, low_canny*3);
+
+    //        imshow("file", gref);
+    //        imshow("template", gtpl);
+
+
+    Mat res_32f(ref.rows - tpl.rows + 1, ref.cols - tpl.cols + 1, CV_32FC1);
+    matchTemplate(gref, gtpl, res_32f, TM_CCOEFF_NORMED);
+
+    res_32f.convertTo(res, CV_8U, 255.0);
+    //imshow("result", res);
+
+    int size = ((tpl.cols + tpl.rows) / 4) * 2 + 1; //force size to be odd
+    adaptiveThreshold(res, res, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, size, -100);
+    //imshow("result_thresh", res);
+
+    while(1)
+    {
+        double minval, maxval;
+        Point minloc, maxloc;
+        minMaxLoc(res, &minval, &maxval, &minloc, &maxloc);
+
+        if(maxval > 0)
+        {
+            rectangle(ref, maxloc, Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows), Scalar(0,255,0), 2);
+            floodFill(res, maxloc, 0); //mark drawn blob
+        }
+        else
+            break;
+    }
+
+    imshow("final", ref);
+    waitKey(0);
+
+    return 0;
+}
+
+
+
 
 
 
