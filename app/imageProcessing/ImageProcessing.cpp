@@ -198,9 +198,15 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         std::cout << "Picture number " + input + " have been selected" << std::endl;
 
         return points.at(std::stoi(input));
-    } else
+    } else if (points.size() == 1){
         return points.at(0);
+    } else {
+        std::cout << "No table tennis ball found!" << std::endl;
+        cv::imshow("PointsNotFound" + std::to_string(0), median_blur);
+        cv::waitKey();
 
+        return cv::Point(-1, -1);
+    }
 }
 
 void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
