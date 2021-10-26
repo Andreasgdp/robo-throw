@@ -1,4 +1,5 @@
 #include "App.h"
+using namespace Eigen;
 
 App::App(std::string robotIP, std::string gripperIP, bool localEnv) : roboConn(robotIP), simulator("127.0.0.1"), gripper(gripperIP)
 {
@@ -86,13 +87,13 @@ void App::moveHome()
     this->waitForMoveRobot(this->homeJointPoses);
 }
 
-bool App::hasMovedToPos(const std::vector<double> &pos)
+bool App::hasMovedToPos(const VectorXd &pos)
 {
     // TODO: make sure they are able to be compared
     return this->roboConn.getActualJointPoses() == pos;
 }
 
-void App::waitForMoveRobot(const std::vector<double> &pos)
+void App::waitForMoveRobot(const VectorXd &pos)
 {
     while (!this->hasMovedToPos(pos))
     {
