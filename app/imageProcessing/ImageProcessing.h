@@ -19,8 +19,12 @@ public:
     std::vector<cv::Mat> loadLocalImg();
 
     cv::Mat cropImg(cv::Mat img);
-    void coordConvert(cv::Point imgPos) ;
+    cv::Mat cornerDetection(cv::Mat image);
+    void cordConvert(cv::Point imgPos) ;
 
+    void lastStand(cv::Mat img);
+
+    int lortePis(cv::Mat ref);
 
 private:
     int _sim = false;
