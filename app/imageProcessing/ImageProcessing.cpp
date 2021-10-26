@@ -18,11 +18,11 @@ void ImageProcessing::calibrate()
     cv::Mat imgtmp = this->pylonPic().at(0);
 //    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
     cv::Point p = this->ballDetection(imgtmp);
-    this->coordConvert(p);
+    this->cordConvert(p);
 
     cv::Mat tmpla = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
 
-    this->getCornersV2(this->loadLoaclimg());
+    this->getCornersV2(this->loadLocalImg());
 
     this->lortePis(this->pylonPic()[0]);
 }
@@ -479,7 +479,7 @@ int ImageProcessing::lortePis(cv::Mat img)
     vector<Mat> results;
 
     //cv::Mat ref  = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
-    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenLeft.jpg").clone();
+    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenRight.jpg").clone();
     cv::Mat ref = img(cv::Range(300,750),cv::Range(250,1150)).clone();
 
 
