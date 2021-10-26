@@ -4,25 +4,20 @@ ImageProcessing::ImageProcessing(){}
 
 void ImageProcessing::calibrate()
 {
-    std::vector<cv::Mat> tmp;
-    cv::Mat tmp2;
-
-    std::string hCalib;
-
-
+    std::string input;
     std::cout<<"Run new calibration? [y/n]";
-    std::cin>> hCalib;
+    std::cin>> input;
 
-    if(hCalib=="y"){
+    if(input=="y")
         this->getCornersV2(this->pylonPic());
-    } else if(hCalib=="n"){
-        this->getCornersV2(this->loadLoaclimg());
-    }
+    else if(input=="n")
+        this->getCornersV2(this->loadLocalImg());
+
     imgAmt = 1;
     cv::Mat imgtmp = this->pylonPic().at(0);
 //    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
     cv::Point p = this->ballDetection(imgtmp);
-    this->cordConvert(p);
+    this->coordConvert(p);
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -204,20 +199,17 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     }
 }
 
-void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
-{
-
+void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec) {
     for(int i = 0; i<imgVec.size();i++){
         cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
     }
 
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
-
     std::vector<std::vector<cv::Point3f>> Q;
     // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
     // fields with a size of 15x15mm
 
-    //int checkerBoard[2] = {6,9};
+    // int checkerBoard[2] = {6,9};
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
     for(int i = 1; i<=BoardSize.height; i++){
@@ -235,7 +227,6 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
         // 2. Read in the image an call cv::findChessboardCorners()
         cv::Mat img = f.clone();
         cv::Mat gray;
-
         cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
 
         bool patternFound = cv::findChessboardCorners(gray, BoardSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
@@ -270,7 +261,6 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
 
     float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
 
-
     std::cout << "Reprojection error = " << error << "\nK =\n"
               << K << "\nk=\n"
               << k << std::endl;
@@ -300,7 +290,7 @@ void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec)
     _calibrationMat.push_back(mapY);
 }
 
-std::vector<cv::Mat> ImageProcessing::loadLoaclimg()
+std::vector<cv::Mat> ImageProcessing::loadLocalImg()
 {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
@@ -329,7 +319,7 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img)
     return crop;
 }
 
-void ImageProcessing::cordConvert(cv::Point imgPos)
+void ImageProcessing::coordConvert(cv::Point imgPos)
 {
     float x, y;
     float xWith = 705, yWith = 678;

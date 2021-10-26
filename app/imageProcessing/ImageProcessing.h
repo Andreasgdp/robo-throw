@@ -16,10 +16,10 @@ public:
     std::vector<cv::Mat> pylonPic();
     cv::Point ballDetection(cv::Mat src);
     void getCornersV2(std::vector<cv::Mat> imgVec);
-    std::vector<cv::Mat> loadLoaclimg();
+    std::vector<cv::Mat> loadLocalImg();
 
     cv::Mat cropImg(cv::Mat img);
-    void cordConvert(cv::Point imgPos) ;
+    void coordConvert(cv::Point imgPos) ;
 
 
 private:
