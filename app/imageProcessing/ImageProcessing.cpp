@@ -4,25 +4,27 @@ ImageProcessing::ImageProcessing(){}
 
 void ImageProcessing::calibrate()
 {
-    cv::Mat tmp2;
-    std::string input;
-    std::cout<<"Run new calibration? [y/n]";
-    std::cin>> input;
+//    cv::Mat tmp2;
+//    std::string input;
+//    std::cout<<"Run new calibration? [y/n]";
+//    std::cin>> input;
 
-    if(input=="y")
-        this->getCornersV2(this->pylonPic());
-    else if(input=="n")
-        this->getCornersV2(this->loadLocalImg());
+//    if(input=="y")
+//        this->getCornersV2(this->pylonPic());
+//    else if(input=="n")
+//        this->getCornersV2(this->loadLocalImg());
 
     imgAmt = 1;
-    cv::Mat imgtmp = this->pylonPic().at(0);
-//    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
-    cv::Point p = this->ballDetection(imgtmp);
-    this->cordConvert(p);
+//    cv::Mat imgtmp = this->pylonPic().at(0);
+////    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
+//    cv::Point p = this->ballDetection(imgtmp);
+//    this->cordConvert(p);
 
-    cv::Mat tmpla = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
+//    cv::Mat tmpla = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
 
     this->getCornersV2(this->loadLocalImg());
+
+//    cv::imwrite("../app/imageProcessing/images/TestPic.jpg", this->pylonPic()[0]);
 
     this->lortePis(this->pylonPic()[0]);
 }
@@ -479,7 +481,7 @@ int ImageProcessing::lortePis(cv::Mat img)
     vector<Mat> results;
 
     //cv::Mat ref  = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
-    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenRight.jpg").clone();
+    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenLeft1.jpg").clone();
     cv::Mat ref = img(cv::Range(300,750),cv::Range(250,1150)).clone();
 
 
@@ -498,23 +500,22 @@ int ImageProcessing::lortePis(cv::Mat img)
     cvtColor(ref, gref, COLOR_BGR2GRAY);
     cvtColor(tpl, gtpl, COLOR_BGR2GRAY);
 
-    const int low_canny = 60;
+    const int low_canny = 30;
     Canny(gref, gref, low_canny, low_canny*3);
     Canny(gtpl, gtpl, low_canny, low_canny*3);
 
-    //        imshow("file", gref);
-    //        imshow("template", gtpl);
-
+    imshow("file", gref);
+    imshow("template", gtpl);
+    waitKey(0);
+    destroyAllWindows();
 
     Mat res_32f(ref.rows - tpl.rows + 1, ref.cols - tpl.cols + 1, CV_32FC1);
     matchTemplate(gref, gtpl, res_32f, TM_CCOEFF_NORMED);
 
     res_32f.convertTo(res, CV_8U, 255.0);
-    //imshow("result", res);
 
     int size = ((tpl.cols + tpl.rows) / 4) * 2 + 1; //force size to be odd
     adaptiveThreshold(res, res, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, size, -100);
-    //imshow("result_thresh", res);
 
     while(1)
     {
