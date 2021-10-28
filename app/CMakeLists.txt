@@ -23,6 +23,9 @@ include_directories(${Pylon_INCLUDE_DIRS})
 # UR-RTDE
 find_package(ur_rtde REQUIRED)
 
+# SQL
+find_package(Qt6 COMPONENTS Sql REQUIRED)
+
 # Eigen
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -30,4 +33,4 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 add_executable(app main.cpp ${SOURCE_FILES} ${HEADER_FILES})
 
 # Link libraries
-target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES} Eigen3::Eigen)
+target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES} Eigen3::Eigen Qt6::Sql)

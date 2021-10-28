@@ -3,45 +3,52 @@
 #include "./jointPoseGetter/JointPoseGetter.h"
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
-#include <math.h>
-#include <chrono>
-#include <thread>
+#include "./app/App.h"
+#include "./gripperHandling/GripperController.h"
+#include <Eigen/Eigen>
+#include "coordinateTranslator/CoordinateTranslator.h"
+#include "./api/Api.h"
+
+#include <iostream>
+
+#include <QtSql>
+#include <QSqlDatabase>
+#include <QCoreApplication>
+#include <QSqlDriver>
+
 
 using namespace std;
 using namespace Eigen;
 
-int main()
+Eigen::Matrix4d CoordinateTranslator::_transformationMatrix;
+Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
+
+int main(int argc, char *argv[])
 {
-    RobotConnection r("127.0.0.1");
-//    RobotConnection r("192.168.100.30");
-    JointPoseGetter j;
 
-    VectorXd dx(6);
-    dx << 0.04, 0, 0, 0, 0, 0;
+    Api api;
+    api.createDatabase();
 
-    VectorXd q_end(6);
-    q_end << -0.136581,-0.217782,1.655361,-0.485521, 2.96964, -0.775282;
-    r.moveJ(q_end, 1, 1);
-    VectorXd x_end = r.getActualTCPPose();
-    this_thread::sleep_for(chrono::milliseconds(1000));
+    cout << api.getPoints(2) << endl;
 
-    VectorXd dq_end = j.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
-    cout << "expected joint poses:  \n" << q_end << endl;
 
-    VectorXd q_start = q_end + (dq_end * -3);
-    r.moveJ(q_start, 1, 1);
 
-    this_thread::sleep_for(chrono::milliseconds(1000));
 
-    vector<VectorXd> test = j.getJointVelocities(q_start, q_end, dx);
+//     Instantiating a db with the SQLite (MySQL) driver
+//    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+//    db.setDatabaseName("../app/api/data.db");
+//    if (db.open())
+//    {
+//        QSqlQuery query(db); // if multiple connections used, without the `db` in constructor    will cause the query to use the default database (first opened and available one)
+//        query.exec("SELECT col1 FROM test;");
+//        while (query.next()) {
+//            int col1 = query.value(0).toInt();
+//            qDebug() << col1;
+//        }
+//    }
 
-    for (int i = 0; i < test.size(); i++)
-    {
-        r.speedJ(test.at(i), 40);
-        this_thread::sleep_for(chrono::milliseconds(8));
-    }
-    cout << "actual:  \n" << r.getActualJointPoses() << endl;
-    r.speedStop(10);
 
-    return 0;
+
+
+    return 1;
 }
