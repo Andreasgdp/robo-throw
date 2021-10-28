@@ -19,9 +19,9 @@ public:
     std::vector<cv::Mat> loadLocalImg();
     std::vector<cv::Point> cornerDetection(cv::Mat ref);
 
-    cv::Mat cropImg(cv::Mat img);
+    cv::Mat cropImg(cv::Mat img, std::vector<cv::Point> point);
     cv::Mat Threshold(cv::Mat image);
-    void coordConvert(cv::Point imgPos) ;
+    void coordConvert(cv::Point imgPos, cv::Mat img) ;
 
     void lastStand(cv::Mat img);
 
