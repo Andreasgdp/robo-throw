@@ -15,16 +15,16 @@ public:
     void calibrate();
     std::vector<cv::Mat> pylonPic();
     cv::Point ballDetection(cv::Mat src);
-    void getCornersV2(std::vector<cv::Mat> imgVec);
+    void chessboardDetection(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLocalImg();
+    std::vector<cv::Point> cornerDetection(cv::Mat ref);
 
     cv::Mat cropImg(cv::Mat img);
-    cv::Mat cornerDetection(cv::Mat image);
-    void cordConvert(cv::Point imgPos) ;
+    cv::Mat Threshold(cv::Mat image);
+    void coordConvert(cv::Point imgPos) ;
 
     void lastStand(cv::Mat img);
 
-    int lortePis(cv::Mat ref);
 
 private:
     int _sim = false;

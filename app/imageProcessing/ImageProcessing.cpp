@@ -9,24 +9,23 @@ void ImageProcessing::calibrate()
 //    std::cout<<"Run new calibration? [y/n]";
 //    std::cin>> input;
 
-//    if(input=="y")
-//        this->getCornersV2(this->pylonPic());
-//    else if(input=="n")
-//        this->getCornersV2(this->loadLocalImg());
+    if(input=="y")
+        this->chessboardDetection(this->pylonPic());
+    else if(input=="n")
+        this->chessboardDetection(this->loadLocalImg());
 
     imgAmt = 1;
-//    cv::Mat imgtmp = this->pylonPic().at(0);
-////    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
-//    cv::Point p = this->ballDetection(imgtmp);
-//    this->cordConvert(p);
+    this->cornerDetection(this->pylonPic()[0]);
 
-//    cv::Mat tmpla = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
 
-    this->getCornersV2(this->loadLocalImg());
+//    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
+    //cv::Point p = this->ballDetection(imgtmp);
+    //this->cordConvert(p);
 
-//    cv::imwrite("../app/imageProcessing/images/TestPic.jpg", this->pylonPic()[0]);
 
-    this->lortePis(this->pylonPic()[0]);
+
+
+
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -208,7 +207,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     }
 }
 
-void ImageProcessing::getCornersV2(std::vector<cv::Mat> imgVec) {
+void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     for(int i = 0; i<imgVec.size();i++){
         cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
     }
@@ -328,7 +327,7 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img)
     return crop;
 }
 
-cv::Mat ImageProcessing::cornerDetection(cv::Mat image)
+cv::Mat ImageProcessing::Threshold(cv::Mat image)
 {
     cv::Mat img, crop, gray, out, outNorm, outNormSc;
     //cv::imwrite("../app/imageProcessing/images/fuck_shit.jpg",notimg);
@@ -422,7 +421,7 @@ cv::Mat ImageProcessing::cornerDetection(cv::Mat image)
     return grayMod;
 }
 
-void ImageProcessing::cordConvert(cv::Point imgPos)
+void ImageProcessing::coordConvert(cv::Point imgPos)
 {
     float x, y;
     float xWith = 705, yWith = 678;
@@ -473,19 +472,20 @@ void ImageProcessing::lastStand(cv::Mat img)
 
 }
 
-int ImageProcessing::lortePis(cv::Mat img)
+std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
 {
     using namespace cv;
     using namespace std;
 
     vector<Mat> results;
+    vector<Point> points;
 
     //cv::Mat ref  = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
-    cv::Mat tpl = cv::imread("../app/imageProcessing/images/tokenLeft1.jpg").clone();
+    cv::Mat tplR = cv::imread("../app/imageProcessing/images/tokenRight.jpg").clone();
+    cv::Mat tplL = cv::imread("../app/imageProcessing/images/tokenLeft1.jpg").clone();
     cv::Mat ref = img(cv::Range(300,750),cv::Range(250,1150)).clone();
 
 
-    cv::Mat res;
 
 //    if(ref.empty() || tpl.empty())
 //    {
@@ -493,8 +493,14 @@ int ImageProcessing::lortePis(cv::Mat img)
 //        return -1;
 //    }
 
+    cv::Mat res, tpl;
     Mat gref, gtpl;
 
+    imshow("tmp",ref);
+    waitKey(0);
+
+
+    tpl = tplL.clone();
 
 
     cvtColor(ref, gref, COLOR_BGR2GRAY);
@@ -504,19 +510,19 @@ int ImageProcessing::lortePis(cv::Mat img)
     Canny(gref, gref, low_canny, low_canny*3);
     Canny(gtpl, gtpl, low_canny, low_canny*3);
 
-    imshow("file", gref);
-    imshow("template", gtpl);
-    waitKey(0);
-    destroyAllWindows();
+            imshow("file", gref);
+           imshow("template", gtpl);
 
     Mat res_32f(ref.rows - tpl.rows + 1, ref.cols - tpl.cols + 1, CV_32FC1);
     matchTemplate(gref, gtpl, res_32f, TM_CCOEFF_NORMED);
 
     res_32f.convertTo(res, CV_8U, 255.0);
+    imshow("result", res);
 
     int size = ((tpl.cols + tpl.rows) / 4) * 2 + 1; //force size to be odd
     adaptiveThreshold(res, res, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, size, -100);
-
+    imshow("result_thresh", res);
+    waitKey(0);
     while(1)
     {
         double minval, maxval;
@@ -535,7 +541,7 @@ int ImageProcessing::lortePis(cv::Mat img)
     imshow("final", ref);
     waitKey(0);
 
-    return 0;
+    return points;
 }
 
 
