@@ -4,30 +4,36 @@ ImageProcessing::ImageProcessing(){}
 
 void ImageProcessing::calibrate()
 {
-//    cv::Mat tmp2;
     std::string input;
     std::cout<<"Run new calibration? [y/n]";
     std::cin>> input;
 
-    if(input=="y")
+    if(input=="y"){
         this->chessboardDetection(this->pylonPic());
-    else if(input=="n")
+        std::cout << "Ready for cropping? (y)" << std::endl;
+        std::cin >> input;
+    } else if(input=="n")
         this->chessboardDetection(this->loadLocalImg());
 
+    input = "";
     imgAmt = 1;
-    cv::Mat tmp = this->cropImg(this->pylonPic()[0],this->cornerDetection(this->pylonPic()[0]));
-    this->coordConvert(this->ballDetection(tmp),tmp);
+    std::vector<cv::Point> tempPoints;
 
-    cv::imshow("shit works?",tmp);
-    cv::waitKey(0);
-//    cv::Mat imgtmp = cv::imread("../app/imageProcessing/images/table_tennis_ball.jpg", -1);
-    //cv::Point p = this->ballDetection(imgtmp);
-    //this->cordConvert(p);
+    while (true) {
+        cropCornerPoints = this->cornerDetection(this->pylonPic()[0]);
+        if (cv::waitKey() == 'y') {
+            cv::destroyAllWindows();
+            break;
+        }
+        else
+            cv::destroyAllWindows();
 
+    }
 
+    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
 
-
-
+    cv::imshow("Result", tmp);
+    cv::waitKey();
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -71,12 +77,12 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
         GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
         if ( GenApi::IsWritable( exposureAuto)){
             exposureAuto->FromString("Off");
-            std::cout << "Exposure auto disabled." << std::endl;
+//            std::cout << "Exposure auto disabled." << std::endl;
         }
 
         // Set custom exposure
         GenApi::CFloatPtr exposureTime = nodemap.GetNode("ExposureTime");
-        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
+//        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
         if(exposureTime.IsValid()) {
             if(myExposure >= exposureTime->GetMin() && myExposure <= exposureTime->GetMax()) {
                 exposureTime->SetValue(myExposure);
@@ -90,7 +96,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             std::cout << ">> Failed to set exposure value." << std::endl;
 
         }
-        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
+//        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
         // Start the grabbing of c_countOfImagesToGrab images.
         // The camera device is parameterized with a default configuration which
@@ -296,6 +302,7 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
             cv::waitKey(0);
         }
     }
+    cv::destroyAllWindows();
     _calibrationMat.push_back(mapX);
     _calibrationMat.push_back(mapY);
 }
@@ -314,11 +321,10 @@ std::vector<cv::Mat> ImageProcessing::loadLocalImg()
 }
 
 
-cv::Mat ImageProcessing::cropImg(cv::Mat img, std::vector<cv::Point> point)
+cv::Mat ImageProcessing::cropImg(cv::Mat img)
 {
-
-    int y = (point[0].y+point[1].y)/2;
-    cv::Mat crop = img(cv::Range(y,img.rows),cv::Range(point[1].x,point[0].x)).clone(); // Slicing to crop the image
+    int y = (cropCornerPoints[0].y+cropCornerPoints[1].y)/2; // Average height
+    cv::Mat crop = img(cv::Range(y,img.rows),cv::Range(cropCornerPoints[1].x,cropCornerPoints[0].x)).clone(); // Slicing to crop the image
 
     return crop;
 }
@@ -541,8 +547,7 @@ for(int i=0;i<tpl.size();i++){
 //            break;
 //  }
 
-    imshow("final", ref);
-    waitKey(0);
+    imshow("Correct corners? (y/n)", ref);
 
     return points;
 }

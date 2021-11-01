@@ -19,7 +19,7 @@ public:
     std::vector<cv::Mat> loadLocalImg();
     std::vector<cv::Point> cornerDetection(cv::Mat ref);
 
-    cv::Mat cropImg(cv::Mat img, std::vector<cv::Point> point);
+    cv::Mat cropImg(cv::Mat img);
     cv::Mat Threshold(cv::Mat image);
     void coordConvert(cv::Point imgPos, cv::Mat img) ;
 
@@ -30,7 +30,7 @@ private:
     int _sim = false;
     const cv::Size BoardSize{6,9};
     int _camHeight = 139, _camWith =80; //cm
-
+    std::vector<cv::Point> cropCornerPoints;
     bool autoImg = true; //
 
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
