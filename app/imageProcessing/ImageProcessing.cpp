@@ -31,6 +31,14 @@ void ImageProcessing::calibrate()
     }
 
     cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
+    cv::Point ball = this->ballDetection(tmp);
+    while(ball.x == -1 && ball.y==-1){
+        std::cout<<"take new image when ready, press p"<<std::endl;
+        if(cv::waitKey()=='p'){
+            tmp = this->cropImg(this->pylonPic()[0]);
+            ball = this->ballDetection(tmp);
+        }
+    }
 
     cv::imshow("Result", tmp);
     cv::waitKey();
@@ -181,7 +189,6 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
 
     std::vector<cv::Vec3f> circles;
     HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
-
     for( size_t i = 0; i < circles.size(); i++ ) {
         cv::Vec3i c = circles[i];
         cv::Point center = cv::Point(c[0], c[1]);
@@ -190,14 +197,12 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
         bufferImages.push_back(src_grey.clone());
     }
-
     if(points.size() > 1) {
         for (unsigned int i = 0; i < bufferImages.size(); i++) {
             cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
             cv::waitKey();
             cv::destroyWindow("showImage" + std::to_string(i));
         }
-
         std::cout << "Put in the correct picture number: ";
         std::string input;
         std::cin >> input;
@@ -208,9 +213,8 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         return points.at(0);
     } else {
         std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);
+        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);       
         cv::waitKey();
-
         return cv::Point(-1, -1);
     }
 }
@@ -246,6 +250,11 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
         cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
 
         bool patternFound = cv::findChessboardCorners(gray, BoardSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+        if(!patternFound){
+            std::cout<<"No chessboard found on image" + std::to_string(i)<<std::endl;
+            std::cout<<"Take new images!"<<std::endl;
+            break;
+        }
 
         // 2. Use cv::cornerSubPix() to refine the found corner detections
         if(patternFound){
