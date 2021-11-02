@@ -3,33 +3,50 @@
 using namespace std;
 using namespace Eigen;
 
-Simulation::Simulation(std::string IP) : roboConn(IP) {
+Simulation::Simulation(std::string IP) : _roboConn(IP) {
 }
 
-bool Simulation::calibrateCam()
-{
-    this->imgProc.calibrate();
-    return false;
+bool Simulation::notProtectiveStop() {
+    return !_roboConn.isProtectiveStopped();
 }
 
-bool Simulation::moveSuccess(const VectorXd &jointPoses, double speed, double acceleration)
-{
-    this->roboConn.moveJ(jointPoses, speed, acceleration);
-
-    return this->hasFinishedMoving(jointPoses);
+bool Simulation::destinationReached(const Eigen::VectorXd &destination) {
+    return _roboConn.getActualTCPPose() == destination;
 }
 
-bool Simulation::hasFinishedMoving(const VectorXd &pos)
-{
-    while (!this->hasMovedToPos(pos))
-    {
-        // Implement a timeout feature. Throw error if timeout.
+bool Simulation::executeGrabSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos) {
+    // Move to start
+    _roboConn.moveL(startPos);
+
+    // Move to destination
+    _roboConn.moveL(endPos);
+
+    // Do checks
+    if (notProtectiveStop() && destinationReached(endPos)) {
+        return true;
+    } else {
+        return false;
+    }  
+}
+
+bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds) {
+    // Move to start
+    _roboConn.moveL(startPos);
+
+    // TODO: Move correctly
+    // Move to destination
+    for (int i = 0; i < jointSpeeds.size(); i++) {
+        _roboConn.speedJ(jointSpeeds[i]);
     }
-    return true;
+    // check for destination reasched (fast punkt)
+    _roboConn.speedStop(10);
+
+
+    // Do checks
+    if (notProtectiveStop()) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-bool Simulation::hasMovedToPos(const VectorXd &pos)
-{
-    // TODO: make sure they are able to be compared
-    return this->roboConn.getActualJointPoses() == pos;
-}

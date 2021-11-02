@@ -7,16 +7,17 @@
 #include "../robotConnection/RobotConnection.h"
 #include "../simulation/Simulation.h"
 #include "../gripperHandling/GripperController.h"
+#include "../coordinateTranslator/CoordinateTranslator.h"
 
 
 class App
 {
 public:
-    App(std::string IP, std::string gripperIP = "192.168.1.20",  bool localEnv = false);
+    App(std::string IP, std::string gripperIP = "192.168.1.20", bool localEnv = false);
 
     /*
-        @brief Calibrates the camera based on an image of a calibration board.
-    */
+     * @brief Calibrates the camera based on an image of a calibration board.
+     */
     void calibrateCam();
 
     /*
@@ -40,19 +41,21 @@ private:
     //TODO: when all member variables are created, create getters and setters (automatic)
 
     // localEnv is a variable, that desides weather to run the program using local files or live camera.
-    bool localEnv;
+    bool _localEnv;
 
-    std::string IP;
-    Eigen::VectorXd jointPoses;
-    double speed = 1.0;
-    double acceleration = 1.0;
-    Eigen::VectorXd homeJointPoses;
-    ImageProcessing imgProcessor;
-    RobotConnection roboConn;
-    Simulation simulator;
-    Eigen::VectorXd goalPos;
-    Eigen::VectorXd objectPos;
-    GripperController gripper;
+    std::string _IP;
+    Eigen::VectorXd _jointPoses;
+    double _speed = 1.0;
+    double _acceleration = 1.0;
+    Eigen::VectorXd _homeJointPoses;
+    ImageProcessing _imgProcessor;
+    RobotConnection _roboConn;
+    Simulation _simulator;
+    Eigen::VectorXd _goalPos;
+    Eigen::VectorXd _objectPos;
+    GripperController _gripper;
+    CoordinateTranslator _coordTrans;
+
 
     // add member variable for jointPoseGetter
     // add member variable for api

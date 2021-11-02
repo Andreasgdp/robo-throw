@@ -11,21 +11,18 @@
     to ensure they are possible before actually sending them to a
     real robot.
 */
+
 class Simulation
 {
 public:
     Simulation(std::string IP);
-    bool calibrateCam();
-    bool moveSuccess(const Eigen::VectorXd &jointPoses, double speed, double acceleration);
-
-
+    bool notProtectiveStop();
+    bool destinationReached(const Eigen::VectorXd &destination);
+    bool executeGrabSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos);
+    bool executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
 
 private:
-    RobotConnection roboConn;
-    ImageProcessing imgProc;
-
-    bool hasFinishedMoving(const Eigen::VectorXd &pos);
-    bool hasMovedToPos(const Eigen::VectorXd &pos);
+    RobotConnection _roboConn;
 };
 
 #endif // SIMULATION_H
