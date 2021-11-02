@@ -87,9 +87,6 @@ VectorXd velocityCalc( double xWorld, double yWorld, double zWorld) {
     CoordinateTranslator.calibrateRobotToTable();
     Vector3d pos = CoordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
-    // Temp
-    Vector3d pos;
-    pos << xWorld, yWorld, zWorld;
     // The home/trow pos in meters and radian
     VectorXd _throwpos;
     _throwpos << 0.20375, -0.2635, 0.6638, 1.3, -1, 1.595;
