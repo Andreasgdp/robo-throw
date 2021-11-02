@@ -5,17 +5,18 @@
 typedef Eigen::Matrix<double, 6, 6> Matrix6d;
 
 
-class JointPoseGetter
+class ThrowCalc
 {
 private:
 	/* data */
 public:
-	JointPoseGetter(/* args */);
-	~JointPoseGetter();
+    ThrowCalc(/* args */);
+    ~ThrowCalc();
     Matrix6d jacobian(double q1, double q2, double q3, double q4, double q5, double q6);
     Matrix6d jacobianInverse(double q1, double q2, double q3, double q4, double q5, double q6);
     Eigen::VectorXd linearFitFunction(double t, double startTime, const Eigen::VectorXd &dq_end,const Eigen::VectorXd &dq_start, double endTime);
     std::vector<Eigen::VectorXd> getJointVelocities(const Eigen::VectorXd &q_start, const Eigen::VectorXd &q_end,const Eigen::VectorXd &dx);
+Eigen::VectorXd velocityCalc( double xWorld, double yWorld, double zWorld);
 
 private:
 };

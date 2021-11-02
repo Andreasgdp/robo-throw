@@ -1,6 +1,6 @@
 #include <iostream>
 #include <eigen3/Eigen/Dense>
-#include "./jointPoseGetter/JointPoseGetter.h"
+#include "./ThrowCalc/ThrowCalc.h"
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
 #include <math.h>
@@ -14,7 +14,7 @@ int main()
 {
     RobotConnection r("127.0.0.1");
 //    RobotConnection r("192.168.100.30");
-    JointPoseGetter j;
+    ThrowCalc j;
 
     VectorXd dx(6);
     dx << 0.04, 0, 0, 0, 0, 0;
