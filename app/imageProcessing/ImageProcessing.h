@@ -13,15 +13,17 @@ class ImageProcessing
 public:
     ImageProcessing();
     void calibrate();
+    std::vector<double> getBallCoords();
     std::vector<cv::Mat> pylonPic();
     cv::Point ballDetection(cv::Mat src);
     void chessboardDetection(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLocalImg();
     std::vector<cv::Point> cornerDetection(cv::Mat ref);
 
+
     cv::Mat cropImg(cv::Mat img);
     cv::Mat Threshold(cv::Mat image);
-    void coordConvert(cv::Point imgPos, cv::Mat img) ;
+    std::vector<double> coordConvert(cv::Point imgPos, cv::Mat img) ;
 
     void lastStand(cv::Mat img);
 

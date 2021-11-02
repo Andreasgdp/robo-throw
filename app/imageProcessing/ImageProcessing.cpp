@@ -42,6 +42,18 @@ void ImageProcessing::calibrate()
 
     cv::imshow("Result", tmp);
     cv::waitKey();
+
+}
+
+std::vector<double> ImageProcessing::getBallCoords()
+{
+    cv::Mat img = this->pylonPic()[0].clone();
+    std::cout<<"lort";
+    cv::Mat crop = this->cropImg(img);
+    cv::Point imgPoints = this->ballDetection(crop);
+    std::vector<double> realCoords = this->coordConvert(imgPoints,crop);
+
+    return realCoords;
 }
 
 std::vector<cv::Mat> ImageProcessing::pylonPic(){
@@ -85,12 +97,12 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
         GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
         if ( GenApi::IsWritable( exposureAuto)){
             exposureAuto->FromString("Off");
-//            std::cout << "Exposure auto disabled." << std::endl;
+            //            std::cout << "Exposure auto disabled." << std::endl;
         }
 
         // Set custom exposure
         GenApi::CFloatPtr exposureTime = nodemap.GetNode("ExposureTime");
-//        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
+        //        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
         if(exposureTime.IsValid()) {
             if(myExposure >= exposureTime->GetMin() && myExposure <= exposureTime->GetMax()) {
                 exposureTime->SetValue(myExposure);
@@ -104,7 +116,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             std::cout << ">> Failed to set exposure value." << std::endl;
 
         }
-//        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
+        //        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
         // Start the grabbing of c_countOfImagesToGrab images.
         // The camera device is parameterized with a default configuration which
@@ -213,7 +225,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         return points.at(0);
     } else {
         std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);       
+        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);
         cv::waitKey();
         return cv::Point(-1, -1);
     }
@@ -432,7 +444,7 @@ cv::Mat ImageProcessing::Threshold(cv::Mat image)
     return grayMod;
 }
 
-void ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
+std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 {
     float x, y;
     float xWith = img.rows, yWith = img.cols;
@@ -441,8 +453,13 @@ void ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
     x = imgPos.x*lengthPerPixel;
     y = imgPos.y*lengthPerPixel;
 
+    std::vector<double> points;
+    points.push_back(x);
+    points.push_back(y);
+
 
     std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
+    return points;
 }
 
 void ImageProcessing::lastStand(cv::Mat img)
@@ -485,79 +502,41 @@ void ImageProcessing::lastStand(cv::Mat img)
 
 std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
 {
-    using namespace cv;
-    using namespace std;
+    std::vector<cv::Mat> results, tpl;
+    std::vector<cv::Point> points;
+    cv::Mat res, gref, gtpl;
 
-    vector<Mat> results;
-    vector<Point> points;
-
-    //cv::Mat ref  = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
     cv::Mat tplR = cv::imread("../app/imageProcessing/images/tokenRight.jpg").clone();
     cv::Mat tplL = cv::imread("../app/imageProcessing/images/tokenLeft1.jpg").clone();
-    //cv::Mat ref = img(cv::Range(300,750),cv::Range(250,1150)).clone();
     cv::Mat ref = img.clone();
-
-
-//    if(ref.empty() || tpl.empty())
-//    {
-//        cout << "Error reading file(s)!" << endl;
-//        return -1;
-//    }
-    std::vector<cv::Mat> tpl;
-    cv::Mat res;
-    Mat gref, gtpl;
-
-//    imshow("tmp",ref);
-//    waitKey(0);
-
 
     tpl.push_back( tplR.clone());
     tpl.push_back( tplL.clone());
 
-for(int i=0;i<tpl.size();i++){
-    cvtColor(ref, gref, COLOR_BGR2GRAY);
-    cvtColor(tpl[i], gtpl, COLOR_BGR2GRAY);
+    for(int i=0;i<tpl.size();i++){
+        cv::cvtColor(ref, gref, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(tpl[i], gtpl, cv::COLOR_BGR2GRAY);
 
-    const int low_canny = 30;
-    Canny(gref, gref, low_canny, low_canny*3);
-    Canny(gtpl, gtpl, low_canny, low_canny*3);
+        const int low_canny = 30;
+        cv::Canny(gref, gref, low_canny, low_canny*3);
+        cv::Canny(gtpl, gtpl, low_canny, low_canny*3);
 
-//            imshow("file", gref);
-//           imshow("template", gtpl);
+        cv::Mat res_32f(ref.rows - tpl[i].rows + 1, ref.cols - tpl[i].cols + 1, CV_32FC1);
+        matchTemplate(gref, gtpl, res_32f, cv::TM_CCOEFF_NORMED);
 
-    Mat res_32f(ref.rows - tpl[i].rows + 1, ref.cols - tpl[i].cols + 1, CV_32FC1);
-    matchTemplate(gref, gtpl, res_32f, TM_CCOEFF_NORMED);
+        res_32f.convertTo(res, CV_8U, 255.0);
 
-    res_32f.convertTo(res, CV_8U, 255.0);
-//    imshow("result", res);
-
-    int size = ((tpl[i].cols + tpl[i].rows) / 4) * 2 + 1; //force size to be odd
-    adaptiveThreshold(res, res, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, size, -120);
-//    imshow("result_thresh", res);
-//    waitKey(0);
+        int size = ((tpl[i].cols + tpl[i].rows) / 4) * 2 + 1; //force size to be odd
+        cv::adaptiveThreshold(res, res, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, size, -120);
 
         double minval, maxval;
-        Point minloc, maxloc;
-        minMaxLoc(res, &minval, &maxval, &minloc, &maxloc);
-        points.push_back(Point(maxloc.x + (tpl[i].cols/2), maxloc.y + (tpl[i].rows/2)));
-        circle( ref, points[i], 10, cv::Scalar(0,100,255), 5, cv::LINE_AA); // Draws center
+        cv::Point minloc, maxloc;
+        cv::minMaxLoc(res, &minval, &maxval, &minloc, &maxloc);
+        points.push_back(cv::Point(maxloc.x + (tpl[i].cols/2), maxloc.y + (tpl[i].rows/2)));
+        cv::circle( ref, points[i], 10, cv::Scalar(0,100,255), 5, cv::LINE_AA); // Draws center
+    }
 
-}
-
-
-
-// while(1){
-//        if(maxval > 0)
-//        {
-//            //rectangle(ref, maxloc, Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows), Scalar(0,255,0), 2);
-//            //floodFill(res, maxloc, 0); //mark drawn blob
-//        }
-//        else
-//            break;
-//  }
-
-    imshow("Correct corners? (y/n)", ref);
-
+    cv::imshow("Correct corners? (y/n)", ref);
     return points;
 }
 
