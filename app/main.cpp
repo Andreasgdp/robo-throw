@@ -19,6 +19,14 @@ Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
 int main()
 {
+    VectorXd actualPos(6);
+    actualPos << 0, 0, 0, 0, 0, 0;
+    VectorXd withinPos(6);
+    withinPos << 2, -2, 2, 2, 2, 2;
+
+    Simulation sim("127.0.0.1");
+    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
+
     /*
     VectorXd homePos(6);
     homePos << 0.143, -0.435, 0.20, -0.001, 3.12, 0.04;
@@ -58,7 +66,7 @@ int main()
     rtde_control.moveL({-1.143, -0.435, 0.20, -0.001, 3.12, 0.04}, 0.5, 0.2);
     */
 
-
+    /*
     // Calibration points in robot and world frame
     Vector3d P_robot1 = {-0.05907, -0.31838, 0.17};
     Vector3d P_robot2 = {0.06377, -0.48364, 0.17};
@@ -79,6 +87,7 @@ int main()
     CoordinateTranslator.calibrateRobotToTable();
     Vector3d pos = CoordinateTranslator.computeRobotPointCoords(0.5, 0.3, 0.02);
     cout << "Entered point from world frame in robot frame: " << endl << pos << endl;
+    */
 
     /*
     Vector3d rot;

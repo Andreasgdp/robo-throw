@@ -36,6 +36,8 @@ public:
     */
     void moveHome();
 
+    const Eigen::VectorXd &getHomePosCoords() const;
+
 private:
     // Member variables
     //TODO: when all member variables are created, create getters and setters (automatic)
@@ -47,7 +49,7 @@ private:
     Eigen::VectorXd _jointPoses;
     double _speed = 1.0;
     double _acceleration = 1.0;
-    Eigen::VectorXd _homeJointPoses;
+    Eigen::VectorXd _homePosCoords;
     ImageProcessing _imgProcessor;
     RobotConnection _roboConn;
     Simulation _simulator;

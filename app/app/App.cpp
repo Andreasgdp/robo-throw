@@ -29,6 +29,7 @@ App::App(std::string robotIP,
 
 void App::findAndGrabObject()
 {
+    /*
     cv::Mat objectImg;
 
     if (_localEnv)
@@ -39,6 +40,7 @@ void App::findAndGrabObject()
     {
         // Use imageProcessing to get image from camera
     }
+    */
 
     // use imageProcessing to get coordinates to object in relation to the table from image
 
@@ -47,17 +49,26 @@ void App::findAndGrabObject()
     double x = 0.5, y = 0.3, z = 0.02; // TODO: Get point coords from imageprocessing
     Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(x, y, z);
 
+    VectorXd homePos(6);
+    homePos << getHomePosCoords();
+
     Vector3d robotObjectPointRotation;
-    robotObjectPointRotation << 1.7, 2.65, 0; // Hard-coded rotation
+    robotObjectPointRotation << homePos[3], homePos[4], homePos[5]; // Hard-coded rotation
     VectorXd robotObjectPointAndRotation(robotObjectPoint.size() + robotObjectPointRotation.size());
     robotObjectPointAndRotation << robotObjectPoint, robotObjectPointRotation;
 
-    // simulate move (handle err by calculating new joint poses)
-        //bool moveSuccess = this->simulator.moveSuccess(this->jointPoses, this->speed, this->acceleration);
-        //if (!moveSuccess) throw "Simulation failed when trying to grab object";
+    // simulate move
+    VectorXd endPosAboveObject(6);
+    endPosAboveObject << robotObjectPointAndRotation[0], robotObjectPointAndRotation[1], 0.1, homePos[3], homePos[4], homePos[5];
 
-    // move to and grab object
+    _simulator.executeMoveLSimulation(homePos, endPosAboveObject);
+    _simulator.executeMoveLSimulation(endPosAboveObject, robotObjectPointAndRotation);
+
+    // move to object
     _roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
+    _roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
+
+    // grab object
     _gripper.close();
 }
 
@@ -89,7 +100,11 @@ void App::moveHome()
     // simulate move (handle err by calculating new joint poses)
     // calculate and simulate until a valid move is made (implement timeout and throw err)
 
-    _roboConn.moveJ(_homeJointPoses, _speed, _acceleration);
+    _roboConn.moveL(_homePosCoords, _speed, _acceleration);
+}
+
+const Eigen::VectorXd &App::getHomePosCoords() const {
+    return _homePosCoords;
 }
 
 bool App::hasMovedToPos(const VectorXd &pos)
@@ -108,7 +123,7 @@ void App::waitForMoveRobot(const VectorXd &pos)
 
 void App::setDefaultPosMovement()
 {
-    _homeJointPoses = _roboConn.getHomeJointPos();
+    _homePosCoords = _roboConn.getActualTCPPose();
     _speed = _roboConn.getDefaultSpeed();
     _acceleration = _roboConn.getDefaultAcceleration();
 }

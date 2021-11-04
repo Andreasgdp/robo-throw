@@ -17,9 +17,10 @@ class Simulation
 public:
     Simulation(std::string IP);
     bool notProtectiveStop();
+    bool withinOffset(const Eigen::VectorXd &actualPos, const Eigen::VectorXd &withinOffsetPos, double offset);
     bool destinationReached(const Eigen::VectorXd &destination);
-    bool executeGrabSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos);
-    bool executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
+    void executeMoveLSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos);
+    void executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
 
 private:
     RobotConnection _roboConn;

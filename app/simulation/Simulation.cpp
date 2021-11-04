@@ -4,17 +4,37 @@ using namespace std;
 using namespace Eigen;
 
 Simulation::Simulation(std::string IP) : _roboConn(IP) {
+    // TODO: Move home
 }
 
 bool Simulation::notProtectiveStop() {
     return !_roboConn.isProtectiveStopped();
 }
 
-bool Simulation::destinationReached(const Eigen::VectorXd &destination) {
-    return _roboConn.getActualTCPPose() == destination;
+bool Simulation::withinOffset(const VectorXd &actualPos, const VectorXd &withinOffsetPos, double offset) {
+    if (actualPos.size() != withinOffsetPos.size()) {
+        throw "Must be of same size!";
+    }
+
+    bool status = false;
+    for (int i = 0; i < actualPos.size(); i++) {
+        if (withinOffsetPos[i] <= actualPos[i] + offset / 2 && withinOffsetPos[i] >= actualPos[i] - offset / 2) {
+            status = true;
+        } else {
+            status = false;
+        }
+        if (status == false) {
+            return false;
+        }
+    }
+    return true;
 }
 
-bool Simulation::executeGrabSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos) {
+bool Simulation::destinationReached(const Eigen::VectorXd &destination) {
+    return withinOffset(_roboConn.getActualTCPPose(), destination, 0.01);
+}
+
+void Simulation::executeMoveLSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos) {
     // Move to start
     _roboConn.moveL(startPos);
 
@@ -23,13 +43,11 @@ bool Simulation::executeGrabSimulation(const Eigen::VectorXd &startPos, const Ei
 
     // Do checks
     if (notProtectiveStop() && destinationReached(endPos)) {
-        return true;
-    } else {
-        return false;
-    }  
+        throw "MoveL simulation faild";
+    }
 }
 
-bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds) {
+void Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds) {
     // Move to start
     _roboConn.moveL(startPos);
 
@@ -41,12 +59,9 @@ bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const s
     // check for destination reasched (fast punkt)
     _roboConn.speedStop(10);
 
-
     // Do checks
     if (notProtectiveStop()) {
-        return true;
-    } else {
-        return false;
+        throw "Throw simulation failed";
     }
 }
 
