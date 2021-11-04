@@ -1,14 +1,13 @@
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include <eigen3/Eigen/Dense>
+#include "../coordinateTranslator/CoordinateTranslator.h"
 
 typedef Eigen::Matrix<double, 6, 6> Matrix6d;
 
 
 class ThrowCalc
 {
-private:
-	/* data */
 public:
     ThrowCalc(/* args */);
     ~ThrowCalc();
@@ -16,7 +15,7 @@ public:
     Matrix6d jacobianInverse(double q1, double q2, double q3, double q4, double q5, double q6);
     Eigen::VectorXd linearFitFunction(double t, double startTime, const Eigen::VectorXd &dq_end,const Eigen::VectorXd &dq_start, double endTime);
     std::vector<Eigen::VectorXd> getJointVelocities(const Eigen::VectorXd &q_start, const Eigen::VectorXd &q_end,const Eigen::VectorXd &dx);
-Eigen::VectorXd velocityCalc( double xWorld, double yWorld, double zWorld);
+    Eigen::VectorXd velocityCalc(CoordinateTranslator CoordinateTranslator, double xWorld, double yWorld, double zWorld);
 
 private:
 };

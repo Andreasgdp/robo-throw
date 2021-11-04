@@ -1,5 +1,4 @@
 #include "ThrowCalc.h"
-#include "CoordinateTranslator.h"
 #include "cmath"
 #include <math.h>
 #include <Eigen/Dense>
@@ -71,7 +70,7 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
     return jointVelocities;
 }
 
-VectorXd velocityCalc( double xWorld, double yWorld, double zWorld) {
+VectorXd ThrowCalc::velocityCalc(CoordinateTranslator CoordinateTranslator, double xWorld, double yWorld, double zWorld) {
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
@@ -83,12 +82,10 @@ VectorXd velocityCalc( double xWorld, double yWorld, double zWorld) {
     double angle = (a * M_PI)/180;
 
     // Convert world coordinates to robot coordinates
-    CoordinateTranslator CoordinateTranslator(P_robot, P_world);
-    CoordinateTranslator.calibrateRobotToTable();
     Vector3d pos = CoordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
     // The home/trow pos in meters and radian
-    VectorXd _throwpos;
+    VectorXd _throwpos(6);
     _throwpos << 0.20375, -0.2635, 0.6638, 1.3, -1, 1.595;
 
     // Translate 0.0.0 to the throwpos
