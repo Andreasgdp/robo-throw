@@ -43,6 +43,8 @@ void ImageProcessing::calibrate()
     cv::imshow("Result", tmp);
     cv::waitKey();
 
+    this->getBallCoords();
+
 }
 
 std::vector<double> ImageProcessing::getBallCoords()
@@ -131,14 +133,14 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
 
-            if(cv::waitKey(1) == 'q'){       //quit
-                camera.Close();
-                break;
-            }
 
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             {
+                if(imgVector.size()>=imgAmt || cv::waitKey(1) == 'q'){
+                    camera.Close();
+                    break;
+                }
                 // Convert the grabbed buffer to a pylon image.
                 formatConverter.Convert(pylonImage, ptrGrabResult);
                 // Create an OpenCV image from a pylon image.
@@ -168,14 +170,12 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     //                    cv::Rect iCrop(100, 10, 900, 600);
                     //                    cv::Mat cropImg = openCvImage(iCrop);
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
-                if(cv::waitKey(1) == 'p'){
+                if(cv::waitKey() == 'p'){
                     cv::Mat tmp=openCvImage.clone();
                     imgVector.push_back(tmp);
                     cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                    if(imgVector.size()>=imgAmt){
-                        camera.Close();
-                    }
                 }
+
             }
             else
             {
@@ -446,11 +446,19 @@ cv::Mat ImageProcessing::Threshold(cv::Mat image)
 
 std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 {
+
+    //cam height 139 cm
     float x, y;
-    float xWith = img.rows, yWith = img.cols;
+    float xWith = img.cols, yWith = img.rows;
     float realX = 80; //cm
     float lengthPerPixel = realX/xWith;
     x = imgPos.x*lengthPerPixel;
+    if(x<40){
+        x=x+((40-x)/40*0.4);
+    }
+    else if(x>40){
+        x=x+((40-x)/40*0.4);
+    }
     y = imgPos.y*lengthPerPixel;
 
     std::vector<double> points;
@@ -459,6 +467,8 @@ std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 
 
     std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
+    std::cout<<"rows: " + std::to_string(img.rows) + " cols: " + std::to_string(img.cols)<<std::endl;
+    std::cout<<"point x: " + std::to_string(imgPos.x) + " point y: " + std::to_string(imgPos.y)<<std::endl;
     return points;
 }
 
@@ -527,7 +537,7 @@ std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
         res_32f.convertTo(res, CV_8U, 255.0);
 
         int size = ((tpl[i].cols + tpl[i].rows) / 4) * 2 + 1; //force size to be odd
-        cv::adaptiveThreshold(res, res, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, size, -120);
+        cv::adaptiveThreshold(res, res, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, size, -100);
 
         double minval, maxval;
         cv::Point minloc, maxloc;
