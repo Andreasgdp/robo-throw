@@ -45,7 +45,7 @@ VectorXd JointPoseGetter::linearFitFunction(double t, double startTime, const Ve
     return next_dq;
 }
 
-vector<VectorXd> JointPoseGetter::getJointVelocities(const VectorXd &q_start, const VectorXd &q_end,const VectorXd &dx)
+vector<VectorXd> JointPoseGetter::getJointVelocities(const VectorXd &q_end,const VectorXd &dx)
 {
     VectorXd dq_end = this->jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
 

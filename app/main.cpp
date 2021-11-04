@@ -26,29 +26,21 @@ Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 int main(int argc, char *argv[])
 {
 
+
     Api api;
     api.createDatabase();
 
-    cout << api.getPoints(2) << endl;
+    CalibPoint cp;
+    cp.calibId = 1;
+    cp.pointRobot = Vector3d(1, 2, 3);
+    cp.pointTable = Vector3d(2, 3, 4);
+    cp.robotId = 1;
 
+    api.createCalibPoint(cp);
 
+    CalibPoint cpGet = api.getCalibPoint(29);
 
-
-//     Instantiating a db with the SQLite (MySQL) driver
-//    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-//    db.setDatabaseName("../app/api/data.db");
-//    if (db.open())
-//    {
-//        QSqlQuery query(db); // if multiple connections used, without the `db` in constructor    will cause the query to use the default database (first opened and available one)
-//        query.exec("SELECT col1 FROM test;");
-//        while (query.next()) {
-//            int col1 = query.value(0).toInt();
-//            qDebug() << col1;
-//        }
-//    }
-
-
-
+    cout << cpGet.pointRobot << endl;
 
     return 1;
 }

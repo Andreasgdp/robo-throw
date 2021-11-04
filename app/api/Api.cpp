@@ -10,8 +10,12 @@ int qstate;
 
 Api::Api()
 {
-    _db = QSqlDatabase::addDatabase("QSQLITE");
-    _db.setDatabaseName("../app/api/data.db");
+    _db = QSqlDatabase::addDatabase("QMYSQL");
+    _db.setHostName("localhost");
+    _db.setDatabaseName("test");
+    _db.setUserName("user1");
+    _db.setPassword("password1");
+    // _db.setDatabaseName("../app/api/data.db");
 }
 
 bool Api::createDatabase()
@@ -20,46 +24,34 @@ bool Api::createDatabase()
     if (_db.open())
     {
         QSqlQuery query(_db); // if multiple connections used, without the `db` in constructor will cause the query to use the default database (first opened and available one)
-        success = query.exec("CREATE TABLE IF NOT EXISTS throw( "
-                             "id INT, "
-                             "success BIT, "
-                             "failedAt STRING, "
-                             "deviation FLOAT, "
-                             "objPos INT, "
-                             "goalPos INT, "
-                             "robotStartConfig INT, "
-                             "totalThrowTime FLOAT, "
-                             "calibImgTime FLOAT, "
-                             "findObjTime FLOAT, "
-                             "pathCalcTime FLOAT, "
-                             "grabTime FlOAT, "
-                             "throwTime FLOAT, "
-                             "apiLogTime FLOAT);");
-
-        if (!success)
-            throw "err in throw query exec";
-
-        success = query.exec("CREATE TABLE IF NOT EXISTS calibPoint( "
-                             "id INT, "
-                             "calibId INT, "
-                             "pointTable INT, "
-                             "pointRobot INT"
-                             "robotId INT); ");
-
-        if (!success)
-            throw "err in calibPoint query exec";
 
         success = query.exec("CREATE TABLE IF NOT EXISTS point( "
-                             "id INT, "
+                             "id INT NOT NULL AUTO_INCREMENT, "
                              "x FLOAT, "
                              "y FLOAT, "
-                             "z FLOAT); ");
+                             "z FLOAT,"
+                             "PRIMARY KEY (id) "
+                             "); ");
 
         if (!success)
-            throw "err in point query exec";
+            throw std::invalid_argument("err in point query exec");
+
+        success = query.exec("CREATE TABLE IF NOT EXISTS calibPoint( "
+                             "id INT NOT NULL AUTO_INCREMENT, "
+                             "calibId INT, "
+                             "pointTable INT, "
+                             "pointRobot INT,"
+                             "robotId INT,"
+                             "PRIMARY KEY (id), "
+                             "FOREIGN KEY (pointTable) REFERENCES point(id),"
+                             "FOREIGN KEY (pointRobot) REFERENCES point(id)"
+                             "); ");
+
+        if (!success)
+            throw std::invalid_argument("err in calibPoint query exec");
 
         success = query.exec("CREATE TABLE IF NOT EXISTS robotConfig( "
-                             "id INT, "
+                             "id INT NOT NULL AUTO_INCREMENT, "
                              "j1 FLOAT, "
                              "j2 FLOAT, "
                              "j3 FLOAT, "
@@ -71,7 +63,33 @@ bool Api::createDatabase()
                              "z FLOAT, "
                              "q1 FLOAT, "
                              "q2 FLOAT, "
-                             "q3 FLOAT); ");
+                             "q3 FLOAT,"
+                             "PRIMARY KEY (id) "
+                             "); ");
+        if (!success)
+            throw std::invalid_argument("err in robotConfig query exec");
+
+        success = query.exec("CREATE TABLE IF NOT EXISTS throw( "
+                             "id INT NOT NULL AUTO_INCREMENT, "
+                             "success BIT, "
+                             "failedAt VARCHAR(1024), "
+                             "deviation FLOAT, "
+                             "objPos INT, "
+                             "goalPos INT, "
+                             "robotStartConfig INT, "
+                             "totalThrowTime FLOAT, "
+                             "calibImgTime FLOAT, "
+                             "findObjTime FLOAT, "
+                             "pathCalcTime FLOAT, "
+                             "grabTime FlOAT, "
+                             "throwTime FLOAT, "
+                             "apiLogTime FLOAT, "
+                             "PRIMARY KEY (id), "
+                             "FOREIGN KEY (objPos) REFERENCES point(id),"
+                             "FOREIGN KEY (goalPos) REFERENCES point(id),"
+                             "FOREIGN KEY (robotStartConfig) REFERENCES robotConfig(id)"
+                             ");");
+
     }
     return success;
 }
@@ -112,36 +130,42 @@ bool Api::createCalibPoint(CalibPoint c)
     {
         QSqlQuery query(_db); // if multiple connections used, without the `db` in constructor will cause the query to use the default database (first opened and available one)
 
-        query.prepare("INSERT INTO point VALUES (x, y, z) WHERE x = :x AND y = :y AND z = :z; SELECT SCOPE_IDENTITY();");
+        query.prepare("INSERT INTO point (x, y, z) VALUES (:x, :y, :z);");
         query.bindValue(":x", c.pointTable[0]);
         query.bindValue(":y", c.pointTable[1]);
         query.bindValue(":z", c.pointTable[2]);
         success = query.exec();
         if (!success)
-            throw "err in pointTable query exec";
+            throw std::invalid_argument("err in pointTable query exec");
+
+        query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
             pointTableId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO point VALUES (x, y, z) WHERE x = :x AND y = :y AND z = :z; SELECT SCOPE_IDENTITY();");
+        query.prepare("INSERT INTO point (x, y, z) VALUES (:x, :y, :z);");
         query.bindValue(":x", c.pointRobot[0]);
         query.bindValue(":y", c.pointRobot[1]);
         query.bindValue(":z", c.pointRobot[2]);
         success = query.exec();
         if (!success)
-            throw "err in pointRobot query exec";
+            throw std::invalid_argument("err in pointRobot query exec");
+
+        query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
             pointRobotId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO calibPoint VALUES (calibId, pointTable, pointRobot, robotId) WHERE calibId = :calibId AND pointTable = :pointTable AND pointRobot = :pointRobot AND robotId = :robotId; SELECT SCOPE_IDENTITY();");
-        query.bindValue(":calibId", c.pointTable[0]);
-        query.bindValue(":pointTable", pointRobotId);
-        query.bindValue(":pointRobot", pointTableId);
-        query.bindValue(":robotId", c.pointTable[3]);
+        query.prepare("INSERT INTO calibPoint (calibId, pointTable, pointRobot, robotId) VALUES (:calibId, :pointTable, :pointRobot, :robotId);");
+        query.bindValue(":calibId", c.calibId);
+        query.bindValue(":pointTable", pointTableId);
+        query.bindValue(":pointRobot", pointRobotId);
+        query.bindValue(":robotId", c.robotId);
         success = query.exec();
+        if (!success)
+            throw std::invalid_argument("err in calibPoint query exec");
     }
     return success;
 }
@@ -162,7 +186,7 @@ bool Api::createThrow(Throw t)
         query.bindValue(":z", t.objPos[2]);
         success = query.exec();
         if (!success)
-            throw "err in pointTable query exec";
+            throw std::invalid_argument("err in pointTable query exec");
         if (query.next())
         {
             objPosId = query.value(0).toInt();
@@ -174,17 +198,14 @@ bool Api::createThrow(Throw t)
         query.bindValue(":z", t.goalPos[2]);
         success = query.exec();
         if (!success)
-            throw "err in pointRobot query exec";
+            throw std::invalid_argument("err in pointRobot query exec");
         if (query.next())
         {
             goalPosId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO robotConfig VALUES ("
-                      "j1, j2, j3, j4, j5, j6, x, y, z, q1, q2, q3"
-                      ") WHERE "
-                      "j1 = :j1 AND j2 = :j2 AND j3 = :j3 AND j4 = :j4 AND j5 = :j5 AND j6 = :j6 AND "
-                      "x = :x AND y = :y AND z = :z AND q1 = :q1 AND q2 = :q2 AND q3 = :q3; "
+        query.prepare("INSERT INTO robotConfig (j1, j2, j3, j4, j5, j6, x, y, z, q1, q2, q3) "
+                      "VALUES (:j1, :j2, :j3, :j4, :j5, :j6, :x, :y, :z, :q1, :q2, :q3); "
                       "SELECT SCOPE_IDENTITY();");
         query.bindValue(":j1", t.robotStartConfig.j1);
         query.bindValue(":j2", t.robotStartConfig.j2);
@@ -200,7 +221,7 @@ bool Api::createThrow(Throw t)
         query.bindValue(":q3", t.robotStartConfig.q3);
         success = query.exec();
         if (!success)
-            throw "err in pointRobot query exec";
+            throw std::invalid_argument("err in pointRobot query exec");
         if (query.next())
         {
             robotStartConfigId = query.value(0).toInt();
@@ -255,7 +276,7 @@ bool Api::createThrow(Throw t)
 CalibPoint Api::getCalibPoint(int id)
 {
     if (!_db.open())
-        throw "database not open.";
+        throw std::invalid_argument("database not open.");
     CalibPoint c;
     QSqlQuery query(_db);
     if (id <= 0)
@@ -336,7 +357,7 @@ RobotConfig Api::getRobotConfig(int id)
 Throw Api::getThrow(int id)
 {
     if (!_db.open())
-        throw "database not open.";
+        throw std::invalid_argument("database not open.");
     Throw t;
     QSqlQuery query(_db);
     if (id <= 0)
@@ -389,7 +410,7 @@ vector<Throw> Api::getThrows(int limit)
     vector<int> ids;
     vector<Throw> throws;
     if (!_db.open())
-        throw "database not open.";
+        throw std::invalid_argument("database not open.");
     QSqlQuery query(_db);
 
     if (limit <= 0)
