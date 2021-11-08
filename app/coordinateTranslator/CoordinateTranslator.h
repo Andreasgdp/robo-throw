@@ -9,10 +9,11 @@ class CoordinateTranslator
 {
 public:
     CoordinateTranslator();
-    CoordinateTranslator(const std::vector<Eigen::Vector3d> &robotPointSet, const std::vector<Eigen::Vector3d> &worldPointSet);
 
     // Robot to table calibration
+    void setPointSets(const std::vector<Eigen::Vector3d> &newRobotPointSet, const std::vector<Eigen::Vector3d> &newWorldPointSet);
     void setNumberOfPoints();
+    bool isPointSetsValid();
     Eigen::Vector3d computeCentroid(const std::vector<Eigen::Vector3d> &pointSet);
     std::vector<Eigen::Vector3d> computeZeroCentroidPointSet(const std::vector<Eigen::Vector3d> &pointSet, const Eigen::Vector3d &centroid);
     Eigen::JacobiSVD<Eigen::Matrix3d> computeSVD(const std::vector<Eigen::Vector3d> &robotPointSet, const std::vector<Eigen::Vector3d> &worldPointSet, unsigned int computationOptions = Eigen::ComputeFullU | Eigen::ComputeFullV);

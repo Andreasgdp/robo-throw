@@ -7,17 +7,16 @@ using namespace Eigen;
 CoordinateTranslator::CoordinateTranslator() {
 }
 
-CoordinateTranslator::CoordinateTranslator(const vector<Vector3d> &robotPointSet, const vector<Vector3d> &worldPointSet) {
-    _robotPointSet = robotPointSet;
-    _worldPointSet = worldPointSet;
-    setNumberOfPoints();
+void CoordinateTranslator::setNumberOfPoints() {
+    _numberOfPoints = _robotPointSet.size();
 }
 
-void CoordinateTranslator::setNumberOfPoints() {
-    if (_robotPointSet.size() != _worldPointSet.size()) {
-            throw invalid_argument("Robot and world point sets must be of same size!");
+bool CoordinateTranslator::isPointSetsValid() {
+    if (_robotPointSet.size() > 0 && _worldPointSet.size() > 0 && _robotPointSet.size() == _worldPointSet.size()) {
+        return true;
     } else {
-        _numberOfPoints = _robotPointSet.size();
+        throw invalid_argument("Robot and world point sets must be larger than 0 and of same size!");
+        return false;
     }
 }
 
@@ -69,6 +68,8 @@ void CoordinateTranslator::computeInverseTransformationMatrix() {
 }
 
 void CoordinateTranslator::calibrateRobotToTable() {
+    isPointSetsValid();
+
     Vector3d robotCentroid = computeCentroid(_robotPointSet);
     Vector3d worldCentroid = computeCentroid(_worldPointSet);
 
@@ -86,6 +87,13 @@ Vector3d CoordinateTranslator::computeRobotPointCoords(double x, double y, doubl
     Vector3d robotPoint3d = {robotPoint4d(0), robotPoint4d(1), robotPoint4d(2)};
     return robotPoint3d;
 }
+
+void CoordinateTranslator::setPointSets(const std::vector<Eigen::Vector3d> &newRobotPointSet, const std::vector<Eigen::Vector3d> &newWorldPointSet) {
+    _robotPointSet = newRobotPointSet;
+    _worldPointSet = newWorldPointSet;
+    setNumberOfPoints();
+}
+
 
 
 
