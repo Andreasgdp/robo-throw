@@ -13,16 +13,27 @@ class ImageProcessing
 public:
     ImageProcessing();
     void calibrate();
+    std::vector<double> getBallCoords();
     std::vector<cv::Mat> pylonPic();
-    void getCornersV2(std::vector<cv::Mat> imgVec);
-    std::vector<cv::Mat> loadLoaclimg();
+    cv::Point ballDetection(cv::Mat src);
+    void chessboardDetection(std::vector<cv::Mat> imgVec);
+    std::vector<cv::Mat> loadLocalImg();
+    std::vector<cv::Point> cornerDetection(cv::Mat ref);
+
+
+    cv::Mat cropImg(cv::Mat img);
+    cv::Mat Threshold(cv::Mat image);
+    std::vector<double> coordConvert(cv::Point imgPos, cv::Mat img) ;
+
+    void lastStand(cv::Mat img);
 
 
 private:
     int _sim = false;
     const cv::Size BoardSize{6,9};
-    bool isCalib = false;
-    bool preCalib = false;
+    int _camHeight = 139, _camWith =80; //cm
+    std::vector<cv::Point> cropCornerPoints;
+    bool autoImg = true; //
 
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
     int imgAmt = 10; // Ammount of images to take

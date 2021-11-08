@@ -7,6 +7,12 @@ Simulation::Simulation(std::string IP) : _roboConn(IP) {
     // TODO: Move home
 }
 
+
+//void Simulation::calibrateCam()
+//{
+//    this->imgProc.calibrate();
+//}
+
 bool Simulation::notProtectiveStop() {
     return !_roboConn.isProtectiveStopped();
 }

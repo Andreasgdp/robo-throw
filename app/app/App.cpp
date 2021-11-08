@@ -24,6 +24,15 @@ App::App(std::string robotIP,
     //coordTrans.setPointSets(P_robot, P_world);    // TODO: Get pointsets from DB
     //coordTrans.calibrateRobotToTable();           // TODO: Fix line above for no error
     this->moveHome();
+
+}
+
+void App::calibrateCam()
+{
+//    bool camCalibrated = this->simulator.calibrateCam();
+//    if (!camCalibrated) throw "Couldn't calibrate cam";
+//    this->imgProcessor.calibrate();
+
     _gripper.open();
 }
 
