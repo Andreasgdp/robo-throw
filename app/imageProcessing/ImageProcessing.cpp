@@ -19,18 +19,18 @@ void ImageProcessing::calibrate()
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
 
-    cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
+    cropCornerPoints = this->cornersHoughCircles(this->pylonPic()[0]);
 
-    while (true) {
-        cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
-        if (cv::waitKey() == 'y') {
-            cv::destroyAllWindows();
-            break;
-        }
-        else
-            cv::destroyAllWindows();
+//    while (true) {
+//        cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
+//        if (cv::waitKey() == 'y') {
+//            cv::destroyAllWindows();
+//            break;
+//        }
+//        else
+//            cv::destroyAllWindows();
 
-    }
+//    }
 
 //    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
 //    cv::Point ball = this->ballDetection(tmp);
@@ -559,30 +559,39 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
 
 std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
     cv::Mat image_hsv;
-    cvtColor(src, image_hsv, cv::COLOR_BGR2HSV);
+    cv::cvtColor(src, image_hsv, cv::COLOR_BGR2HSV);
     cv::medianBlur(image_hsv, image_hsv, 9);
 
-    cv::Mat mask1, mask2, mask_combined, image_masked;
+    cv::Mat lower_red_hue_range, upper_red_hue_range, red_hue_image;
 
-    cv::inRange(image_hsv, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), mask1);
-    cv::inRange(image_hsv, cv::Scalar(10, 70, 50), cv::Scalar(50, 255, 255), mask2);
+    cv::inRange(image_hsv, cv::Scalar(0, 100, 100), cv::Scalar(30, 255, 255), lower_red_hue_range);
+    cv::inRange(image_hsv, cv::Scalar(160, 100, 100), cv::Scalar(179, 255, 255), upper_red_hue_range);
 
-    cv::bitwise_or(mask1, mask2, mask_combined);
-    cv::bitwise_and(src, src, image_masked, mask_combined);
+    cv::addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, red_hue_image);
+    cv::GaussianBlur(red_hue_image, red_hue_image, cv::Size(9, 9), 2, 2);
 
-    cv::imshow("test", image_masked);
+    cv::imshow("red_hue_image", red_hue_image);
     cv::waitKey();
 
-    cv::imshow("test1", mask_combined);
+    std::vector<cv::Vec3f> circles;
+    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/8, 100, 20, 0, 0);
+
+    if(circles.size() == 0) std::exit(-1);
+    for(size_t current_circle = 0; current_circle < circles.size(); ++current_circle) {
+        cv::Point center(std::round(circles[current_circle][0]), std::round(circles[current_circle][1]));
+        int radius = std::round(circles[current_circle][2]);
+
+        cv::circle(image_hsv, center, radius, cv::Scalar(0, 255, 0), 5);
+    }
+
+    cv::imshow("image_hsv", image_hsv);
     cv::waitKey();
 
-    cv::threshold(image_masked, image_masked, 85, 255, cv::THRESH_BINARY);
 
-    cv::imshow("test treshold", image_masked);
-    cv::waitKey();
+//    cv::cvtColor(lower_red_hue_range, ballsDetectBGR, cv::COLOR_HSV2BGR);
 
     std::vector<cv::Point> points;
-    points.push_back(this->ballDetection(image_masked));
+//    points.push_back(this->ballDetection(ballsDetectBGR));
 
 
     return points;
