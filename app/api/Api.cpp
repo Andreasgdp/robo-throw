@@ -15,7 +15,6 @@ Api::Api()
     _db.setDatabaseName("test");
     _db.setUserName("user1");
     _db.setPassword("password1");
-    // _db.setDatabaseName("../app/api/data.db");
 }
 
 bool Api::createDatabase()
@@ -71,7 +70,7 @@ bool Api::createDatabase()
 
         success = query.exec("CREATE TABLE IF NOT EXISTS throw( "
                              "id INT NOT NULL AUTO_INCREMENT, "
-                             "success BIT, "
+                             "success BOOL, "
                              "failedAt VARCHAR(1024), "
                              "deviation FLOAT, "
                              "objPos INT, "
@@ -89,6 +88,9 @@ bool Api::createDatabase()
                              "FOREIGN KEY (goalPos) REFERENCES point(id),"
                              "FOREIGN KEY (robotStartConfig) REFERENCES robotConfig(id)"
                              ");");
+        if (!success) {
+            qDebug() << query.lastError();
+        }
 
     }
     return success;
@@ -180,33 +182,35 @@ bool Api::createThrow(Throw t)
     {
         QSqlQuery query(_db); // if multiple connections used, without the `db` in constructor will cause the query to use the default database (first opened and available one)
 
-        query.prepare("INSERT INTO point VALUES (x, y, z) WHERE x = :x AND y = :y AND z = :z; SELECT SCOPE_IDENTITY();");
+        query.prepare("INSERT INTO point (x, y, z) VALUES (:x, :y, :z);");
         query.bindValue(":x", t.objPos[0]);
         query.bindValue(":y", t.objPos[1]);
         query.bindValue(":z", t.objPos[2]);
         success = query.exec();
         if (!success)
             throw std::invalid_argument("err in pointTable query exec");
+
+        query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
             objPosId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO point VALUES (x, y, z) WHERE x = :x AND y = :y AND z = :z; SELECT SCOPE_IDENTITY();");
+        query.prepare("INSERT INTO point (x, y, z) VALUES (:x, :y, :z);");
         query.bindValue(":x", t.goalPos[0]);
         query.bindValue(":y", t.goalPos[1]);
         query.bindValue(":z", t.goalPos[2]);
         success = query.exec();
         if (!success)
             throw std::invalid_argument("err in pointRobot query exec");
+        query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
             goalPosId = query.value(0).toInt();
         }
 
         query.prepare("INSERT INTO robotConfig (j1, j2, j3, j4, j5, j6, x, y, z, q1, q2, q3) "
-                      "VALUES (:j1, :j2, :j3, :j4, :j5, :j6, :x, :y, :z, :q1, :q2, :q3); "
-                      "SELECT SCOPE_IDENTITY();");
+                      "VALUES (:j1, :j2, :j3, :j4, :j5, :j6, :x, :y, :z, :q1, :q2, :q3);");
         query.bindValue(":j1", t.robotStartConfig.j1);
         query.bindValue(":j2", t.robotStartConfig.j2);
         query.bindValue(":j3", t.robotStartConfig.j3);
@@ -222,12 +226,14 @@ bool Api::createThrow(Throw t)
         success = query.exec();
         if (!success)
             throw std::invalid_argument("err in pointRobot query exec");
+
+        query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
             robotStartConfigId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO throw VALUES ("
+        query.prepare("INSERT INTO throw ("
                       "success, "
                       "failedAt, "
                       "deviation, "
@@ -241,20 +247,22 @@ bool Api::createThrow(Throw t)
                       "grabTime, "
                       "throwTime, "
                       "apiLogTime"
-                      ") WHERE "
-                      "success = :success AND "
-                      "failedAt = :failedAt AND "
-                      "deviation = :deviation AND "
-                      "objPos = :objPos AND "
-                      "goalPos = :goalPos AND "
-                      "robotStartConfig = :robotStartConfig AND "
-                      "totalThrowTime = :totalThrowTime AND "
-                      "calibImgTime = :calibImgTime AND "
-                      "findObjTime = :findObjTime AND "
-                      "pathCalcTime = :pathCalcTime AND "
-                      "grabTime = :grabTime AND "
-                      "throwTime = :throwTime AND "
-                      "apiLogTime = :apiLogTime;");
+                      ")"
+                      " VALUES  ("
+                      ":success, "
+                      ":failedAt, "
+                      ":deviation, "
+                      ":objPos, "
+                      ":goalPos, "
+                      ":robotStartConfig, "
+                      ":totalThrowTime, "
+                      ":calibImgTime, "
+                      ":findObjTime, "
+                      ":pathCalcTime, "
+                      ":grabTime, "
+                      ":throwTime, "
+                      ":apiLogTime"
+                      ")");
         query.bindValue(":success", t.success);
         query.bindValue(":failedAt", QString::fromStdString(t.failedAt));
         query.bindValue(":deviation", t.deviation);
@@ -269,6 +277,9 @@ bool Api::createThrow(Throw t)
         query.bindValue(":throwTime", t.throwTime);
         query.bindValue(":apiLogTime", t.apiLogTime);
         success = query.exec();
+        if (!success) {
+            qDebug() << query.lastError();
+        }
     }
     return success;
 }
@@ -380,24 +391,24 @@ Throw Api::getThrow(int id)
                       "grabTime, "
                       "throwTime, "
                       "apiLogTime "
-                      "FROM throw WHERE p.id = :id;");
+                      "FROM throw WHERE id = :id;");
         query.bindValue(":id", id);
         query.exec();
         if (query.next())
         {
-            t.success = query.value(0).toInt();
-            t.failedAt = query.value(1).toInt();
-            t.deviation = query.value(2).toInt();
-            t.objPos = this->getPoint(query.value(3).toInt());
-            t.goalPos = this->getPoint(query.value(4).toInt());
-            t.robotStartConfig = this->getRobotConfig(query.value(5).toInt());
-            t.totalThrowTime = query.value(6).toInt();
-            t.calibImgTime = query.value(7).toInt();
-            t.findObjTime = query.value(8).toInt();
-            t.pathCalcTime = query.value(9).toInt();
-            t.grabTime = query.value(10).toInt();
-            t.throwTime = query.value(11).toInt();
-            t.apiLogTime = query.value(12).toInt();
+            t.success = query.value(0).toBool();
+            t.failedAt = query.value(1).toString().toStdString();
+            t.deviation = query.value(2).toDouble();
+            t.objPos = this->getPoint(query.value(3).toDouble());
+            t.goalPos = this->getPoint(query.value(4).toDouble());
+            t.robotStartConfig = this->getRobotConfig(query.value(5).toDouble());
+            t.totalThrowTime = query.value(6).toDouble();
+            t.calibImgTime = query.value(7).toDouble();
+            t.findObjTime = query.value(8).toDouble();
+            t.pathCalcTime = query.value(9).toDouble();
+            t.grabTime = query.value(10).toDouble();
+            t.throwTime = query.value(11).toDouble();
+            t.apiLogTime = query.value(12).toDouble();
 
             return t;
         }
@@ -419,12 +430,12 @@ vector<Throw> Api::getThrows(int limit)
     }
     else
     {
-        query.prepare("SELECT id FROM point LIMIT :limit;");
+        query.prepare("SELECT id FROM throw LIMIT :limit;");
         query.bindValue(":limit", limit);
         query.exec();
-        if (query.next())
+        while (query.next())
         {
-            ids.push_back(query.value(0).toDouble());
+            ids.push_back(query.value(0).toInt());
         }
         if (ids.size() <= 0) throw std::invalid_argument("no throws has been logged yet");
 
