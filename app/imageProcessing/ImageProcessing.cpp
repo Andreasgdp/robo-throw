@@ -19,8 +19,10 @@ void ImageProcessing::calibrate()
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
 
+    cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
+
     while (true) {
-        cropCornerPoints = this->cornerDetection(this->pylonPic()[0]);
+        cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
         if (cv::waitKey() == 'y') {
             cv::destroyAllWindows();
             break;
@@ -30,20 +32,20 @@ void ImageProcessing::calibrate()
 
     }
 
-    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
-    cv::Point ball = this->ballDetection(tmp);
-    while(ball.x == -1 && ball.y==-1){
-        std::cout<<"take new image when ready, press p"<<std::endl;
-        if(cv::waitKey()=='p'){
-            tmp = this->cropImg(this->pylonPic()[0]);
-            ball = this->ballDetection(tmp);
-        }
-    }
+//    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
+//    cv::Point ball = this->ballDetection(tmp);
+//    while(ball.x == -1 && ball.y==-1){
+//        std::cout<<"take new image when ready, press p"<<std::endl;
+//        if(cv::waitKey()=='p'){
+//            tmp = this->cropImg(this->pylonPic()[0]);
+//            ball = this->ballDetection(tmp);
+//        }
+//    }
 
-    cv::imshow("Result", tmp);
-    cv::waitKey();
+//    cv::imshow("Result", tmp);
+//    cv::waitKey();
 
-    this->getBallCoords();
+//    this->getBallCoords();
 
 }
 
@@ -190,45 +192,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                   << e.GetDescription() << std::endl;
     }
     return imgVector;
-}
-
-cv::Point ImageProcessing::ballDetection(cv::Mat src) {
-    std::vector<cv::Point> points;
-    std::vector<cv::Mat> bufferImages;
-    cv::Mat src_grey;
-    cvtColor(src, src_grey, cv::COLOR_BGR2GRAY);
-    cv::medianBlur(src_grey, src_grey, 5);
-
-    std::vector<cv::Vec3f> circles;
-    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
-    for( size_t i = 0; i < circles.size(); i++ ) {
-        cv::Vec3i c = circles[i];
-        cv::Point center = cv::Point(c[0], c[1]);
-        points.push_back(center);
-        circle( src_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
-        circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
-        bufferImages.push_back(src_grey.clone());
-    }
-    if(points.size() > 1) {
-        for (unsigned int i = 0; i < bufferImages.size(); i++) {
-            cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
-            cv::waitKey();
-            cv::destroyWindow("showImage" + std::to_string(i));
-        }
-        std::cout << "Put in the correct picture number: ";
-        std::string input;
-        std::cin >> input;
-        std::cout << "Picture number " + input + " have been selected" << std::endl;
-
-        return points.at(std::stoi(input));
-    } else if (points.size() == 1){
-        return points.at(0);
-    } else {
-        std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);
-        cv::waitKey();
-        return cv::Point(-1, -1);
-    }
 }
 
 void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
@@ -510,7 +473,7 @@ void ImageProcessing::lastStand(cv::Mat img)
 
 }
 
-std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
+std::vector<cv::Point> ImageProcessing::cornersTempleMatching(cv::Mat img)
 {
     std::vector<cv::Mat> results, tpl;
     std::vector<cv::Point> points;
@@ -550,6 +513,80 @@ std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
     return points;
 }
 
+cv::Point ImageProcessing::ballDetection(cv::Mat src) {
+    std::vector<cv::Point> points;
+    std::vector<cv::Mat> bufferImages;
+    cv::Mat src_grey;
+    cvtColor(src, src_grey, cv::COLOR_BGR2GRAY);
+    cv::medianBlur(src_grey, src_grey, 5);
+
+    std::vector<cv::Vec3f> circles;
+    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+    for( size_t i = 0; i < circles.size(); i++ ) {
+        cv::Vec3i c = circles[i];
+        cv::Point center = cv::Point(c[0], c[1]);
+        points.push_back(center);
+        circle( src_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
+        circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
+        bufferImages.push_back(src_grey.clone());
+    }
+    if(points.size() > 1) {
+        for (unsigned int i = 0; i < bufferImages.size(); i++) {
+            cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
+            cv::waitKey();
+            cv::destroyWindow("showImage" + std::to_string(i));
+        }
+        std::cout << "Put in the correct picture number: ";
+        std::string input;
+        std::cin >> input;
+        std::cout << "Picture number " + input + " have been selected" << std::endl;
+
+        return points.at(std::stoi(input));
+    } else if (points.size() == 1){
+
+        cv::imshow("testo", src_grey);
+        cv::waitKey();
+
+
+        return points.at(0);
+    } else {
+        std::cout << "No table tennis ball found!" << std::endl;
+        cv::imshow("PointsNotFound", src_grey);
+        cv::waitKey();
+        return cv::Point(-1, -1);
+    }
+}
+
+std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
+    cv::Mat image_hsv;
+    cvtColor(src, image_hsv, cv::COLOR_BGR2HSV);
+    cv::medianBlur(image_hsv, image_hsv, 9);
+
+    cv::Mat mask1, mask2, mask_combined, image_masked;
+
+    cv::inRange(image_hsv, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), mask1);
+    cv::inRange(image_hsv, cv::Scalar(10, 70, 50), cv::Scalar(50, 255, 255), mask2);
+
+    cv::bitwise_or(mask1, mask2, mask_combined);
+    cv::bitwise_and(src, src, image_masked, mask_combined);
+
+    cv::imshow("test", image_masked);
+    cv::waitKey();
+
+    cv::imshow("test1", mask_combined);
+    cv::waitKey();
+
+    cv::threshold(image_masked, image_masked, 85, 255, cv::THRESH_BINARY);
+
+    cv::imshow("test treshold", image_masked);
+    cv::waitKey();
+
+    std::vector<cv::Point> points;
+    points.push_back(this->ballDetection(image_masked));
+
+
+    return points;
+}
 
 
 

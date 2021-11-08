@@ -3,6 +3,7 @@
 #include "./ThrowCalc/ThrowCalc.h"
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
+#include "imageProcessing/ImageProcessing.h"
 #include <math.h>
 #include <chrono>
 #include <thread>
@@ -19,6 +20,8 @@ Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
 int main(int argc, char *argv[])
 {
+    ImageProcessing imageprocessing;
+    imageprocessing.calibrate();
     VectorXd actualPos(6);
     actualPos << 0, 0, 0, 0, 0, 0;
     VectorXd withinPos(6);
