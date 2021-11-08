@@ -22,7 +22,12 @@ include_directories(${Pylon_INCLUDE_DIRS})
 
 # UR-RTDE
 find_package(ur_rtde REQUIRED)
+
+# Eigen
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
+# Adds executables
 add_executable(app main.cpp ${SOURCE_FILES} ${HEADER_FILES})
 
-#Link libraries
-target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES})
+# Link libraries
+target_link_libraries(app PRIVATE ur_rtde::rtde ${OpenCV_LIBS} ${Pylon_LIBRARIES} ${RL_LIBRARIES} Eigen3::Eigen)

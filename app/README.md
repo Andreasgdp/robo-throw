@@ -25,6 +25,13 @@ sudo apt-get update
 sudo apt-get install librl librl-demos librl-examples librl-dev 
 ```
 
+## Eigen Library (for working with matrices)
+The following is probably already installed on your linux machine, but if it is not, use this command to install it.
+
+```
+sudo apt install libeigen3-dev
+```
+
 ## URSim
 Carefully follow the following steps to install URSim.
 
