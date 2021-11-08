@@ -50,8 +50,9 @@ public:
 
     bool isProtectiveStopped();
 
-    const Eigen::VectorXd &getHomeJointPos() const;
-    void setHomeJointPos(const Eigen::VectorXd &newHomeJointPos);
+    const Eigen::VectorXd &getHomePosCoords() const;
+    void setHomePosCoords(const Eigen::VectorXd &homePosCoords);
+    void moveHome(double speed, double acceleration);
 
     double getDefaultSpeed() const;
     void setDefaultSpeed(double newDefaultSpeed);
@@ -59,12 +60,14 @@ public:
     double getDefaultAcceleration() const;
     void setDefaultAcceleration(double newDefaultAcceleration);
 
+    void throwMove();
+
 private:
     std::string IP;
     ur_rtde::RTDEControlInterface rtde_control;
     ur_rtde::RTDEReceiveInterface rtde_recieve;
     // TODO: find good values for home pos
-    Eigen::VectorXd homeJointPos;
+    Eigen::VectorXd _homePosCoords;
     double defaultSpeed = 1;
     double defaultAcceleration = 1;
 };
