@@ -9,6 +9,7 @@
 #include "coordinateTranslator/CoordinateTranslator.h"
 #include "gripperHandling/GripperController.h"
 #include "simulation/Simulation.h"
+#include <boost/timer/timer.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -17,15 +18,38 @@ using namespace ur_rtde;
 Eigen::Matrix4d CoordinateTranslator::_transformationMatrix;
 Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
+template <
+    class result_t   = std::chrono::milliseconds,
+    class clock_t    = std::chrono::steady_clock,
+    class duration_t = std::chrono::milliseconds
+>
+auto since(std::chrono::time_point<clock_t, duration_t> const& start)
+{
+    return std::chrono::duration_cast<result_t>(clock_t::now() - start);
+}
+
 int main(int argc, char *argv[])
 {
-    VectorXd actualPos(6);
-    actualPos << 0, 0, 0, 0, 0, 0;
-    VectorXd withinPos(6);
-    withinPos << 2, -2, 2, 2, 2, 2;
 
-    Simulation sim("127.0.0.1");
-    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
+    auto start = std::chrono::steady_clock::now();
+
+    std::cout << "Elapsed(ms)=" << since(start).count() << std::endl;
+
+    this_thread::sleep_for(chrono::milliseconds(8));
+
+    std::cout << "Elapsed(us)="
+              << since<std::chrono::microseconds>(start).count()
+              << std::endl;
+
+
+
+//    VectorXd actualPos(6);
+//    actualPos << 0, 0, 0, 0, 0, 0;
+//    VectorXd withinPos(6);
+//    withinPos << 2, -2, 2, 2, 2, 2;
+
+//    Simulation sim("127.0.0.1");
+//    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
 
     /*
     VectorXd homePos(6);
