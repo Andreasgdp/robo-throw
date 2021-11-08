@@ -1,6 +1,6 @@
 #include <iostream>
 #include <eigen3/Eigen/Dense>
-#include "./jointPoseGetter/JointPoseGetter.h"
+#include "./ThrowCalc/ThrowCalc.h"
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
 #include <math.h>

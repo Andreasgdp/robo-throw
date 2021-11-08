@@ -1,4 +1,5 @@
 #include "RobotConnection.h"
+#include "../ThrowCalc/ThrowCalc.h"
 
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
@@ -9,7 +10,9 @@ using namespace Eigen;
 
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
 {
-//     this->homeJointPos << 0, 0, 0, 0, 0, 0;
+    VectorXd homePos;
+    homePos << 189.55, -150.99, 257.11, 2.533, -1.801, 0.101; // TODO: Set final home pos
+    setHomePosCoords(homePos);
 }
 
 void RobotConnection::moveJ(const VectorXd &jointPoses, double speed, double acceleration)
@@ -223,14 +226,19 @@ bool RobotConnection::isProtectiveStopped()
     return this->rtde_recieve.isProtectiveStopped();
 }
 
-const VectorXd &RobotConnection::getHomeJointPos() const
+const VectorXd &RobotConnection::getHomePosCoords() const
 {
-    return homeJointPos;
+    return _homePosCoords;
 }
 
-void RobotConnection::setHomeJointPos(const VectorXd &newHomeJointPos)
+void RobotConnection::setHomePosCoords(const VectorXd &homePosCoords)
 {
-    homeJointPos = newHomeJointPos;
+    _homePosCoords = homePosCoords;
+}
+
+void RobotConnection::moveHome(double speed, double acceleration)
+{
+    moveL(_homePosCoords, speed, acceleration);
 }
 
 double RobotConnection::getDefaultSpeed() const
@@ -251,6 +259,31 @@ double RobotConnection::getDefaultAcceleration() const
 void RobotConnection::setDefaultAcceleration(double newDefaultAcceleration)
 {
     defaultAcceleration = newDefaultAcceleration;
+}
+
+void RobotConnection::throwMove() // TODO: someone pls fix dis (i dont understand)
+{
+    ThrowCalc j;
+    VectorXd dx(6);
+    dx << 0.04, 0, 0, 0, 0, 0;
+    VectorXd q_end(6);
+    q_end << -0.136581,-0.217782,1.655361,-0.485521, 2.96964, -0.775282;
+    moveJ(q_end, 1, 1);
+    VectorXd x_end = getActualTCPPose();
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    VectorXd dq_end = j.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
+    cout << "expected joint poses:  \n" << q_end << endl;
+    VectorXd q_start = q_end + (dq_end * -3);
+    moveJ(q_start, 1, 1);
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    vector<VectorXd> test = j.getJointVelocities(q_start, q_end, dx);
+    for (int i = 0; i < test.size(); i++)
+    {
+        speedJ(test.at(i), 40);
+        this_thread::sleep_for(chrono::milliseconds(8));
+    }
+    cout << "actual:  \n" << getActualJointPoses() << endl;
+    speedStop(10);
 }
 
 RobotConnection::~RobotConnection()

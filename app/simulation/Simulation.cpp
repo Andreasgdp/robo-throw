@@ -51,13 +51,8 @@ void Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const s
     // Move to start
     _roboConn.moveL(startPos);
 
-    // TODO: Move correctly
-    // Move to destination
-    for (int i = 0; i < jointSpeeds.size(); i++) {
-        _roboConn.speedJ(jointSpeeds[i]);
-    }
-    // check for destination reasched (fast punkt)
-    _roboConn.speedStop(10);
+    // Move / throw
+    _roboConn.throwMove();
 
     // Do checks
     if (notProtectiveStop()) {

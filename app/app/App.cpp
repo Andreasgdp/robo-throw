@@ -53,19 +53,18 @@ void App::findAndGrabObject()
     homePos << getHomePosCoords();
 
     Vector3d robotObjectPointRotation;
-    robotObjectPointRotation << homePos[3], homePos[4], homePos[5]; // Hard-coded rotation
+    robotObjectPointRotation << homePos[3], homePos[4], homePos[5];
     VectorXd robotObjectPointAndRotation(robotObjectPoint.size() + robotObjectPointRotation.size());
     robotObjectPointAndRotation << robotObjectPoint, robotObjectPointRotation;
-
-    // simulate move
     VectorXd endPosAboveObject(6);
     endPosAboveObject << robotObjectPointAndRotation[0], robotObjectPointAndRotation[1], 0.1, homePos[3], homePos[4], homePos[5];
 
+    // simulate move
     _simulator.executeMoveLSimulation(homePos, endPosAboveObject);
     _simulator.executeMoveLSimulation(endPosAboveObject, robotObjectPointAndRotation);
 
     // move to object
-    _roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
+    _roboConn.moveL(endPosAboveObject, _speed, _acceleration);
     _roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
 
     // grab object
@@ -123,7 +122,7 @@ void App::waitForMoveRobot(const VectorXd &pos)
 
 void App::setDefaultPosMovement()
 {
-    _homePosCoords = _roboConn.getActualTCPPose();
+    _homePosCoords = _roboConn.getHomePosCoords();
     _speed = _roboConn.getDefaultSpeed();
     _acceleration = _roboConn.getDefaultAcceleration();
 }
