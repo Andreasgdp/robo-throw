@@ -58,7 +58,7 @@ public:
     Eigen::Vector3d getPoint(int id = -1);
     bool createCalibPoint(CalibPoint c);
     bool createThrow(Throw t);
-    CalibPoint getCalibPoint(int id = -1);
+    std::vector<CalibPoint> getCalibPoint(int robotId = -1);
     RobotConfig getRobotConfig(int id = -1);
     Throw getThrow(int id = -1);
     std::vector<Throw> getThrows(int limit = 1);
