@@ -7,7 +7,7 @@ void ImageProcessing::calibrate()
     std::string input;
     std::cout<<"Run new calibration? [y/n]";
     std::cin>> input;
-
+    cv::Mat localImage = cv::imread("../app/imageProcessing/images/src-test.jpg", 1);
     if(input=="y"){
         this->chessboardDetection(this->pylonPic());
         std::cout << "Ready for cropping? (y)" << std::endl;
@@ -19,7 +19,7 @@ void ImageProcessing::calibrate()
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
 
-    cropCornerPoints = this->cornersHoughCircles(this->pylonPic()[0]);
+    cropCornerPoints = this->cornersHoughCircles(localImage);
 
 //    while (true) {
 //        cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
@@ -558,7 +558,9 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
 }
 
 std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
-    cv::Mat image_hsv;
+    std::vector<cv::Point> points;
+    cv::Mat image_hsv, image_bgr;
+    image_bgr = src;
     cv::cvtColor(src, image_hsv, cv::COLOR_BGR2HSV);
     cv::medianBlur(image_hsv, image_hsv, 9);
 
@@ -574,25 +576,51 @@ std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
     cv::waitKey();
 
     std::vector<cv::Vec3f> circles;
-    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/8, 100, 20, 0, 0);
+    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
 
     if(circles.size() == 0) std::exit(-1);
     for(size_t current_circle = 0; current_circle < circles.size(); ++current_circle) {
         cv::Point center(std::round(circles[current_circle][0]), std::round(circles[current_circle][1]));
         int radius = std::round(circles[current_circle][2]);
-
-        cv::circle(image_hsv, center, radius, cv::Scalar(0, 255, 0), 5);
+        cv::circle(image_bgr, center, radius, cv::Scalar(0, 255, 0), 2);
+        points.push_back(center);
     }
 
-    cv::imshow("image_hsv", image_hsv);
+
+
+    double minX{-1}, maxY{-1};
+    int minXIndx{}, maxYIndx{-1};
+
+//    std::vector<cv::Point>::iterator result = std::min_element(points.begin()->x, points.end()->x);
+//    minY = std::distance(points.begin()->x, minX)
+    for (unsigned int i = 0; i < points.size(); i++) {
+        if (minX > points.at(i).x) {
+            minX = points.at(i).x;
+            minXIndx = i;
+        } else if (minX == -1) {
+            minX = points.at(i).x;
+            minXIndx = i;
+        }
+
+        if (maxY < points.at(i).y) {
+            maxY = points.at(i).y;
+            maxYIndx = i;
+        }
+    }
+
+    cropCornerPoints.push_back(points.at(minXIndx));
+
+    if (minXIndx == 0 && maxYIndx == 1)
+        cropCornerPoints.push_back(points.at(2));
+    else if (minXIndx == 1 && maxYIndx == 2)
+        cropCornerPoints.push_back(points.at(0));
+    else
+        cropCornerPoints.push_back(points.at(1));
+
+    cropCornerPoints.push_back(points.at(maxYIndx));
+
+    cv::imshow("image_hsv_2", image_bgr);
     cv::waitKey();
-
-
-//    cv::cvtColor(lower_red_hue_range, ballsDetectBGR, cv::COLOR_HSV2BGR);
-
-    std::vector<cv::Point> points;
-//    points.push_back(this->ballDetection(ballsDetectBGR));
-
 
     return points;
 }

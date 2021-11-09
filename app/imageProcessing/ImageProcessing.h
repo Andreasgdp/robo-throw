@@ -6,6 +6,7 @@
 #include "opencv2/core/types_c.h"
 #include "vector"
 #include <pylon/PylonIncludes.h>
+#include <algorithm>
 
 
 class ImageProcessing
@@ -20,9 +21,6 @@ public:
     std::vector<cv::Mat> loadLocalImg();
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
     std::vector<cv::Point> cornersHoughCircles(cv::Mat src);
-
-
-
     cv::Mat cropImg(cv::Mat img);
     cv::Mat Threshold(cv::Mat image);
     std::vector<double> coordConvert(cv::Point imgPos, cv::Mat img) ;
