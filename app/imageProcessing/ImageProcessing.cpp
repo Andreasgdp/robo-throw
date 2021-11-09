@@ -307,8 +307,11 @@ std::vector<cv::Mat> ImageProcessing::loadLocalImg()
 
 cv::Mat ImageProcessing::cropImg(cv::Mat img)
 {
-    int y = (cropCornerPoints[0].y+cropCornerPoints[1].y)/2; // Average height
-    cv::Mat crop = img(cv::Range(y,img.rows),cv::Range(cropCornerPoints[1].x,cropCornerPoints[0].x)).clone(); // Slicing to crop the image
+    // first upper left
+    //seckond upper right
+    int y = (cropCornerPoints[0].y+cropCornerPoints[1].y)/2; // Average Y height
+    int x = (cropCornerPoints[1].x+cropCornerPoints[2].x)/2;// Average x with
+    cv::Mat crop = img(cv::Range(y,cropCornerPoints[2].y),cv::Range(cropCornerPoints[0].x, x)).clone(); // Slicing to crop the image
 
     return crop;
 }
