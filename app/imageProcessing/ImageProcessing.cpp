@@ -19,7 +19,12 @@ void ImageProcessing::calibrate()
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
 
-    cropCornerPoints = this->cornersHoughCircles(localImage);
+    this->cornersHoughCircles(localImage);
+
+
+    cv::imshow("croppedImage", this->cropImg(localImage));
+    cv::waitKey();
+
 
 //    while (true) {
 //        cropCornerPoints = this->cornersTempleMatching(this->pylonPic()[0]);
@@ -560,7 +565,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     }
 }
 
-std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
+void ImageProcessing::cornersHoughCircles(cv::Mat src){
     std::vector<cv::Point> points;
     cv::Mat image_hsv, image_bgr;
     image_bgr = src;
@@ -584,18 +589,13 @@ std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
     if(circles.size() == 0) std::exit(-1);
     for(size_t current_circle = 0; current_circle < circles.size(); ++current_circle) {
         cv::Point center(std::round(circles[current_circle][0]), std::round(circles[current_circle][1]));
-        int radius = std::round(circles[current_circle][2]);
-        cv::circle(image_bgr, center, radius, cv::Scalar(0, 255, 0), 2);
+        cv::circle(image_bgr, center, 20, cv::Scalar(0, 255, 0), 2);
         points.push_back(center);
     }
-
-
 
     double minX{-1}, maxY{-1};
     int minXIndx{}, maxYIndx{-1};
 
-//    std::vector<cv::Point>::iterator result = std::min_element(points.begin()->x, points.end()->x);
-//    minY = std::distance(points.begin()->x, minX)
     for (unsigned int i = 0; i < points.size(); i++) {
         if (minX > points.at(i).x) {
             minX = points.at(i).x;
@@ -622,10 +622,15 @@ std::vector<cv::Point> ImageProcessing::cornersHoughCircles(cv::Mat src){
 
     cropCornerPoints.push_back(points.at(maxYIndx));
 
-    cv::imshow("image_hsv_2", image_bgr);
-    cv::waitKey();
+    cropCornerPoints.at(0).x -= 20;
+    cropCornerPoints.at(0).y -= 20;
+    cropCornerPoints.at(1).x += 20;
+    cropCornerPoints.at(1).y -= 20;
+    cropCornerPoints.at(2).x += 20;
+    cropCornerPoints.at(2).y += 20;
 
-    return points;
+    cv::imshow("found corners", image_bgr);
+    cv::waitKey();
 }
 
 
