@@ -15,6 +15,7 @@ Api::Api()
     _db.setDatabaseName("test");
     _db.setUserName("user1");
     _db.setPassword("password1");
+    createDatabase();
 }
 
 bool Api::createDatabase()
@@ -112,9 +113,9 @@ Eigen::Vector3d Api::getPoint(int id)
         query.exec();
         if (query.next())
         {
-            int x = query.value(0).toDouble();
-            int y = query.value(1).toDouble();
-            int z = query.value(2).toDouble();
+            double x = query.value(0).toDouble();
+            double y = query.value(1).toDouble();
+            double z = query.value(2).toDouble();
 
             return Eigen::Vector3d(x, y, z);
         }
@@ -288,6 +289,7 @@ vector<CalibPoint> Api::getCalibPoint(int robotId)
         throw std::invalid_argument("database not open.");
     CalibPoint c;
     QSqlQuery query(_db);
+    cout << "robotId: " << robotId << endl;
     if (robotId <= 0)
     {
         throw std::invalid_argument("id must be greater than 0");

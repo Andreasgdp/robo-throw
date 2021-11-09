@@ -5,58 +5,47 @@ using namespace Eigen;
 
 App::App(std::string robotIP,
          std::string gripperIP,
-         bool localEnv) :
-                          _roboConn(robotIP),
+         bool localEnv) : _roboConn(robotIP),
                           _simulator("127.0.0.1"),
                           _gripper(gripperIP),
-                          _coordTrans()
+                          _coordTrans(),
+                          _api()
 {
+    cout << "Works" << endl;
     _localEnv = localEnv;
     // Sets the ip of the "robot" to the ip provided or to 127.0.0.1 if in local environment
-    _IP = (!_localEnv) ? robotIP : "127.0.0.1";
+    //_IP = (!_localEnv) ? robotIP : "127.0.0.1";
 
-    this->setDefaultPosMovement();
+    setDefaultPosMovement();
 
     if (!_roboConn.isConnected())
         throw "Connection could not be established with ip: " + _IP;
 
     _imgProcessor.calibrate();
-    //coordTrans.setPointSets(P_robot, P_world);    // TODO: Get pointsets from DB
-    //coordTrans.calibrateRobotToTable();           // TODO: Fix line above for no error
-    this->moveHome();
 
-}
+    vector<CalibPoint> calibPoints = _api.getCalibPoint(1);
+    vector<Vector3d> P_robot;
+    vector<Vector3d> P_table;
+    for (int i = 0; i < calibPoints.size(); i++) {
+        P_robot.push_back(calibPoints[i].pointRobot);
+        P_table.push_back(calibPoints[i].pointTable);
+    }
 
-void App::calibrateCam()
-{
-//    bool camCalibrated = this->simulator.calibrateCam();
-//    if (!camCalibrated) throw "Couldn't calibrate cam";
-//    this->imgProcessor.calibrate();
+    _coordTrans.setPointSets(P_robot, P_table);
+    _coordTrans.calibrateRobotToTable();
+
+    moveHome();
 
     _gripper.open();
 }
 
 void App::findAndGrabObject()
 {
-    /*
-    cv::Mat objectImg;
-
-    if (_localEnv)
-    {
-        objectImg = this->getLocalObjectImg();
-    }
-    else
-    {
-        // Use imageProcessing to get image from camera
-    }
-    */
-
     // use imageProcessing to get coordinates to object in relation to the table from image
-
+    vector<double> imgBallCoords = _imgProcessor.getBallCoords();
 
     // translate the coordinates to the object in relation to table to robot base coordinates
-    double x = 0.5, y = 0.3, z = 0.02; // TODO: Get point coords from imageprocessing
-    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(x, y, z);
+    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(imgBallCoords[1], imgBallCoords[0], 0.02); // TODO: Check for hardcoded z
 
     VectorXd homePos(6);
     homePos << getHomePosCoords();
@@ -73,8 +62,8 @@ void App::findAndGrabObject()
     _simulator.executeMoveLSimulation(endPosAboveObject, robotObjectPointAndRotation);
 
     // move to object
-    _roboConn.moveL(endPosAboveObject, _speed, _acceleration);
-    _roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
+    //_roboConn.moveL(endPosAboveObject, _speed, _acceleration);
+    //_roboConn.moveL(robotObjectPointAndRotation, _speed, _acceleration);
 
     // grab object
     _gripper.close();

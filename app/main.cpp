@@ -9,6 +9,8 @@
 #include "coordinateTranslator/CoordinateTranslator.h"
 #include "gripperHandling/GripperController.h"
 #include "simulation/Simulation.h"
+#include "api/Api.h"
+#include "app/App.h"
 
 using namespace std;
 using namespace Eigen;
@@ -19,6 +21,47 @@ Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
 int main(int argc, char *argv[])
 {
+
+    App app("192.168.100.49", "192.168.100.11", false);
+
+    app.findAndGrabObject();
+
+
+
+    /*
+    Api api;
+    CalibPoint calibPoint;
+
+    int robotId = 1;
+    calibPoint.robotId = robotId;
+
+    Vector3d P_robot1 = {-0.05907, -0.31838, 0.17};
+    Vector3d P_robot2 = {0.06377, -0.48364, 0.17};
+    Vector3d P_robot3 = {0.23051, -0.36235 ,0.17};
+
+    Vector3d P_world1 = {0.65, 0.55, 0.205};
+    Vector3d P_world2 = {0.45 , 0.5, 0.205};
+    Vector3d P_world3 = {0.5, 0.3, 0.205};
+
+    calibPoint.pointRobot = P_robot1;
+    calibPoint.pointTable = P_world1;
+
+    api.createCalibPoint(calibPoint);
+
+
+    calibPoint.pointRobot = P_robot2;
+    calibPoint.pointTable = P_world2;
+
+    api.createCalibPoint(calibPoint);
+
+
+    calibPoint.pointRobot = P_robot3;
+    calibPoint.pointTable = P_world3;
+
+    api.createCalibPoint(calibPoint);
+    */
+
+    /*
     VectorXd actualPos(6);
     actualPos << 0, 0, 0, 0, 0, 0;
     VectorXd withinPos(6);
@@ -26,6 +69,7 @@ int main(int argc, char *argv[])
 
     Simulation sim("127.0.0.1");
     cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
+    */
 
     /*
     VectorXd homePos(6);

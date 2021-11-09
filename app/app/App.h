@@ -8,17 +8,13 @@
 #include "../simulation/Simulation.h"
 #include "../gripperHandling/GripperController.h"
 #include "../coordinateTranslator/CoordinateTranslator.h"
+#include "../api/Api.h"
 
 
 class App
 {
 public:
     App(std::string IP, std::string gripperIP = "192.168.1.20", bool localEnv = false);
-
-    /*
-     * @brief Calibrates the camera based on an image of a calibration board.
-     */
-    void calibrateCam();
 
     /*
         @brief Finds and grabs an object with the robot after simulation move.
@@ -57,6 +53,7 @@ private:
     Eigen::VectorXd _objectPos;
     GripperController _gripper;
     CoordinateTranslator _coordTrans;
+    Api _api;
 
 
     // add member variable for jointPoseGetter

@@ -50,7 +50,6 @@ void ImageProcessing::calibrate()
 std::vector<double> ImageProcessing::getBallCoords()
 {
     cv::Mat img = this->pylonPic()[0].clone();
-    std::cout<<"lort";
     cv::Mat crop = this->cropImg(img);
     cv::Point imgPoints = this->ballDetection(crop);
     std::vector<double> realCoords = this->coordConvert(imgPoints,crop);

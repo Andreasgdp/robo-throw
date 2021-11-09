@@ -10,7 +10,7 @@ using namespace Eigen;
 
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
 {
-    VectorXd homePos;
+    VectorXd homePos(6);
     homePos << 189.55, -150.99, 257.11, 2.533, -1.801, 0.101; // TODO: Set final home pos
     setHomePosCoords(homePos);
 }
