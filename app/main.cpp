@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 {
     ImageProcessing imageprocessing;
     imageprocessing.calibrate();
+    imageprocessing.getBallCoords();
 //    VectorXd actualPos(6);
 //    actualPos << 0, 0, 0, 0, 0, 0;
 //    VectorXd withinPos(6);

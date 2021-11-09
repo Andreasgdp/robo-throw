@@ -39,13 +39,7 @@ void ImageProcessing::calibrate()
 
 //    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
 //    cv::Point ball = this->ballDetection(tmp);
-//    while(ball.x == -1 && ball.y==-1){
-//        std::cout<<"take new image when ready, press p"<<std::endl;
-//        if(cv::waitKey()=='p'){
-//            tmp = this->cropImg(this->pylonPic()[0]);
-//            ball = this->ballDetection(tmp);
-//        }
-//    }
+
 
 //    cv::imshow("Result", tmp);
 //    cv::waitKey();
@@ -56,10 +50,19 @@ void ImageProcessing::calibrate()
 
 std::vector<double> ImageProcessing::getBallCoords()
 {
+    std::cout<<"ready for ball finding?"<<std::endl;
+    cv::waitKey();
     cv::Mat img = this->pylonPic()[0].clone();
     std::cout<<"lort";
     cv::Mat crop = this->cropImg(img);
     cv::Point imgPoints = this->ballDetection(crop);
+    while(imgPoints.x == -1 && imgPoints.y==-1){
+        std::cout<<"take new image when ready, press p"<<std::endl;
+        if(cv::waitKey()=='p'){
+            imgPoints = this->ballDetection(this->cropImg(this->pylonPic()[0]));
+
+        }
+    }
     std::vector<double> realCoords = this->coordConvert(imgPoints,crop);
 
     return realCoords;
@@ -177,7 +180,7 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                     //                    cv::Rect iCrop(100, 10, 900, 600);
                     //                    cv::Mat cropImg = openCvImage(iCrop);
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
-                if(cv::waitKey() == 'p'){
+                if(cv::waitKey(50) == 'p'){
                     cv::Mat tmp=openCvImage.clone();
                     imgVector.push_back(tmp);
                     cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
@@ -566,6 +569,14 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
 }
 
 void ImageProcessing::cornersHoughCircles(cv::Mat src){
+    std::cout<<"make new corner callibration? [y/n]"<<std::endl;
+    std::string tmp;
+    std::cin>> tmp;
+    if(tmp == "y")
+        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", src);
+    else
+        src = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
+
     std::vector<cv::Point> points;
     cv::Mat image_hsv, image_bgr;
     image_bgr = src;
@@ -580,8 +591,8 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     cv::addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, red_hue_image);
     cv::GaussianBlur(red_hue_image, red_hue_image, cv::Size(9, 9), 2, 2);
 
-    cv::imshow("red_hue_image", red_hue_image);
-    cv::waitKey();
+    //cv::imshow("red_hue_image", red_hue_image);
+    //cv::waitKey();
 
     std::vector<cv::Vec3f> circles;
     cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
