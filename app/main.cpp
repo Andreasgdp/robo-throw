@@ -22,13 +22,13 @@ int main(int argc, char *argv[])
 {
     ImageProcessing imageprocessing;
     imageprocessing.calibrate();
-    VectorXd actualPos(6);
-    actualPos << 0, 0, 0, 0, 0, 0;
-    VectorXd withinPos(6);
-    withinPos << 2, -2, 2, 2, 2, 2;
+//    VectorXd actualPos(6);
+//    actualPos << 0, 0, 0, 0, 0, 0;
+//    VectorXd withinPos(6);
+//    withinPos << 2, -2, 2, 2, 2, 2;
 
-    Simulation sim("127.0.0.1");
-    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
+//    Simulation sim("127.0.0.1");
+//    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
 
     /*
     VectorXd homePos(6);
