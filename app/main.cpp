@@ -9,7 +9,9 @@
 #include "coordinateTranslator/CoordinateTranslator.h"
 #include "gripperHandling/GripperController.h"
 #include "simulation/Simulation.h"
-#include <boost/timer/timer.hpp>
+#include "../app/api/Logger.h"
+#include "./app/App.h"
+
 
 using namespace std;
 using namespace Eigen;
@@ -18,30 +20,26 @@ using namespace ur_rtde;
 Eigen::Matrix4d CoordinateTranslator::_transformationMatrix;
 Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
-template <
-    class result_t   = std::chrono::milliseconds,
-    class clock_t    = std::chrono::steady_clock,
-    class duration_t = std::chrono::milliseconds
->
-auto since(std::chrono::time_point<clock_t, duration_t> const& start)
-{
-    return std::chrono::duration_cast<result_t>(clock_t::now() - start);
-}
-
 int main(int argc, char *argv[])
 {
 
-    auto start = std::chrono::steady_clock::now();
+//    Logger l1;
+//    l1.getAndSetCurrTimeStamp();
+//    this_thread::sleep_for(chrono::milliseconds(8));
 
-    std::cout << "Elapsed(ms)=" << since(start).count() << std::endl;
+//    this_thread::sleep_for(chrono::milliseconds(8));
+//    Logger l3;
+//    l1.endTime(l1.setThrowTime);
+//    cout << l1.getThrowTime() << endl;
 
+
+    Logger l1;
     this_thread::sleep_for(chrono::milliseconds(8));
-
-    std::cout << "Elapsed(us)="
-              << since<std::chrono::microseconds>(start).count()
-              << std::endl;
-
-
+    l1.startTime();
+    this_thread::sleep_for(chrono::milliseconds(16));
+    Logger l3;
+    l1.endTime(l1.setThrowTime);
+    cout << l1.getThrowTime() << endl;
 
 //    VectorXd actualPos(6);
 //    actualPos << 0, 0, 0, 0, 0, 0;
