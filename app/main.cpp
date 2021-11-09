@@ -16,9 +16,6 @@ using namespace std;
 using namespace Eigen;
 using namespace ur_rtde;
 
-Eigen::Matrix4d CoordinateTranslator::_transformationMatrix;
-Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
-
 int main(int argc, char *argv[])
 {
 

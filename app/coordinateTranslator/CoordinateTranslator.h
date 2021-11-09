@@ -35,8 +35,8 @@ private:
     std::vector<Eigen::Vector3d> _worldPointSet;
 
     // TODO: Find better soltion than using inline
-    static Eigen::Matrix4d _transformationMatrix;
-    static Eigen::Matrix4d _inverseTransformationMatrix;
+    static inline Eigen::Matrix4d _transformationMatrix;
+    static inline Eigen::Matrix4d _inverseTransformationMatrix;
 };
 
 #endif // COORDINATETRANSLATOR_H
