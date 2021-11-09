@@ -37,7 +37,6 @@ bool Api::createDatabase()
 
         success = query.exec("CREATE TABLE IF NOT EXISTS calibPoint( "
                              "id INT NOT NULL AUTO_INCREMENT, "
-                             "calibId INT, "
                              "pointTable INT, "
                              "pointRobot INT,"
                              "robotId INT,"
@@ -160,8 +159,7 @@ bool Api::createCalibPoint(CalibPoint c)
             pointRobotId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO calibPoint (calibId, pointTable, pointRobot, robotId) VALUES (:calibId, :pointTable, :pointRobot, :robotId);");
-        query.bindValue(":calibId", c.calibId);
+        query.prepare("INSERT INTO calibPoint (pointTable, pointRobot, robotId) VALUES (:pointTable, :pointRobot, :robotId);");
         query.bindValue(":pointTable", pointTableId);
         query.bindValue(":pointRobot", pointRobotId);
         query.bindValue(":robotId", c.robotId);
@@ -296,8 +294,7 @@ CalibPoint Api::getCalibPoint(int id)
     }
     else
     {
-        query.prepare("SELECT calibId, "
-                      "pointTable, "
+        query.prepare("SELECT pointTable, "
                       "pointRobot, "
                       "robotId "
                       "FROM calibPoint WHERE id = :id;");
@@ -305,10 +302,9 @@ CalibPoint Api::getCalibPoint(int id)
         query.exec();
         if (query.next())
         {
-            c.calibId = query.value(0).toInt();
-            c.pointTable = this->getPoint(query.value(1).toInt());
-            c.pointRobot = this->getPoint(query.value(2).toInt());
-            c.robotId = query.value(3).toInt();
+            c.pointTable = this->getPoint(query.value(0).toInt());
+            c.pointRobot = this->getPoint(query.value(1).toInt());
+            c.robotId = query.value(2).toInt();
 
             return c;
         }

@@ -45,7 +45,6 @@ class CalibPoint
 {
 public:
     int id;
-    int calibId;
     Eigen::Vector3d pointTable;
     Eigen::Vector3d pointRobot;
     int robotId;
