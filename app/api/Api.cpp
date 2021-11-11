@@ -12,7 +12,7 @@ Api::Api()
 {
     _db = QSqlDatabase::addDatabase("QMYSQL");
     _db.setHostName("localhost");
-    _db.setDatabaseName("test");
+    _db.setDatabaseName("test2");
     _db.setUserName("user1");
     _db.setPassword("password1");
     createDatabase();
@@ -313,7 +313,6 @@ vector<CalibPoint> Api::getCalibPoint(int robotId)
         throw std::invalid_argument("database not open.");
     CalibPoint c;
     QSqlQuery query(_db);
-    cout << "robotId: " << robotId << endl;
     if (robotId <= 0)
     {
         throw std::invalid_argument("id must be greater than 0");
@@ -323,8 +322,6 @@ vector<CalibPoint> Api::getCalibPoint(int robotId)
         query.prepare("SELECT pointTable, "
                       "pointRobot, "
                       "robotId "
-        }
-        vector<CalibPoint> calibPoints;
                       "FROM calibPoint WHERE robotId = :id;");
         query.bindValue(":id", robotId);
         bool success = query.exec();

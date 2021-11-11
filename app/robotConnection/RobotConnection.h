@@ -59,8 +59,8 @@ public:
 
     double getDefaultAcceleration() const;
     void setDefaultAcceleration(double newDefaultAcceleration);
-
-    void throwMove();
+    const Eigen::VectorXd &getHomePosJoints() const;
+    void setHomePosJoints(const Eigen::VectorXd &newHomePosJoints);
 
 private:
     std::string IP;
@@ -68,7 +68,8 @@ private:
     ur_rtde::RTDEReceiveInterface rtde_recieve;
     // TODO: find good values for home pos
     Eigen::VectorXd _homePosCoords;
-    double defaultSpeed = 1;
+    Eigen::VectorXd _homePosJoints;
+    double defaultSpeed = 0.1;
     double defaultAcceleration = 1;
 };
 

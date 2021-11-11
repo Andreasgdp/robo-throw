@@ -70,7 +70,7 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
     return jointVelocities;
 }
 
-VectorXd ThrowCalc::velocityCalc(CoordinateTranslator CoordinateTranslator, double xWorld, double yWorld, double zWorld) {
+VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld) {
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
@@ -82,7 +82,8 @@ VectorXd ThrowCalc::velocityCalc(CoordinateTranslator CoordinateTranslator, doub
     double angle = (a * M_PI)/180;
 
     // Convert world coordinates to robot coordinates
-    Vector3d pos = CoordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
+    CoordinateTranslator coordinateTranslator;
+    Vector3d pos = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
     // The home/trow pos in meters and radian
     VectorXd _throwpos(6);

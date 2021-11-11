@@ -1,6 +1,5 @@
 #include <iostream>
 #include <eigen3/Eigen/Dense>
-#include "./ThrowCalc/ThrowCalc.h"
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
 #include <math.h>
@@ -11,7 +10,6 @@
 #include "simulation/Simulation.h"
 #include "api/Api.h"
 #include "app/App.h"
-#include "../app/api/Logger.h"
 
 
 using namespace std;
@@ -21,8 +19,12 @@ using namespace ur_rtde;
 int main(int argc, char *argv[])
 {
 
-    App app("192.168.100.49", "192.168.100.11", false);
+//    RobotConnection r("127.0.0.1");
+//    RobotConnection r("192.168.100.49");
+//    r.moveHome(r.getDefaultSpeed(), r.getDefaultAcceleration());
 
+
+    App app("192.168.100.49", "192.168.100.11", false);
     app.findAndGrabObject();
 
 
@@ -79,13 +81,13 @@ int main(int argc, char *argv[])
 //    cout << l1.getThrowTime() << endl;
 
 
-    Logger l1;
-    this_thread::sleep_for(chrono::milliseconds(8));
-    l1.startTime();
-    this_thread::sleep_for(chrono::milliseconds(16));
-    Logger l3;
-    l1.endTime(l1.setThrowTime);
-    cout << l1.getThrowTime() << endl;
+//    Logger l1;
+//    this_thread::sleep_for(chrono::milliseconds(8));
+//    l1.startTime();
+//    this_thread::sleep_for(chrono::milliseconds(16));
+//    Logger l3;
+//    l1.endTime(l1.setThrowTime);
+//    cout << l1.getThrowTime() << endl;
 
 //    VectorXd actualPos(6);
 //    actualPos << 0, 0, 0, 0, 0, 0;

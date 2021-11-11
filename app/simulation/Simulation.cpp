@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include "../throwCalc/ThrowCalc.h"
 
 using namespace std;
 using namespace Eigen;
@@ -40,9 +41,13 @@ bool Simulation::destinationReached(const Eigen::VectorXd &destination) {
     return withinOffset(_roboConn.getActualTCPPose(), destination, 0.01);
 }
 
-void Simulation::executeMoveLSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos) {
+bool Simulation::jointPoseReached(const Eigen::VectorXd &jointPose) {
+    return withinOffset(_roboConn.getActualJointPoses(), jointPose, 0.01);
+}
+
+void Simulation::executeMoveLSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endPos) {
     // Move to start
-    _roboConn.moveL(startPos);
+    _roboConn.moveJ(startJointPos);
 
     // Move to destination
     _roboConn.moveL(endPos);
@@ -53,16 +58,35 @@ void Simulation::executeMoveLSimulation(const Eigen::VectorXd &startPos, const E
     }
 }
 
-void Simulation::executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds) {
+void Simulation::executeMoveJSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos) {
     // Move to start
-    _roboConn.moveL(startPos);
+    _roboConn.moveJ(startJointPos);
 
-    // Move / throw
-    _roboConn.throwMove();
+    // Move to destination
+    _roboConn.moveJ(endJointPos);
 
     // Do checks
-    if (notProtectiveStop()) {
+    if (notProtectiveStop() && jointPoseReached(endJointPos)) {
+        throw "MoveL simulation faild";
+    }
+}
+
+void Simulation::executeThrowSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos, const std::vector<Eigen::VectorXd> &jointVelocities) {
+    // Move to start
+    _roboConn.moveL(startJointPos);
+
+    for (int i = 0; i < jointVelocities.size(); i++)
+    {
+        _roboConn.speedJ(jointVelocities.at(i), 40);
+        this_thread::sleep_for(chrono::milliseconds(8));
+    }
+    // Do checks
+    if (notProtectiveStop() && jointPoseReached(endJointPos)) {
         throw "Throw simulation failed";
     }
+    _roboConn.speedStop(10);
+
+
+
 }
 

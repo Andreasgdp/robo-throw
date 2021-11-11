@@ -9,6 +9,8 @@
 #include "../gripperHandling/GripperController.h"
 #include "../coordinateTranslator/CoordinateTranslator.h"
 #include "../api/Api.h"
+//#include "../api/Logger.h"
+#include "../throwCalc/ThrowCalc.h"
 
 
 class App
@@ -25,7 +27,7 @@ public:
         @brief Throws the object held in the gripper to desired goal coordinates.
         @param goalPos - The pos of the goal described be coordinates in a vector.
     */
-    void throwObject(const std::vector<double> &goalPos);
+    void throwObject();
 
     /*
         @brief Moves the robot to a predefined home pos.
@@ -43,9 +45,6 @@ private:
 
     std::string _IP;
     Eigen::VectorXd _jointPoses;
-    double _speed = 1.0;
-    double _acceleration = 1.0;
-    Eigen::VectorXd _homePosCoords;
     ImageProcessing _imgProcessor;
     RobotConnection _roboConn;
     Simulation _simulator;
@@ -54,17 +53,8 @@ private:
     GripperController _gripper;
     CoordinateTranslator _coordTrans;
     Api _api;
-
-
-    // add member variable for jointPoseGetter
-    // add member variable for api
-
-    // Functions
-    bool hasMovedToPos(const Eigen::VectorXd &pos);
-    void waitForMoveRobot(const Eigen::VectorXd &pos);
-    void setDefaultPosMovement();
-    cv::Mat getLocalCalibrationImg();
-    cv::Mat getLocalObjectImg();
+//    Logger _log;
+    ThrowCalc _throwCalc;
 };
 
 #endif // APP_H
