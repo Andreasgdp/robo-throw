@@ -9,6 +9,9 @@
 #include "coordinateTranslator/CoordinateTranslator.h"
 #include "gripperHandling/GripperController.h"
 #include "simulation/Simulation.h"
+#include "../app/api/Logger.h"
+#include "./app/App.h"
+
 
 using namespace std;
 using namespace Eigen;
@@ -19,13 +22,32 @@ Eigen::Matrix4d CoordinateTranslator::_inverseTransformationMatrix;
 
 int main(int argc, char *argv[])
 {
-    VectorXd actualPos(6);
-    actualPos << 0, 0, 0, 0, 0, 0;
-    VectorXd withinPos(6);
-    withinPos << 2, -2, 2, 2, 2, 2;
 
-    Simulation sim("127.0.0.1");
-    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
+//    Logger l1;
+//    l1.getAndSetCurrTimeStamp();
+//    this_thread::sleep_for(chrono::milliseconds(8));
+
+//    this_thread::sleep_for(chrono::milliseconds(8));
+//    Logger l3;
+//    l1.endTime(l1.setThrowTime);
+//    cout << l1.getThrowTime() << endl;
+
+
+    Logger l1;
+    this_thread::sleep_for(chrono::milliseconds(8));
+    l1.startTime();
+    this_thread::sleep_for(chrono::milliseconds(16));
+    Logger l3;
+    l1.endTime(l1.setThrowTime);
+    cout << l1.getThrowTime() << endl;
+
+//    VectorXd actualPos(6);
+//    actualPos << 0, 0, 0, 0, 0, 0;
+//    VectorXd withinPos(6);
+//    withinPos << 2, -2, 2, 2, 2, 2;
+
+//    Simulation sim("127.0.0.1");
+//    cout << "Within: " << sim.withinOffset(actualPos, withinPos, 4) << endl;
 
     /*
     VectorXd homePos(6);
