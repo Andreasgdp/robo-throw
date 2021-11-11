@@ -426,29 +426,32 @@ cv::Mat ImageProcessing::Threshold(cv::Mat image)
 
 std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 {
-
     //cam height 139 cm
-    float x, y;
-    float xWith = img.cols, yWith = img.rows;
-    float realX = 80; //cm
-    float lengthPerPixel = realX/xWith;
-    x = imgPos.x*lengthPerPixel;
-    if(x<40){
-        x=x+((40-x)/40*0.4);
-    }
-    else if(x>40){
-        x=x+((40-x)/40*0.4);
-    }
-    y = imgPos.y*lengthPerPixel;
+    float x1, x2, y1, y2, z1, z2, maxZ, theta;
+    float xWidth = img.cols, yWidth = img.rows;
+    float realX = 80, realY = 75; //cm
+    float lengthPerPixelX = realX/xWidth;
+    float lengthPerPixelY = realY/yWidth;
+
+    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
+    x1 = imgPos.x*lengthPerPixelX;
+    y1 = imgPos.y*lengthPerPixelY;
+    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
+
+    theta = acos(x1/z1);
+    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
+    x2 = cos(theta) * z2;
+    y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x);
-    points.push_back(y);
+    points.push_back(x2);
+    points.push_back(y2);
 
+    std::cout << "unscaled x = " << std::to_string(x1) << ", unscaled y = " << std::to_string(y1);
+    std::cout << ", which means the hypotenuse = " << std::to_string(z1) << std::endl;
+    std::cout << "scaled x = " << std::to_string(x2) << ", unscaled y = " << std::to_string(y2);
+    std::cout << ", which means the hypotenuse = " << std::to_string(z2) << std::endl;
 
-    std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
-    std::cout<<"rows: " + std::to_string(img.rows) + " cols: " + std::to_string(img.cols)<<std::endl;
-    std::cout<<"point x: " + std::to_string(imgPos.x) + " point y: " + std::to_string(imgPos.y)<<std::endl;
     return points;
 }
 
