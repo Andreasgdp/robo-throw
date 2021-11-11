@@ -33,8 +33,10 @@ bool Api::createDatabase()
                              "PRIMARY KEY (id) "
                              "); ");
 
-        if (!success)
-            throw std::invalid_argument("err in point query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         success = query.exec("CREATE TABLE IF NOT EXISTS calibPoint( "
                              "id INT NOT NULL AUTO_INCREMENT, "
@@ -46,8 +48,10 @@ bool Api::createDatabase()
                              "FOREIGN KEY (pointRobot) REFERENCES point(id)"
                              "); ");
 
-        if (!success)
-            throw std::invalid_argument("err in calibPoint query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         success = query.exec("CREATE TABLE IF NOT EXISTS robotConfig( "
                              "id INT NOT NULL AUTO_INCREMENT, "
@@ -65,8 +69,10 @@ bool Api::createDatabase()
                              "q3 FLOAT,"
                              "PRIMARY KEY (id) "
                              "); ");
-        if (!success)
-            throw std::invalid_argument("err in robotConfig query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         success = query.exec("CREATE TABLE IF NOT EXISTS throw( "
                              "id INT NOT NULL AUTO_INCREMENT, "
@@ -90,6 +96,7 @@ bool Api::createDatabase()
                              ");");
         if (!success) {
             qDebug() << query.lastError();
+            _db.rollback();
         }
 
     }
@@ -110,7 +117,11 @@ Eigen::Vector3d Api::getPoint(int id)
     {
         query.prepare("SELECT x, y, z FROM point WHERE id = :id;");
         query.bindValue(":id", id);
-        query.exec();
+        bool success = query.exec();
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
         if (query.next())
         {
             double x = query.value(0).toDouble();
@@ -137,8 +148,10 @@ bool Api::createCalibPoint(CalibPoint c)
         query.bindValue(":y", c.pointTable[1]);
         query.bindValue(":z", c.pointTable[2]);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in pointTable query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
@@ -151,8 +164,10 @@ bool Api::createCalibPoint(CalibPoint c)
         query.bindValue(":y", c.pointRobot[1]);
         query.bindValue(":z", c.pointRobot[2]);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in pointRobot query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
@@ -165,8 +180,10 @@ bool Api::createCalibPoint(CalibPoint c)
         query.bindValue(":pointRobot", pointRobotId);
         query.bindValue(":robotId", c.robotId);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in calibPoint query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
     }
     return success;
 }
@@ -186,8 +203,10 @@ bool Api::createThrow(Throw t)
         query.bindValue(":y", t.objPos[1]);
         query.bindValue(":z", t.objPos[2]);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in pointTable query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
@@ -200,8 +219,10 @@ bool Api::createThrow(Throw t)
         query.bindValue(":y", t.goalPos[1]);
         query.bindValue(":z", t.goalPos[2]);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in pointRobot query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
         query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
         {
@@ -223,8 +244,10 @@ bool Api::createThrow(Throw t)
         query.bindValue(":q2", t.robotStartConfig.q2);
         query.bindValue(":q3", t.robotStartConfig.q3);
         success = query.exec();
-        if (!success)
-            throw std::invalid_argument("err in pointRobot query exec");
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
 
         query.exec("SELECT LAST_INSERT_ID();");
         if (query.next())
@@ -278,6 +301,7 @@ bool Api::createThrow(Throw t)
         success = query.exec();
         if (!success) {
             qDebug() << query.lastError();
+            _db.rollback();
         }
     }
     return success;
@@ -299,11 +323,14 @@ vector<CalibPoint> Api::getCalibPoint(int robotId)
         query.prepare("SELECT pointTable, "
                       "pointRobot, "
                       "robotId "
+        }
+        vector<CalibPoint> calibPoints;
                       "FROM calibPoint WHERE robotId = :id;");
         query.bindValue(":id", robotId);
         bool success = query.exec();
         if (!success) {
             qDebug() << query.lastError();
+            _db.rollback();
         }
         vector<CalibPoint> calibPoints;
         while (query.next())
@@ -348,7 +375,11 @@ RobotConfig Api::getRobotConfig(int id)
                       "q3 "
                       "FROM robotConfig WHERE id = :id;");
         query.bindValue(":id", id);
-        query.exec();
+        bool success = query.exec();
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
         if (query.next())
         {
             r.j1 = query.value(0).toDouble();
@@ -398,7 +429,11 @@ Throw Api::getThrow(int id)
                       "apiLogTime "
                       "FROM throw WHERE id = :id;");
         query.bindValue(":id", id);
-        query.exec();
+        bool success = query.exec();
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
         if (query.next())
         {
             t.success = query.value(0).toBool();
@@ -437,7 +472,11 @@ vector<Throw> Api::getThrows(int limit)
     {
         query.prepare("SELECT id FROM throw LIMIT :limit;");
         query.bindValue(":limit", limit);
-        query.exec();
+        bool success = query.exec();
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
         while (query.next())
         {
             ids.push_back(query.value(0).toInt());
