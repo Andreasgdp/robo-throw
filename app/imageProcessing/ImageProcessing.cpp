@@ -48,22 +48,28 @@ void ImageProcessing::calibrate()
 
 }
 
-std::vector<double> ImageProcessing::getBallCoords()
-{
-    std::cout<<"ready for ball finding?"<<std::endl;
-    cv::waitKey();
-    cv::Mat img = this->pylonPic()[0].clone();
-    std::cout<<"lort";
-    cv::Mat crop = this->cropImg(img);
-    cv::Point imgPoints = this->ballDetection(crop);
-    while(imgPoints.x == -1 && imgPoints.y==-1){
-        std::cout<<"take new image when ready, press p"<<std::endl;
-        if(cv::waitKey()=='p'){
-            imgPoints = this->ballDetection(this->cropImg(this->pylonPic()[0]));
+std::vector<double> ImageProcessing::getBallCoords() {
+    std::string input;
+    std::vector<double> realCoords{0};
+    cv::destroyAllWindows();
+    while (true){
+        std::cout <<"ready for ball finding? (y)" <<std::endl;
+        std::cin >> input;
 
+        if (input == "y") {
+            cv::Mat img = this->pylonPic()[0].clone();
+            cv::Mat crop = this->cropImg(img);
+            cv::Point imgPoints = this->ballDetection(crop);
+            while(imgPoints.x == -1 && imgPoints.y==-1){
+                std::cout<<"take new image when ready, press p"<<std::endl;
+                if(cv::waitKey()=='p'){
+                    imgPoints = this->ballDetection(this->cropImg(this->pylonPic()[0]));
+                }
+            }
+            realCoords = this->coordConvert(imgPoints,crop);
+            break;
         }
     }
-    std::vector<double> realCoords = this->coordConvert(imgPoints,crop);
 
     return realCoords;
 }
@@ -603,8 +609,6 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
         cv::circle(image_bgr, center, 20, cv::Scalar(0, 255, 0), 2);
         points.push_back(center);
     }
-
-    std::cout << points.size() << std::endl;
 
     double minX{-1}, maxY{-1};
     int minXIndx{}, maxYIndx{-1};
