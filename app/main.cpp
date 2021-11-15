@@ -2,6 +2,7 @@
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include "./robotConnection/RobotConnection.h"
+#include "imageProcessing/ImageProcessing.h"
 #include <math.h>
 #include <chrono>
 #include <thread>
