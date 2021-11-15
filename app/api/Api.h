@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <eigen3/Eigen/Dense>
 #include <string>
+#include <vector>
 
 class RobotConfig
 {

@@ -71,6 +71,10 @@ std::vector<double> ImageProcessing::getBallCoords() {
         }
     }
 
+    std::cout << "realCoords" << std::endl;
+    std::cout << realCoords.at(0) << std::endl;
+    std::cout << realCoords.at(1) << std::endl << std::endl;
+
     return realCoords;
 }
 
@@ -444,8 +448,8 @@ std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
     y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x2);
-    points.push_back(y2);
+    points.push_back(x2/100);
+    points.push_back(y2/100);
 
     std::cout << "unscaled x = " << std::to_string(x1) << ", unscaled y = " << std::to_string(y1);
     std::cout << ", which means the hypotenuse = " << std::to_string(z1) << std::endl;

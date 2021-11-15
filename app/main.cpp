@@ -22,13 +22,14 @@ int main(int argc, char *argv[])
 
 //    RobotConnection r("127.0.0.1");
 //    RobotConnection r("192.168.100.49");
+//    cout << r.getActualJointPoses() << endl << endl;
+//    cout << r.getActualTCPPose() << endl << endl;
 //    r.moveHome(r.getDefaultSpeed(), r.getDefaultAcceleration());
 
 
     App app("192.168.100.49", "192.168.100.11", false);
     app.findAndGrabObject();
-
-
+    app.throwObject();
 
     /*
     Api api;

@@ -16,7 +16,7 @@ class Simulation
 {
 public:
     Simulation(std::string IP);
-    bool notProtectiveStop();
+    bool protectiveStop();
     bool withinOffset(const Eigen::VectorXd &actualPos, const Eigen::VectorXd &withinOffsetPos, double offset);
     bool destinationReached(const Eigen::VectorXd &destination);
     bool jointPoseReached(const Eigen::VectorXd &jointPose);

@@ -14,8 +14,8 @@ Simulation::Simulation(std::string IP) : _roboConn(IP) {
 //    this->imgProc.calibrate();
 //}
 
-bool Simulation::notProtectiveStop() {
-    return !_roboConn.isProtectiveStopped();
+bool Simulation::protectiveStop() {
+    return _roboConn.isProtectiveStopped();
 }
 
 bool Simulation::withinOffset(const VectorXd &actualPos, const VectorXd &withinOffsetPos, double offset) {
@@ -25,7 +25,7 @@ bool Simulation::withinOffset(const VectorXd &actualPos, const VectorXd &withinO
 
     bool status = false;
     for (int i = 0; i < actualPos.size(); i++) {
-        if (withinOffsetPos[i] <= actualPos[i] + offset / 2 && withinOffsetPos[i] >= actualPos[i] - offset / 2) {
+        if (withinOffsetPos[i] <= actualPos[i] + (offset / 2) && withinOffsetPos[i] >= actualPos[i] - (offset / 2)) {
             status = true;
         } else {
             status = false;
@@ -53,7 +53,7 @@ void Simulation::executeMoveLSimulation(const Eigen::VectorXd &startJointPos, co
     _roboConn.moveL(endPos);
 
     // Do checks
-    if (notProtectiveStop() && destinationReached(endPos)) {
+    if (protectiveStop() && !destinationReached(endPos)) {
         throw "MoveL simulation faild";
     }
 }
@@ -62,11 +62,13 @@ void Simulation::executeMoveJSimulation(const Eigen::VectorXd &startJointPos, co
     // Move to start
     _roboConn.moveJ(startJointPos);
 
+    cout << "has moved to first pos" << endl;
+
     // Move to destination
     _roboConn.moveJ(endJointPos);
 
     // Do checks
-    if (notProtectiveStop() && jointPoseReached(endJointPos)) {
+    if (protectiveStop() && !jointPoseReached(endJointPos)) {
         throw "MoveL simulation faild";
     }
 }
@@ -77,14 +79,15 @@ void Simulation::executeThrowSimulation(const Eigen::VectorXd &startJointPos, co
 
     for (int i = 0; i < jointVelocities.size(); i++)
     {
-        _roboConn.speedJ(jointVelocities.at(i), 40);
+        _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
         this_thread::sleep_for(chrono::milliseconds(8));
     }
+    _roboConn.speedStop(10);
     // Do checks
-    if (notProtectiveStop() && jointPoseReached(endJointPos)) {
+    if (protectiveStop() && jointPoseReached(endJointPos)) {
         throw "Throw simulation failed";
     }
-    _roboConn.speedStop(10);
+
 
 
 

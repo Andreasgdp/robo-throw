@@ -53,6 +53,7 @@ public:
     const Eigen::VectorXd &getHomePosCoords() const;
     void setHomePosCoords(const Eigen::VectorXd &homePosCoords);
     void moveHome(double speed, double acceleration);
+    void moveThrowPos(double speed, double acceleration);
 
     double getDefaultSpeed() const;
     void setDefaultSpeed(double newDefaultSpeed);
@@ -62,6 +63,12 @@ public:
     const Eigen::VectorXd &getHomePosJoints() const;
     void setHomePosJoints(const Eigen::VectorXd &newHomePosJoints);
 
+    const Eigen::VectorXd &getThrowPosCoords() const;
+    void setThrowPosCoords(const Eigen::VectorXd &newThrowPosCoords);
+
+    const Eigen::VectorXd &getThrowPosJoints() const;
+    void setThrowPosJoints(const Eigen::VectorXd &newThrowPosJoints);
+
 private:
     std::string IP;
     ur_rtde::RTDEControlInterface rtde_control;
@@ -69,7 +76,9 @@ private:
     // TODO: find good values for home pos
     Eigen::VectorXd _homePosCoords;
     Eigen::VectorXd _homePosJoints;
-    double defaultSpeed = 0.1;
+    Eigen::VectorXd _throwPosCoords;
+    Eigen::VectorXd _throwPosJoints;
+    double defaultSpeed = 1;
     double defaultAcceleration = 1;
 };
 

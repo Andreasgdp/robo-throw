@@ -11,14 +11,19 @@ using namespace Eigen;
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
 {
     VectorXd homePos(6);
-//    homePos << 0.18955, -0.15099, 0.25711, 2.533, -1.801, 0.101; // TODO: Set final home pos
-    homePos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
-
+    homePos << 0.248773, -0.172556, 0.22111, -2.73333, 1.46224, -0.0583505;
     setHomePosCoords(homePos);
     VectorXd homeJointPos(6);
-//    homeJointPos << -0.183905, -0.890511, -2.46864, -1.30769, 1.5145, -0.519824;
-    homeJointPos <<  1.91136, -2.10508, 1.79123, -1.93872, -1.52253, -1.60655;
+    homeJointPos <<  2.14883, -1.96807, 2.44214, -2.05719, -1.51589, -1.58204;
     setHomePosJoints(homeJointPos);
+
+    VectorXd throwPos(6);
+    throwPos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
+    setThrowPosCoords(homePos);
+    VectorXd throwJointPos(6);
+    throwJointPos <<  1.91136, -2.10508, 1.79123, -1.93872, -1.52253, -1.60655;
+    setThrowPosJoints(throwJointPos);
+
 }
 
 void RobotConnection::moveJ(const VectorXd &jointPoses, double speed, double acceleration)
@@ -247,6 +252,11 @@ void RobotConnection::moveHome(double speed, double acceleration)
     moveJ(_homePosJoints, speed, acceleration);
 }
 
+void RobotConnection::moveThrowPos(double speed, double acceleration)
+{
+    moveJ(_throwPosJoints, speed, acceleration);
+}
+
 double RobotConnection::getDefaultSpeed() const
 {
     return defaultSpeed;
@@ -275,6 +285,26 @@ const Eigen::VectorXd &RobotConnection::getHomePosJoints() const
 void RobotConnection::setHomePosJoints(const Eigen::VectorXd &newHomePosJoints)
 {
     _homePosJoints = newHomePosJoints;
+}
+
+const Eigen::VectorXd &RobotConnection::getThrowPosCoords() const
+{
+    return _throwPosCoords;
+}
+
+void RobotConnection::setThrowPosCoords(const Eigen::VectorXd &newThrowPosCoords)
+{
+    _throwPosCoords = newThrowPosCoords;
+}
+
+const Eigen::VectorXd &RobotConnection::getThrowPosJoints() const
+{
+    return _throwPosJoints;
+}
+
+void RobotConnection::setThrowPosJoints(const Eigen::VectorXd &newThrowPosJoints)
+{
+    _throwPosJoints = newThrowPosJoints;
 }
 
 RobotConnection::~RobotConnection()
