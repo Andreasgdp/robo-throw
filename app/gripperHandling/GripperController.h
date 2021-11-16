@@ -11,7 +11,7 @@ public:
             const std::string &address="192.168.100.10",
             const unsigned short int &port=1000,
             const float &acceleration=3.0f,
-            const float &forceLimit=10.0f,
+            const float &forceLimit=65.0,
             const unsigned int &period=10);
 
     ~GripperController();

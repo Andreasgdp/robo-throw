@@ -15,7 +15,7 @@ public:
     Matrix6d jacobianInverse(double q1, double q2, double q3, double q4, double q5, double q6);
     Eigen::VectorXd linearFitFunction(double t, double startTime, const Eigen::VectorXd &dq_end,const Eigen::VectorXd &dq_start, double endTime);
     std::vector<Eigen::VectorXd> getJointVelocities(const Eigen::VectorXd &q_start, const Eigen::VectorXd &q_end,const Eigen::VectorXd &dx);
-    Eigen::VectorXd velocityCalc(CoordinateTranslator CoordinateTranslator, double xWorld, double yWorld, double zWorld);
+    Eigen::VectorXd velocityCalc(double xWorld, double yWorld, double zWorld, Eigen::VectorXd throwpos);
 
 private:
 };
