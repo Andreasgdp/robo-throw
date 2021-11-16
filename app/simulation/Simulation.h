@@ -16,11 +16,13 @@ class Simulation
 {
 public:
     Simulation(std::string IP);
-    bool notProtectiveStop();
+    bool protectiveStop();
     bool withinOffset(const Eigen::VectorXd &actualPos, const Eigen::VectorXd &withinOffsetPos, double offset);
     bool destinationReached(const Eigen::VectorXd &destination);
-    void executeMoveLSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endPos);
-    void executeThrowSimulation(const Eigen::VectorXd &startPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
+    bool jointPoseReached(const Eigen::VectorXd &jointPose);
+    void executeMoveLSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endPos);
+    void executeMoveJSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos);
+    void executeThrowSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endJointPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
 
 private:
     RobotConnection _roboConn;

@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <eigen3/Eigen/Dense>
 #include <string>
+#include <vector>
 
 class RobotConfig
 {
@@ -45,7 +46,6 @@ class CalibPoint
 {
 public:
     int id;
-    int calibId;
     Eigen::Vector3d pointTable;
     Eigen::Vector3d pointRobot;
     int robotId;
@@ -59,7 +59,7 @@ public:
     Eigen::Vector3d getPoint(int id = -1);
     bool createCalibPoint(CalibPoint c);
     bool createThrow(Throw t);
-    CalibPoint getCalibPoint(int id = -1);
+    std::vector<CalibPoint> getCalibPoint(int robotId = -1);
     RobotConfig getRobotConfig(int id = -1);
     Throw getThrow(int id = -1);
     std::vector<Throw> getThrows(int limit = 1);

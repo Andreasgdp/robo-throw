@@ -12,9 +12,10 @@ Api::Api()
 {
     _db = QSqlDatabase::addDatabase("QMYSQL");
     _db.setHostName("localhost");
-    _db.setDatabaseName("test");
+    _db.setDatabaseName("test2");
     _db.setUserName("user1");
-    _db.setPassword("password1");
+    _db.setPassword("Test?1234");
+    createDatabase();
 }
 
 bool Api::createDatabase()
@@ -39,7 +40,6 @@ bool Api::createDatabase()
 
         success = query.exec("CREATE TABLE IF NOT EXISTS calibPoint( "
                              "id INT NOT NULL AUTO_INCREMENT, "
-                             "calibId INT, "
                              "pointTable INT, "
                              "pointRobot INT,"
                              "robotId INT,"
@@ -124,9 +124,9 @@ Eigen::Vector3d Api::getPoint(int id)
         }
         if (query.next())
         {
-            int x = query.value(0).toDouble();
-            int y = query.value(1).toDouble();
-            int z = query.value(2).toDouble();
+            double x = query.value(0).toDouble();
+            double y = query.value(1).toDouble();
+            double z = query.value(2).toDouble();
 
             return Eigen::Vector3d(x, y, z);
         }
@@ -175,8 +175,7 @@ bool Api::createCalibPoint(CalibPoint c)
             pointRobotId = query.value(0).toInt();
         }
 
-        query.prepare("INSERT INTO calibPoint (calibId, pointTable, pointRobot, robotId) VALUES (:calibId, :pointTable, :pointRobot, :robotId);");
-        query.bindValue(":calibId", c.calibId);
+        query.prepare("INSERT INTO calibPoint (pointTable, pointRobot, robotId) VALUES (:pointTable, :pointRobot, :robotId);");
         query.bindValue(":pointTable", pointTableId);
         query.bindValue(":pointRobot", pointRobotId);
         query.bindValue(":robotId", c.robotId);
@@ -308,39 +307,41 @@ bool Api::createThrow(Throw t)
     return success;
 }
 
-CalibPoint Api::getCalibPoint(int id)
+vector<CalibPoint> Api::getCalibPoint(int robotId)
 {
     if (!_db.open())
         throw std::invalid_argument("database not open.");
     CalibPoint c;
     QSqlQuery query(_db);
-    if (id <= 0)
+    if (robotId <= 0)
     {
         throw std::invalid_argument("id must be greater than 0");
     }
     else
     {
-        query.prepare("SELECT calibId, "
-                      "pointTable, "
+        query.prepare("SELECT pointTable, "
                       "pointRobot, "
                       "robotId "
-                      "FROM calibPoint WHERE id = :id;");
-        query.bindValue(":id", id);
+                      "FROM calibPoint WHERE robotId = :id;");
+        query.bindValue(":id", robotId);
         bool success = query.exec();
         if (!success) {
             qDebug() << query.lastError();
             _db.rollback();
         }
-        if (query.next())
+        vector<CalibPoint> calibPoints;
+        while (query.next())
         {
-            c.calibId = query.value(0).toInt();
-            c.pointTable = this->getPoint(query.value(1).toInt());
-            c.pointRobot = this->getPoint(query.value(2).toInt());
-            c.robotId = query.value(3).toInt();
+            c.pointTable = this->getPoint(query.value(0).toInt());
+            c.pointRobot = this->getPoint(query.value(1).toInt());
+            c.robotId = query.value(2).toInt();
 
-            return c;
+            calibPoints.push_back(c);
         }
-        throw std::invalid_argument("item with that id does not exist");
+        if (calibPoints.size() <= 0)
+            throw std::invalid_argument("item with that id does not exist");
+
+        return calibPoints;
     }
 }
 

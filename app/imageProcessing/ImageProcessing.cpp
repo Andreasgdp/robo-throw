@@ -19,41 +19,40 @@ void ImageProcessing::calibrate()
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
 
-    while (true) {
-        cropCornerPoints = this->cornerDetection(this->pylonPic()[0]);
-        if (cv::waitKey() == 'y') {
-            cv::destroyAllWindows();
-            break;
-        }
-        else
-            cv::destroyAllWindows();
+    this->cornersHoughCircles(this->pylonPic()[0]);
 
-    }
 
-    cv::Mat tmp = this->cropImg(this->pylonPic()[0]);
-    cv::Point ball = this->ballDetection(tmp);
-    while(ball.x == -1 && ball.y==-1){
-        std::cout<<"take new image when ready, press p"<<std::endl;
-        if(cv::waitKey()=='p'){
-            tmp = this->cropImg(this->pylonPic()[0]);
-            ball = this->ballDetection(tmp);
-        }
-    }
-
-    cv::imshow("Result", tmp);
+    cv::imshow("croppedImage", this->cropImg(this->pylonPic()[0]));
     cv::waitKey();
-
-    this->getBallCoords();
 
 }
 
-std::vector<double> ImageProcessing::getBallCoords()
-{
-    cv::Mat img = this->pylonPic()[0].clone();
-    std::cout<<"lort";
-    cv::Mat crop = this->cropImg(img);
-    cv::Point imgPoints = this->ballDetection(crop);
-    std::vector<double> realCoords = this->coordConvert(imgPoints,crop);
+std::vector<double> ImageProcessing::getBallCoords() {
+    std::string input;
+    std::vector<double> realCoords{0};
+    cv::destroyAllWindows();
+    while (true){
+        std::cout <<"ready for ball finding? (y)" <<std::endl;
+        std::cin >> input;
+
+        if (input == "y") {
+            cv::Mat img = this->pylonPic()[0].clone();
+            cv::Mat crop = this->cropImg(img);
+            cv::Point imgPoints = this->ballDetection(crop);
+            while(imgPoints.x == -1 && imgPoints.y==-1){
+                std::cout<<"take new image when ready, press p"<<std::endl;
+                if(cv::waitKey()=='p'){
+                    imgPoints = this->ballDetection(this->cropImg(this->pylonPic()[0]));
+                }
+            }
+            realCoords = this->coordConvert(imgPoints,crop);
+            break;
+        }
+    }
+
+    std::cout << "realCoords" << std::endl;
+    std::cout << realCoords.at(0) << std::endl;
+    std::cout << realCoords.at(1) << std::endl << std::endl;
 
     return realCoords;
 }
@@ -118,7 +117,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
             std::cout << ">> Failed to set exposure value." << std::endl;
 
         }
-        //        std::cout << "New exposure: " << exposureTime->GetValue() << std::endl;
 
         // Start the grabbing of c_countOfImagesToGrab images.
         // The camera device is parameterized with a default configuration which
@@ -167,10 +165,8 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
                 }
                 //If not calibrated take X amount op pics
                 else{
-                    //                    cv::Rect iCrop(100, 10, 900, 600);
-                    //                    cv::Mat cropImg = openCvImage(iCrop);
                     cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
-                if(cv::waitKey() == 'p'){
+                if(cv::waitKey(50) == 'p'){
                     cv::Mat tmp=openCvImage.clone();
                     imgVector.push_back(tmp);
                     cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
@@ -192,45 +188,6 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(){
     return imgVector;
 }
 
-cv::Point ImageProcessing::ballDetection(cv::Mat src) {
-    std::vector<cv::Point> points;
-    std::vector<cv::Mat> bufferImages;
-    cv::Mat src_grey;
-    cvtColor(src, src_grey, cv::COLOR_BGR2GRAY);
-    cv::medianBlur(src_grey, src_grey, 5);
-
-    std::vector<cv::Vec3f> circles;
-    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
-    for( size_t i = 0; i < circles.size(); i++ ) {
-        cv::Vec3i c = circles[i];
-        cv::Point center = cv::Point(c[0], c[1]);
-        points.push_back(center);
-        circle( src_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
-        circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
-        bufferImages.push_back(src_grey.clone());
-    }
-    if(points.size() > 1) {
-        for (unsigned int i = 0; i < bufferImages.size(); i++) {
-            cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
-            cv::waitKey();
-            cv::destroyWindow("showImage" + std::to_string(i));
-        }
-        std::cout << "Put in the correct picture number: ";
-        std::string input;
-        std::cin >> input;
-        std::cout << "Picture number " + input + " have been selected" << std::endl;
-
-        return points.at(std::stoi(input));
-    } else if (points.size() == 1){
-        return points.at(0);
-    } else {
-        std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound" + std::to_string(0), src_grey);
-        cv::waitKey();
-        return cv::Point(-1, -1);
-    }
-}
-
 void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     for(int i = 0; i<imgVec.size();i++){
         cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
@@ -240,8 +197,6 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     std::vector<std::vector<cv::Point3f>> Q;
     // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
     // fields with a size of 15x15mm
-
-    // int checkerBoard[2] = {6,9};
     // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
     for(int i = 1; i<=BoardSize.height; i++){
@@ -254,8 +209,6 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     // Detect feature points
     std::size_t i = 0;
     for (auto const &f : imgVec) {
-        //std::cout << std::string(f) << std::endl;
-
         // 2. Read in the image an call cv::findChessboardCorners()
         cv::Mat img = f.clone();
         cv::Mat gray;
@@ -309,11 +262,7 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     cv::imwrite("../app/imageProcessing/images/mapX.jpg", mapX);
     cv::imwrite("../app/imageProcessing/images/mapY.jpg", mapY);
     for (auto const &f : imgVec) {
-
-        //std::cout << std::string(f) << std::endl;
-
         cv::Mat img = f.clone();
-        //std::cout<<"test"<<std::endl;
         cv::Mat imgUndistorted;
         // 5. Remap the image using the precomputed interpolation maps.
         cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
@@ -335,8 +284,6 @@ std::vector<cv::Mat> ImageProcessing::loadLocalImg()
     cv::glob("../app/imageProcessing/images/calibration*.jpg", fileNames, false);
     for(int i = 0; i<fileNames.size();i++){
         imgVec.push_back(cv::imread(fileNames[i]));
-        //cv::imshow( "myWindow" +std::to_string(i), imgVec[i]);
-        //cv::waitKey(0);
     }
     return imgVec;
 }
@@ -344,8 +291,11 @@ std::vector<cv::Mat> ImageProcessing::loadLocalImg()
 
 cv::Mat ImageProcessing::cropImg(cv::Mat img)
 {
-    int y = (cropCornerPoints[0].y+cropCornerPoints[1].y)/2; // Average height
-    cv::Mat crop = img(cv::Range(y,img.rows),cv::Range(cropCornerPoints[1].x,cropCornerPoints[0].x)).clone(); // Slicing to crop the image
+    // first upper left
+    //seckond upper right
+    int y = (cropCornerPoints[0].y+cropCornerPoints[1].y)/2; // Average Y height
+    int x = (cropCornerPoints[1].x+cropCornerPoints[2].x)/2;// Average x with
+    cv::Mat crop = img(cv::Range(y,cropCornerPoints[2].y),cv::Range(cropCornerPoints[0].x, x)).clone(); // Slicing to crop the image
 
     return crop;
 }
@@ -353,11 +303,6 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img)
 cv::Mat ImageProcessing::Threshold(cv::Mat image)
 {
     cv::Mat img, crop, gray, out, outNorm, outNormSc;
-    //cv::imwrite("../app/imageProcessing/images/fuck_shit.jpg",notimg);
-    //img = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
-    //cv::Mat crop = img(cv::Range(300,600),cv::Range(300,1150)).clone();
-    //first range top/bottom, seckond left/right
-
     img=image.clone();
 
     //MANUAL THRESHOLDING - RGB
@@ -422,53 +367,37 @@ cv::Mat ImageProcessing::Threshold(cv::Mat image)
     cv::imshow("bin", grayMod);
     cv::waitKey();
 
-
-    //    cv::Mat tmpMat;
-    //    out =  cv::Mat::zeros(grayMod.size(), CV_32FC1);
-    //    cv::cornerHarris(grayMod, out, 3, 3, 0.02);
-
-    //    cv::normalize(out, outNorm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
-    //    cv::convertScaleAbs(outNorm, outNormSc);
-
-    //    for (int j = 0; j < outNorm.rows; j++) {
-    //        for (int i = 0; i < outNorm.cols; i++) {
-    //            if ((int)outNorm.at<float>(j, i) >150) {
-    //                circle(img, cv::Point(i, j), 4, cv::Scalar(0, 0, 255), 2, 8, 0);
-    //            }
-    //        }
-    //    }
-    //    cv::imshow("Output Harris", img);
-    //    cv::waitKey();
-
-
     return grayMod;
 }
 
 std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 {
-
     //cam height 139 cm
-    float x, y;
-    float xWith = img.cols, yWith = img.rows;
-    float realX = 80; //cm
-    float lengthPerPixel = realX/xWith;
-    x = imgPos.x*lengthPerPixel;
-    if(x<40){
-        x=x+((40-x)/40*0.4);
-    }
-    else if(x>40){
-        x=x+((40-x)/40*0.4);
-    }
-    y = imgPos.y*lengthPerPixel;
+    float x1, x2, y1, y2, z1, z2, maxZ, theta;
+    float xWidth = img.cols, yWidth = img.rows;
+    float realX = 80, realY = 75; //cm
+    float lengthPerPixelX = realX/xWidth;
+    float lengthPerPixelY = realY/yWidth;
+
+    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
+    x1 = imgPos.x*lengthPerPixelX;
+    y1 = imgPos.y*lengthPerPixelY;
+    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
+
+    theta = acos(x1/z1);
+    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
+    x2 = cos(theta) * z2;
+    y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x);
-    points.push_back(y);
+    points.push_back(x2/100);
+    points.push_back(y2/100);
 
+    std::cout << "unscaled x = " << std::to_string(x1) << ", unscaled y = " << std::to_string(y1);
+    std::cout << ", which means the hypotenuse = " << std::to_string(z1) << std::endl;
+    std::cout << "scaled x = " << std::to_string(x2) << ", unscaled y = " << std::to_string(y2);
+    std::cout << ", which means the hypotenuse = " << std::to_string(z2) << std::endl;
 
-    std::cout<<"x position: " + std::to_string(x) + " y position: " + std::to_string(y)<<std::endl;
-    std::cout<<"rows: " + std::to_string(img.rows) + " cols: " + std::to_string(img.cols)<<std::endl;
-    std::cout<<"point x: " + std::to_string(imgPos.x) + " point y: " + std::to_string(imgPos.y)<<std::endl;
     return points;
 }
 
@@ -476,12 +405,8 @@ void ImageProcessing::lastStand(cv::Mat img)
 {
     cv::Mat image, gray, crop;
     cv::Mat output, output_norm, output_norm_scaled;
-    //    image = cv::imread("../app/imageProcessing/images/fuck_shit.jpg").clone();
     image = img.clone();
     crop = image(cv::Range(350,700),cv::Range(300,1100)).clone();
-
-    //cv::cvtColor(crop, gray, cv::COLOR_BGR2GRAY);
-
 
     // Detecting corners using the goodFeaturesToTrack built in function
     std::vector<cv::Point2f> corners;
@@ -504,13 +429,9 @@ void ImageProcessing::lastStand(cv::Mat img)
     // Displaying the result
     cv::imshow("Output Shi-Tomasi", crop);
     cv::waitKey();
-
-
-
-
 }
 
-std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
+std::vector<cv::Point> ImageProcessing::cornersTempleMatching(cv::Mat img)
 {
     std::vector<cv::Mat> results, tpl;
     std::vector<cv::Point> points;
@@ -550,10 +471,119 @@ std::vector<cv::Point> ImageProcessing::cornerDetection(cv::Mat img)
     return points;
 }
 
+cv::Point ImageProcessing::ballDetection(cv::Mat src) {
+    std::vector<cv::Point> points;
+    std::vector<cv::Mat> bufferImages;
+    cv::Mat src_grey;
+    cvtColor(src, src_grey, cv::COLOR_BGR2GRAY);
+    cv::medianBlur(src_grey, src_grey, 5);
+
+    std::vector<cv::Vec3f> circles;
+    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+    for( size_t i = 0; i < circles.size(); i++ ) {
+        cv::Vec3i c = circles[i];
+        cv::Point center = cv::Point(c[0], c[1]);
+        points.push_back(center);
+        circle( src_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
+        circle( src_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
+        bufferImages.push_back(src_grey.clone());
+    }
+    if(points.size() > 1) {
+        for (unsigned int i = 0; i < bufferImages.size(); i++) {
+            cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
+            cv::waitKey();
+            cv::destroyWindow("showImage" + std::to_string(i));
+        }
+        std::cout << "Put in the correct picture number: ";
+        std::string input;
+        std::cin >> input;
+        std::cout << "Picture number " + input + " have been selected" << std::endl;
+
+        return points.at(std::stoi(input));
+    } else if (points.size() == 1){
+
+        cv::imshow("testo", src_grey);
+        cv::waitKey();
 
 
+        return points.at(0);
+    } else {
+        std::cout << "No table tennis ball found!" << std::endl;
+        cv::imshow("PointsNotFound", src_grey);
+        cv::waitKey();
+        return cv::Point(-1, -1);
+    }
+}
 
+void ImageProcessing::cornersHoughCircles(cv::Mat src){
+    std::cout<<"make new corner callibration? [y/n]"<<std::endl;
+    std::string tmp;
+    std::cin>> tmp;
+    if(tmp == "y")
+        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", src);
+    else
+        src = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
 
+    std::vector<cv::Point> points;
+    cv::Mat image_hsv, image_bgr;
+    image_bgr = src;
+    cv::cvtColor(src, image_hsv, cv::COLOR_BGR2HSV);
+    cv::medianBlur(image_hsv, image_hsv, 9);
 
+    cv::Mat lower_red_hue_range, upper_red_hue_range, red_hue_image;
 
+    cv::inRange(image_hsv, cv::Scalar(0, 100, 100), cv::Scalar(30, 255, 255), lower_red_hue_range);
+    cv::inRange(image_hsv, cv::Scalar(160, 100, 100), cv::Scalar(179, 255, 255), upper_red_hue_range);
 
+    cv::addWeighted(lower_red_hue_range, 1.0, upper_red_hue_range, 1.0, 0.0, red_hue_image);
+    cv::GaussianBlur(red_hue_image, red_hue_image, cv::Size(9, 9), 2, 2);
+
+    std::vector<cv::Vec3f> circles;
+    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+
+    if(circles.size() == 0) std::exit(-1);
+    for(size_t current_circle = 0; current_circle < circles.size(); ++current_circle) {
+        cv::Point center(std::round(circles[current_circle][0]), std::round(circles[current_circle][1]));
+        cv::circle(image_bgr, center, 20, cv::Scalar(0, 255, 0), 2);
+        points.push_back(center);
+    }
+
+    double minX{-1}, maxY{-1};
+    int minXIndx{}, maxYIndx{-1};
+
+    for (unsigned int i = 0; i < points.size(); i++) {
+        if (minX > points.at(i).x) {
+            minX = points.at(i).x;
+            minXIndx = i;
+        } else if (minX == -1) {
+            minX = points.at(i).x;
+            minXIndx = i;
+        }
+
+        if (maxY < points.at(i).y) {
+            maxY = points.at(i).y;
+            maxYIndx = i;
+        }
+    }
+
+    cropCornerPoints.push_back(points.at(minXIndx));
+
+    if ((minXIndx == 0 && maxYIndx == 1) || (minXIndx == 1 && maxYIndx == 0))
+        cropCornerPoints.push_back(points.at(2));
+    else if ((minXIndx == 1 && maxYIndx == 2) || (minXIndx == 2 && maxYIndx == 1))
+        cropCornerPoints.push_back(points.at(0));
+    else if ((minXIndx == 2 && maxYIndx == 0) || (minXIndx == 0 && maxYIndx == 2))
+        cropCornerPoints.push_back(points.at(1));
+
+    cropCornerPoints.push_back(points.at(maxYIndx));
+
+    cropCornerPoints.at(0).x -= 20;
+    cropCornerPoints.at(0).y -= 20;
+    cropCornerPoints.at(1).x += 20;
+    cropCornerPoints.at(1).y -= 20;
+    cropCornerPoints.at(2).x += 20;
+    cropCornerPoints.at(2).y += 20;
+
+    cv::imshow("found corners", image_bgr);
+    cv::waitKey();
+}

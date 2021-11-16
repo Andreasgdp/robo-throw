@@ -56,7 +56,7 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
     dq_start << 0, 0, 0, 0, 0, 0;
 
     double startTime = 0;
-    double endTime = 4;
+    double endTime = 0.1;
 
     double stepSize = 0.008;
     int totalSteps = endTime/stepSize;
@@ -70,28 +70,25 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
     return jointVelocities;
 }
 
-VectorXd ThrowCalc::velocityCalc(CoordinateTranslator CoordinateTranslator, double xWorld, double yWorld, double zWorld) {
+VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, VectorXd throwpos) {
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
     double a = 45;
     int t = 0;
-    VectorXd velocityXYZ(3);
+    VectorXd velocityXYZ(6);
 
     // Calc the angle in radian
     double angle = (a * M_PI)/180;
 
     // Convert world coordinates to robot coordinates
-    Vector3d pos = CoordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
-
-    // The home/trow pos in meters and radian
-    VectorXd _throwpos(6);
-    _throwpos << 0.20375, -0.2635, 0.6638, 1.3, -1, 1.595;
+    CoordinateTranslator coordinateTranslator;
+    Vector3d pos = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
     // Translate 0.0.0 to the throwpos
-    x = pos(0) - _throwpos(0);
-    y = pos(1) - _throwpos(1);
-    z = pos(2) - _throwpos(2);
+    x = pos(0) - throwpos(0);
+    y = pos(1) - throwpos(1);
+    z = pos(2) - throwpos(2);
 
     // In the x,z plane
     // The general speed
@@ -112,7 +109,7 @@ VectorXd ThrowCalc::velocityCalc(CoordinateTranslator CoordinateTranslator, doub
     // adding the two z speeds
     double vz = vzx + vzy;
 
-    velocityXYZ << vx, vy, vz;
+    velocityXYZ << vx, vy, vz, 0, 0, 0;
 
     return velocityXYZ;
 }
