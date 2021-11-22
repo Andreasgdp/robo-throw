@@ -16,7 +16,7 @@ App::App(std::string robotIP,
     _IP = (!_localEnv) ? robotIP : "127.0.0.1";
 
     if (!_roboConn.isConnected())
-        throw "Connection could not be established with ip: " + _IP;
+        throw std::invalid_argument("Connection could not be established with ip: " + _IP);
 
     _imgProcessor.calibrate();
 
@@ -38,13 +38,14 @@ App::App(std::string robotIP,
 
 void App::findAndGrabObject()
 {
+    bool simSuccess = false;
     this->moveHome();
 
     // use imageProcessing to get coordinates to object in relation to the table from image
     vector<double> imgBallCoords = _imgProcessor.getBallCoords();
 
     // translate the coordinates to the object in relation to table to robot base coordinates
-    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(imgBallCoords[1], imgBallCoords[0], 0.212); // TODO: Check for hardcoded z
+    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(imgBallCoords[1], imgBallCoords[0], 0.2115); // TODO: Check for hardcoded z
 
     VectorXd homePos = _roboConn.getHomePosCoords();
 
@@ -57,53 +58,72 @@ void App::findAndGrabObject()
     VectorXd endPosAboveObject(6);
     endPosAboveObject << robotObjectPointAndRotation[0], robotObjectPointAndRotation[1], 0.220, robotObjectPointRotation;
 
-    // simulate move
-    _simulator.executeMoveLSimulation(_roboConn.getHomePosJoints(), endPosAboveObject);
+    // move above object
+    simSuccess = _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), endPosAboveObject);
+    if (!simSuccess) return;
     _roboConn.moveL(endPosAboveObject, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
     // move to object
-    _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), robotObjectPointAndRotation);
+    simSuccess = _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), robotObjectPointAndRotation);
+    if (!simSuccess) return;
     _roboConn.moveL(robotObjectPointAndRotation, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
     // grab object
     _gripper.close();
-    this->moveHome();
+
+    // move above object
+    simSuccess = _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), endPosAboveObject);
+    if (!simSuccess) return;
+    _roboConn.moveL(endPosAboveObject, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 }
 
 void App::throwObject()
 {
-    _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getThrowPosJoints());
+    bool simSuccess = false;
+    simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getThrowPosJoints());
+    if (!simSuccess) return;
     _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
-    Vector3d goalPos = Vector3d(0.4,0.3,0);
+    Vector3d goalPos = Vector3d(0.4,0.4,0);
 
     VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose());
     VectorXd q_end = _roboConn.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
+    // Find acceleration vector
+    VectorXd accVector(6);
+    double t = 0.1;
+    accVector = dq_end / t;
+
     // Starting pos for throw
-    VectorXd q_start = q_end - (dq_end * 0.1);
+    VectorXd q_start = q_end - (0.5 * accVector * pow(t, 2));
+
 
     // Move from home to start of throw
-    _simulator.executeMoveJSimulation(q_end, q_start);
+    simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), q_start);
+    if (!simSuccess) return;
     _roboConn.moveJ(q_start, 1, 1);
 
-    vector<VectorXd> jointVelocities = _throwCalc.getJointVelocities(q_start, q_end, dx);
+    vector<VectorXd> jointVelocities = _throwCalc.getJointVelocities(t, q_end, q_start, dx, accVector);
 
-    _simulator.executeThrowSimulation(q_start, q_end, jointVelocities);
+    simSuccess = _simulator.executeThrowSimulation(_roboConn.getActualJointPoses(), q_end, jointVelocities);
+    if (!simSuccess) return;
+    _gripper.open();
     for (int i = 0; i < jointVelocities.size(); i++)
     {
-        _roboConn.speedJ(jointVelocities.at(i), 40);
+        _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
         this_thread::sleep_for(chrono::milliseconds(8));
     }
     // TODO: figure out when to release gripper.
-    _gripper.open();
-//    _roboConn.speedStop(10);
+    _roboConn.speedStop(40);
+
 
     this->moveHome();
 }
 
 void App::moveHome()
 {
-    _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getHomePosJoints());
+    bool simSuccess = false;
+    simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getHomePosJoints());
+    if (!simSuccess) return;
     _roboConn.moveJ(_roboConn.getHomePosJoints(), _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 }

@@ -1,4 +1,5 @@
 #include "GripperController.h"
+#include <iostream>
 
 GripperController::GripperController(
         const std::string &address,

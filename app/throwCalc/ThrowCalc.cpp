@@ -34,21 +34,26 @@ Matrix6d ThrowCalc::jacobianInverse(double q1, double q2, double q3, double q4, 
     return jacobian.inverse();
 }
 
-VectorXd ThrowCalc::linearFitFunction(double t, double startTime, const VectorXd &dq_end,const VectorXd &dq_start, double endTime)
+//VectorXd ThrowCalc::linearFitFunction(double t, double startTime, const VectorXd &dq_end,const VectorXd &dq_start, double endTime)
+//{
+//    // Find slope of each joint velocity based on start, end and delta-time
+//    VectorXd next_dq(6);
+//    double dq1 = ((dq_end[0] - dq_start[0])/(endTime - startTime)) * t;
+//    double dq2 = ((dq_end[1] - dq_start[1])/(endTime - startTime)) * t;
+//    double dq3 = ((dq_end[2] - dq_start[2])/(endTime - startTime)) * t;
+//    double dq4 = ((dq_end[3] - dq_start[3])/(endTime - startTime)) * t;
+//    double dq5 = ((dq_end[4] - dq_start[4])/(endTime - startTime)) * t;
+//    double dq6 = ((dq_end[5] - dq_start[5])/(endTime - startTime)) * t;
+//    next_dq << dq1, dq2, dq3, dq4, dq5, dq6;
+//    return next_dq;
+//}
+
+VectorXd ThrowCalc::linearFitFunction(double t, const VectorXd &q_start, const VectorXd &accVector)
 {
-    // Find slope of each joint velocity based on start, end and delta-time
-    VectorXd next_dq(6);
-    double dq1 = ((dq_end[0] - dq_start[0])/(endTime - startTime)) * t;
-    double dq2 = ((dq_end[1] - dq_start[1])/(endTime - startTime)) * t;
-    double dq3 = ((dq_end[2] - dq_start[2])/(endTime - startTime)) * t;
-    double dq4 = ((dq_end[3] - dq_start[3])/(endTime - startTime)) * t;
-    double dq5 = ((dq_end[4] - dq_start[4])/(endTime - startTime)) * t;
-    double dq6 = ((dq_end[5] - dq_start[5])/(endTime - startTime)) * t;
-    next_dq << dq1, dq2, dq3, dq4, dq5, dq6;
-    return next_dq;
+    return accVector * t;
 }
 
-vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const VectorXd &q_end,const VectorXd &dx)
+vector<VectorXd> ThrowCalc::getJointVelocities(double endTime, const VectorXd &q_end, const VectorXd &q_start, const VectorXd &dx, VectorXd &accVector)
 {
     VectorXd dq_end = this->jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
 
@@ -56,7 +61,6 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
     dq_start << 0, 0, 0, 0, 0, 0;
 
     double startTime = 0;
-    double endTime = 0.1;
 
     double stepSize = 0.008;
     int totalSteps = endTime/stepSize;
@@ -64,7 +68,7 @@ vector<VectorXd> ThrowCalc::getJointVelocities(const VectorXd &q_start, const Ve
 
     vector<VectorXd> jointVelocities;
     for(int step = 0; step <= totalSteps; step++) {
-        jointVelocities.push_back(linearFitFunction(step * stepSize, startTime, dq_end, dq_start, endTime));
+        jointVelocities.push_back(linearFitFunction(step * stepSize, q_start, accVector));
     }
 
     return jointVelocities;
@@ -74,7 +78,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
-    double a = 45;
+    double a = 30;
     int t = 0;
     VectorXd velocityXYZ(6);
 
@@ -83,20 +87,21 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     // Convert world coordinates to robot coordinates
     CoordinateTranslator coordinateTranslator;
-    Vector3d pos = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
+    Vector3d posOfBallInRobotCoord = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
     // Translate 0.0.0 to the throwpos
-    x = pos(0) - throwpos(0);
-    y = pos(1) - throwpos(1);
-    z = pos(2) - throwpos(2);
+    x = posOfBallInRobotCoord[0] - throwpos[0];
+    y = posOfBallInRobotCoord[1] - throwpos[1];
+    z = posOfBallInRobotCoord[2] - throwpos[2];
 
     // In the x,z plane
     // The general speed
-    int signX = (x >= 0) ? 1: -1;
+    int signX = (x >= 0) ? 1 : -1;
+
     v0x = (signX * 0.70771 * x * sqrt(-g / (z-tan(angle) * x))) / (cos(angle));
     // The speed in x and the speed in z
     vx = v0x * cos(angle);
-    vzx = v0x * sin(angle) - g * t;
+    vzx = v0x * sin(angle) - g * t;    
 
     // In the y,z plane
     // The general speed
@@ -111,5 +116,5 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     velocityXYZ << vx, vy, vz, 0, 0, 0;
 
-    return velocityXYZ;
+    return -velocityXYZ;
 }
