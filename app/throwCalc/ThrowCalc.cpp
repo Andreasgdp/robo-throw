@@ -64,7 +64,6 @@ vector<VectorXd> ThrowCalc::getJointVelocities(double endTime, const VectorXd &q
 
     double stepSize = 0.008;
     int totalSteps = endTime/stepSize;
-    cout << "total steps: " << totalSteps << endl;
 
     vector<VectorXd> jointVelocities;
     for(int step = 0; step <= totalSteps; step++) {
@@ -78,7 +77,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
-    double a = 30;
+    double a = 10;
     int t = 0;
     VectorXd velocityXYZ(6);
 
@@ -105,7 +104,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     // In the y,z plane
     // The general speed
-    int signY = (y >= 0) ? 1: -1;
+    int signY = (y <= 0) ? 1: -1;
     v0y = (signY * 0.70771 * y * sqrt(-g / (z-tan(angle) * y))) / (cos(angle));
     // The speed in x and the speed in z
     vy = v0y * cos(angle);
@@ -116,5 +115,5 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     velocityXYZ << vx, vy, vz, 0, 0, 0;
 
-    return -velocityXYZ;
+    return velocityXYZ;
 }

@@ -11,17 +11,17 @@ using namespace Eigen;
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
 {
     VectorXd homePos(6);
-    homePos << 0.2445, -0.180043, 0.226905, -2.58137, 1.77185, -0.034345;
+    homePos << 0.2445, -0.180043, 0.280329, -2.58137, 1.77185, -0.034345;
     setHomePosCoords(homePos);
     VectorXd homeJointPos(6);
-    homeJointPos << 2.13226, -1.97107, 2.42766, -2.04258, -1.55178, -1.37824;
+    homeJointPos <<    2.1324,-2.03589,2.31485,-1.86485,-1.55212,-1.37831;
     setHomePosJoints(homeJointPos);
 
     VectorXd throwPos(6);
     throwPos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
     setThrowPosCoords(homePos);
     VectorXd throwJointPos(6);
-    throwJointPos <<  1.91136, -2.10508, 1.79123, -2.7, -0.5, 0;
+    throwJointPos <<  1.0122, -2.10508, 1.79123, -2.7, -0.5, 0;
     setThrowPosJoints(throwJointPos);
 
 }
@@ -183,6 +183,7 @@ bool RobotConnection::isJointsWithinSafetyLimits(const VectorXd &q)
 VectorXd RobotConnection::getTCPOffset()
 {
     vector<double> vectorJointPoses = this->rtde_control.getTCPOffset();
+    cout << vectorJointPoses.at(0) << endl;
     VectorXd tcpPoses(6);
     tcpPoses << vectorJointPoses.at(0), vectorJointPoses.at(1), vectorJointPoses.at(2), vectorJointPoses.at(3), vectorJointPoses.at(4), vectorJointPoses.at(5);
     return tcpPoses;

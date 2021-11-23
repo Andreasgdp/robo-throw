@@ -59,8 +59,6 @@ bool Simulation::executeMoveJSimulation(const Eigen::VectorXd &startJointPos, co
     // Move to start
     _roboConn.moveJ(startJointPos);
 
-    cout << "has moved to first pos" << endl;
-
     // Move to destination
     _roboConn.moveJ(endJointPos);
 

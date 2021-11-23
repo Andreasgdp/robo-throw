@@ -19,8 +19,11 @@ using namespace ur_rtde;
 int main(int argc, char *argv[])
 {
 //    RobotConnection r("192.168.100.49");
-//    cout << r.getActualJointPoses() << endl << endl;
-//    cout << r.getActualTCPPose() << endl << endl;
+//    r.moveThrowPos(1,1);
+//    VectorXd test(6);
+//    test << 0,0,0.19,0,0,0;
+//    r.setTcp(test);
+//    cout << "could run that shit" << endl;
 
 
 //    CoordinateTranslator c;

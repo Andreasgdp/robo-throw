@@ -26,7 +26,7 @@ void GripperController::disconnect() {
 }
 
 void GripperController::close() {
-    this->_gripper.doPrePositionFingers(0.04, 0.05f, false, true);
+    this->_gripper.doPrePositionFingers(0.04, 2, false, true);
 }
 
 void GripperController::open(const float &speed) {

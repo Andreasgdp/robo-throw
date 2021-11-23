@@ -1,13 +1,15 @@
 #include "App.h"
+#include <thread>
 
 using namespace std;
 using namespace Eigen;
+
+GripperController _gripper("192.168.100.11");
 
 App::App(std::string robotIP,
          std::string gripperIP,
          bool localEnv) : _roboConn(robotIP),
                           _simulator("127.0.0.1"),
-                          _gripper(gripperIP),
                           _coordTrans(),
                           _api()
 {
@@ -56,7 +58,7 @@ void App::findAndGrabObject()
     robotObjectPointAndRotation << robotObjectPoint, robotObjectPointRotation;
 
     VectorXd endPosAboveObject(6);
-    endPosAboveObject << robotObjectPointAndRotation[0], robotObjectPointAndRotation[1], 0.220, robotObjectPointRotation;
+    endPosAboveObject << robotObjectPointAndRotation[0], robotObjectPointAndRotation[1], 0.280329, robotObjectPointRotation;
 
     // move above object
     simSuccess = _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), endPosAboveObject);
@@ -84,14 +86,15 @@ void App::throwObject()
     if (!simSuccess) return;
     _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
-    Vector3d goalPos = Vector3d(0.4,0.4,0);
+    Vector3d goalPos = Vector3d(0.2,0.7,0.15);
 
     VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose());
+
     VectorXd q_end = _roboConn.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
     // Find acceleration vector
     VectorXd accVector(6);
-    double t = 0.1;
+    double t = 0.08;
     accVector = dq_end / t;
 
     // Starting pos for throw
@@ -107,7 +110,14 @@ void App::throwObject()
 
     simSuccess = _simulator.executeThrowSimulation(_roboConn.getActualJointPoses(), q_end, jointVelocities);
     if (!simSuccess) return;
-    _gripper.open();
+
+    thread throwThread([](double time) {
+        time = time - time/1.9;
+        int timeMilli = time * 1000;
+        this_thread::sleep_for(chrono::milliseconds(timeMilli));
+        _gripper.open();
+    }, t);
+
     for (int i = 0; i < jointVelocities.size(); i++)
     {
         _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
@@ -116,6 +126,7 @@ void App::throwObject()
     // TODO: figure out when to release gripper.
     _roboConn.speedStop(40);
 
+    throwThread.join();
 
     this->moveHome();
 }

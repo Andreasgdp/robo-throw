@@ -35,7 +35,7 @@ public:
      * @brief Opens the gripper
      * @param The speed the gripper opens with
      */
-    void open(const float &speed = 0.05f);
+    void open(const float &speed = 10);
 
     /*
      * @brief Move gripper to home posistion, fully opened

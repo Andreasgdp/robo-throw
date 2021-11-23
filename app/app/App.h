@@ -50,7 +50,7 @@ private:
     Simulation _simulator;
     Eigen::VectorXd _goalPos;
     Eigen::VectorXd _objectPos;
-    GripperController _gripper;
+//    GripperController _gripper;
     CoordinateTranslator _coordTrans;
     Api _api;
 //    Logger _log;

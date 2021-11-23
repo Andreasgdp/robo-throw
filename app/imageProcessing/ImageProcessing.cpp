@@ -479,7 +479,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
     cv::medianBlur(src_grey, src_grey, 5);
 
     std::vector<cv::Vec3f> circles;
-    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+    HoughCircles(src_grey, circles, cv::HOUGH_GRADIENT, 1, src_grey.rows/16, 100, 30, 15, 25); // The last two parameters is min & max radius
     for( size_t i = 0; i < circles.size(); i++ ) {
         cv::Vec3i c = circles[i];
         cv::Point center = cv::Point(c[0], c[1]);
