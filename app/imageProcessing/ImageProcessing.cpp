@@ -18,11 +18,12 @@ void ImageProcessing::calibrate()
     input = "";
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
+    cv::Mat tmp = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
+    this->cornersHoughCircles(tmp);
+    tmp = this->cropImg(tmp);
+    tmp = this->rotateImg(tmp);
 
-    this->cornersHoughCircles(this->pylonPic()[0]);
-
-
-    cv::imshow("croppedImage", this->cropImg(this->pylonPic()[0]));
+    cv::imshow("croppedImage", tmp);
     cv::waitKey();
 
 }
@@ -431,6 +432,33 @@ void ImageProcessing::lastStand(cv::Mat img)
     cv::waitKey();
 }
 
+cv::Mat ImageProcessing::rotateImg(cv::Mat img)
+{
+    double pi = 3.14159265358979323846;
+    double x1=cropCornerPoints[0].x, x2 = cropCornerPoints[1].x, y1 = cropCornerPoints[0].y, y2 = cropCornerPoints[1].y;
+    double a = (y2-y1)/(x2-x1), b = y1 -x1 * a;
+
+    double fWidth = a*img.cols+b;
+    cv::Point2f A1(0,b);
+    cv::Point2f A2(img.cols,fWidth);
+    cv::Point2f B(img.cols/2,img.rows);
+    cv::Point2f C(img.cols/2,img.rows/2);
+
+
+    double b1 = cv::norm(cv::Mat(A1),cv::Mat(C)), b2 = cv::norm(cv::Mat(A2),cv::Mat(C));
+    double c1 = cv::norm(cv::Mat(A1),cv::Mat(B)), c2 = cv::norm(cv::Mat(A2),cv::Mat(B));
+    double a1 = cv::norm(cv::Mat(B),cv::Mat(C));
+
+    double theta1 = acos((a1*a1+b1*b1-c1*c1)/(2*b1*a1))*180/pi;
+    double theta2 = acos((a1*a1+b2*b2-c2*c2)/(2*b2*a1))*180/pi;
+
+    cv::Mat rMatrix = cv::getRotationMatrix2D(C,theta1-theta2,1), rImage;
+    cv::warpAffine(img,rImage,rMatrix,img.size());
+    cv::imshow("rotated", rImage);
+    cv::waitKey();
+    return rImage;
+}
+
 std::vector<cv::Point> ImageProcessing::cornersTempleMatching(cv::Mat img)
 {
     std::vector<cv::Mat> results, tpl;
@@ -519,9 +547,9 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     std::cout<<"make new corner callibration? [y/n]"<<std::endl;
     std::string tmp;
     std::cin>> tmp;
-    if(tmp == "y")
-        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", src);
-    else
+//    if(tmp == "y")
+//        std::cout<<"test" << std::endl;//cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", src);
+//    else
         src = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
 
     std::vector<cv::Point> points;

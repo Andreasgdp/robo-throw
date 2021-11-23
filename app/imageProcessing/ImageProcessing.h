@@ -8,7 +8,6 @@
 #include <pylon/PylonIncludes.h>
 #include <algorithm>
 
-
 class ImageProcessing
 {
 public:
@@ -26,6 +25,7 @@ public:
     std::vector<double> coordConvert(cv::Point imgPos, cv::Mat img) ;
 
     void lastStand(cv::Mat img);
+    cv::Mat rotateImg(cv::Mat img);
 
 
 private:
