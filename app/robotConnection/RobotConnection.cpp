@@ -11,17 +11,17 @@ using namespace Eigen;
 RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_recieve(IP)
 {
     VectorXd homePos(6);
-    homePos << 0.248773, -0.172556, 0.22111, -2.73333, 1.46224, -0.0583505;
+    homePos << 0.2445, -0.180043, 0.226905, -2.58137, 1.77185, -0.034345;
     setHomePosCoords(homePos);
     VectorXd homeJointPos(6);
-    homeJointPos <<  2.14883, -1.96807, 2.44214, -2.05719, -1.51589, -1.58204;
+    homeJointPos << 2.13226, -1.97107, 2.42766, -2.04258, -1.55178, -1.37824;
     setHomePosJoints(homeJointPos);
 
     VectorXd throwPos(6);
     throwPos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
     setThrowPosCoords(homePos);
     VectorXd throwJointPos(6);
-    throwJointPos <<  1.91136, -2.10508, 1.79123, -1.93872, -1.52253, -1.60655;
+    throwJointPos <<  1.91136, -2.10508, 1.79123, -2.7, -0.5, 0;
     setThrowPosJoints(throwJointPos);
 
 }

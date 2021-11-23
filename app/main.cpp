@@ -12,20 +12,58 @@
 #include "api/Api.h"
 #include "app/App.h"
 
-
 using namespace std;
 using namespace Eigen;
 using namespace ur_rtde;
 
 int main(int argc, char *argv[])
 {
-
-//    RobotConnection r("127.0.0.1");
 //    RobotConnection r("192.168.100.49");
 //    cout << r.getActualJointPoses() << endl << endl;
 //    cout << r.getActualTCPPose() << endl << endl;
-//    r.moveHome(r.getDefaultSpeed(), r.getDefaultAcceleration());
 
+
+//    CoordinateTranslator c;
+//    Api _api;
+//    vector<CalibPoint> calibPoints = _api.getCalibPoint(1);
+//    vector<Vector3d> P_robot;
+//    vector<Vector3d> P_table;
+//    for (int i = 0; i < calibPoints.size(); i++) {
+//        P_robot.push_back(calibPoints[i].pointRobot);
+//        P_table.push_back(calibPoints[i].pointTable);
+//    }
+
+//    c.setPointSets(P_robot, P_table);
+//    c.calibrateRobotToTable();
+
+//    RobotConnection _roboConn("127.0.0.1");
+//    ThrowCalc _throwCalc;
+//    _roboConn.moveThrowPos(1, 1);
+
+//    Vector3d goalPos = Vector3d(0.4,0.4,0);
+
+//    VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose());
+//    cout << dx << endl << endl;
+//    VectorXd q_end = _roboConn.getActualJointPoses();
+//    VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
+//    // Find acceleration vector
+//    VectorXd accVector(6);
+//    double t = 0.1;
+//    accVector = dq_end / t;
+
+//    // Starting pos for throw
+//    VectorXd q_start = q_end - (0.5 * accVector * pow(t, 2));
+
+//    // Move from home to start of throw
+//    _roboConn.moveJ(q_start, 1, 1);
+
+//    vector<VectorXd> jointVelocities = _throwCalc.getJointVelocities(t, q_end, q_start, dx, accVector);
+//    for (int i = 0; i < jointVelocities.size(); i++)
+//    {
+//        _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
+//        this_thread::sleep_for(chrono::milliseconds(8));
+//    }
+//    _roboConn.speedStop(40);
 
     App app("192.168.100.49", "192.168.100.11", false);
     app.findAndGrabObject();
@@ -35,7 +73,7 @@ int main(int argc, char *argv[])
     Api api;
     CalibPoint calibPoint;
 
-    int robotId = 1;
+    int robotId = 1;½
     calibPoint.robotId = robotId;
 
     Vector3d P_robot1 = {-0.05907, -0.31838, 0.17};

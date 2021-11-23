@@ -14,7 +14,7 @@ Api::Api()
     _db.setHostName("localhost");
     _db.setDatabaseName("test2");
     _db.setUserName("user1");
-    _db.setPassword("Test?1234");
+    _db.setPassword("password1");
     createDatabase();
 }
 
