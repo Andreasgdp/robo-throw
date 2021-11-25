@@ -17,9 +17,10 @@ public:
     void chessboardDetection(std::vector<cv::Mat> imgVec);
     cv::Mat   cropImg(cv::Mat img);
     cv::Mat   rotateImg(cv::Mat img);
-    cv::Point ballDetection(cv::Mat src);
+    cv::Point ballDetection(cv::Mat img);
+    cv::Point liveHoughCircles(cv::Mat img);
     std::vector<double>    getBallCoords();
-    std::vector<double>    coordConvert(cv::Point imgPos, cv::Mat img) ;
+    std::vector<double>    coordConvert(cv::Point imgPos, cv::Mat img);
     std::vector<cv::Mat>   grabImage(int imgAmt);
     std::vector<cv::Mat>   loadCalibImages();
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
