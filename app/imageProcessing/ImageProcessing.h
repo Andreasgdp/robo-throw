@@ -21,19 +21,14 @@ public:
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
     void cornersHoughCircles(cv::Mat src);
     cv::Mat cropImg(cv::Mat img);
-    cv::Mat Threshold(cv::Mat image);
     std::vector<double> coordConvert(cv::Point imgPos, cv::Mat img) ;
-
-    void lastStand(cv::Mat img);
     cv::Mat rotateImg(cv::Mat img);
 
 
 private:
     std::vector<cv::Point> cropCornerPoints;
-    bool autoImg = true; //
-    std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
-    bool showimg = false; //show images at every step
-    std::vector<cv::Mat> _calibrationMat; //vector of calibration Mat's
+    std::vector<std::vector<cv::Point3f>> Q;    //Checkerboard voordinates
+    std::vector<cv::Mat> _calibrationMat;       //vector of calibration Mat's
 
 };
 

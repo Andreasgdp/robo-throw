@@ -24,54 +24,40 @@ ImageProcessing::ImageProcessing(){
     } else {
         this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
     }
+}
 
+void ImageProcessing::calibrate() {
     while (true) {
         std::cout << std::endl;
-        std::cout << "You can perform following actions:" << std::endl;
-        std::cout << "1: Run new calibration(s)" << std::endl;
-        std::cout << "2: Find objects" << std::endl;
-        std::cout << "Press q to quit" << std::endl;
-        std::cout << "Choose one: ";
+        std::cout << "Select the desired calibration: " << std::endl;
+        std::cout << "1: Run new chessboard calibration" << std::endl;
+        std::cout << "2: run new corner calibration" << std::endl;
+        std::cout << "press q when done calibrating" << std::endl;
+        std::cout << "Input number and press enter: ";
         std::string input;
         std::cin >> input;
 
         if (input == "1") {
-            this->calibrate();
+            std::cout << "When ready to run calibration press enter.";
+            std::cin.get();
+            this->chessboardDetection(this->pylonPic(30));
         } else if (input == "2") {
-            this->getBallCoords();
-        } else if (input == "q")
+            std::cout << "Place the red dots on the table and press enter.";
+            std::cin.get();
+            cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", this->pylonPic(1)[0]);
+            this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+        } else if (input == "q") {
             break;
-    }
-}
-
-void ImageProcessing::calibrate()
-{
-    std::string input;
-    std::cout << std::endl;
-    std::cout << "Select the desired calibration: " << std::endl;
-    std::cout << "1: Run new chessboard calibration" << std::endl;
-    std::cout << "2: run new corner calibration" << std::endl;
-    std::cout << "Input number and press enter: ";
-    std::cin  >> input;
-
-    if (input == "1") {
-        std::cout << "When ready to run calibration press enter.";
-        std::cin.get();
-        this->chessboardDetection(this->pylonPic(30));
-    } else if (input == "2") {
-        std::cout << "Place the red dots on the table and press enter.";
-        std::cin.get();
-        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", this->pylonPic(1)[0]);
-        this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+        }
     }
 }
 
 std::vector<double> ImageProcessing::getBallCoords() {
-    cv::Mat newImage    = this->rotateImg(this->cropImg(this->pylonPic(1)[0]));
+    cv::Mat   newImage  = this->rotateImg(this->cropImg(this->pylonPic(1)[0]));
     cv::Point imgPoints = this->ballDetection(newImage);
 
     while(imgPoints.x == -1 || imgPoints.y==-1){
-        std::cout << "take new image when ready, press p" << std::endl;
+        std::cout << "take new image, when ready press p" << std::endl;
 
         if(cv::waitKey()=='p'){
             newImage    = this->rotateImg(this->cropImg(this->pylonPic(1)[0]));
@@ -186,16 +172,13 @@ std::vector<cv::Mat> ImageProcessing::pylonPic(int imgAmt){
                         mapY = _calibrationMat[1].clone();
                         cv::Mat imgUndistorted;
                         cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-                        //cv::Mat crop = this->cropImg(imgUndistorted).clone();
-
-                        //cv::Mat tmp=imgUndistorted.clone();
                         imgVector.push_back(imgUndistorted);
-                        if(showimg || !autoImg){cv::destroyWindow("Undistorted image"+std::to_string(imgVector.size()-1));}
                         if(imgVector.size()>=imgAmt){
                             camera.Close();
                             break;
                         }
                     }
+
                     //If not calibrated take X amount op pics
                     else{
                         cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
@@ -262,12 +245,6 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
             cv::cornerSubPix(gray, q[i],cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
             Q.push_back(objp);
         }
-        if(showimg){
-            // Display
-            cv::drawChessboardCorners(img, BoardSize, q[i], patternFound);
-            cv::imshow("chessboard detection", img);
-            cv::waitKey(0);
-        }
         i++;
     }
 
@@ -297,11 +274,6 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
         cv::Mat imgUndistorted;
         // 5. Remap the image using the precomputed interpolation maps.
         cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-        // Display
-        if(showimg){
-            cv::imshow("undistorted image", imgUndistorted);
-            cv::waitKey(0);
-        }
     }
     cv::destroyAllWindows();
     _calibrationMat.push_back(mapX);
@@ -330,76 +302,6 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img)
     return crop;
 }
 
-cv::Mat ImageProcessing::Threshold(cv::Mat image)
-{
-    cv::Mat img, crop, gray, out, outNorm, outNormSc;
-    img=image.clone();
-
-    //MANUAL THRESHOLDING - RGB
-    crop = img(cv::Range(400,800),cv::Range(500,900)).clone();
-    cv::Mat imgMod = img.clone();
-    //cv::vec3b m = cv::mean(crop);
-    uchar deviation = 30;
-
-    long avrgTmp1=0, avrgTmp2=0, avrgTmp3=0;
-    long iter=1;
-
-    for (int r = 0; r < crop.rows; r++) {
-        for (int c = 0; c < crop.cols; c++) {
-            avrgTmp1 = avrgTmp1+crop.at<cv::Vec3b>(r,c)[0];
-            avrgTmp2 = avrgTmp2+crop.at<cv::Vec3b>(r,c)[1];
-            avrgTmp3 = avrgTmp3+crop.at<cv::Vec3b>(r,c)[2];
-            iter++;
-        }
-    }
-    avrgTmp1=avrgTmp1/iter;
-    avrgTmp2=avrgTmp2/iter;
-    avrgTmp3=avrgTmp3/iter;
-
-
-    for (int r = 0; r < imgMod.rows; r++) {
-        for (int c = 0; c < imgMod.cols; c++) {
-
-
-            if(imgMod.at<cv::Vec3b>(r,c)[0] > avrgTmp1 + deviation){imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
-                imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;
-                imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;}
-
-            else if(imgMod.at<cv::Vec3b>(r,c)[1] > avrgTmp2 + deviation){imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;
-                imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
-                imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;}
-
-            else if(imgMod.at<cv::Vec3b>(r,c)[2] > avrgTmp3 + deviation){imgMod.at<cv::Vec3b>(r,c)[2] = imgMod.at<cv::Vec3b>(r,c)[2]*0;
-                imgMod.at<cv::Vec3b>(r,c)[0] = imgMod.at<cv::Vec3b>(r,c)[0]*0;
-                imgMod.at<cv::Vec3b>(r,c)[1] = imgMod.at<cv::Vec3b>(r,c)[1]*0;}
-        }
-    }
-    cv::imshow("bin", imgMod);
-    cv::waitKey();
-
-
-    //MANUAL THRESHOLDING - GRAY
-    cv::cvtColor(imgMod, gray, cv::COLOR_BGR2GRAY);
-
-    crop = gray(cv::Range(400,800),cv::Range(500,900)).clone();
-    cv::Mat grayMod = gray.clone();
-    cv::Scalar m = cv::mean(crop);
-
-    for (int r = 0; r < gray.rows; r++) {
-        for (int c = 0; c < gray.cols; c++) {
-            if(gray.at<uchar>(r,c)> m[0]+deviation){grayMod.at<uchar>(r,c) = 255;}
-            else if(gray.at<uchar>(r,c)< m[0]-deviation){grayMod.at<uchar>(r,c) = 255;}
-            else{grayMod.at<uchar>(r,c)=0;}
-
-
-        }
-    }
-    cv::imshow("bin", grayMod);
-    cv::waitKey();
-
-    return grayMod;
-}
-
 std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
 {
     //cam height 139 cm
@@ -426,36 +328,6 @@ std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
     std::cout << "coordinates for the object is: (" << std::to_string(x2) << "; " << std::to_string(y2) << ")" << std::endl;
 
     return points;
-}
-
-void ImageProcessing::lastStand(cv::Mat img)
-{
-    cv::Mat image, gray, crop;
-    cv::Mat output, output_norm, output_norm_scaled;
-    image = img.clone();
-    crop = image(cv::Range(350,700),cv::Range(300,1100)).clone();
-
-    // Detecting corners using the goodFeaturesToTrack built in function
-    std::vector<cv::Point2f> corners;
-    goodFeaturesToTrack(crop,
-                        corners,
-                        100,            // Max corners to detect
-                        0.1,           // Minimal quality of corners
-                        10,             // Minimum Euclidean distance between the returned corners
-                        cv::Mat(),          // Optional region of interest
-                        10,              // Size of an average block for computing a derivative covariation matrix over each pixel neighbothood
-                        false,          // Use Harri Detector or cornerMinEigenVal - Like when you create your own
-                        0.04);          // Free parameter for the Harris detector
-
-
-    // Drawing a circle around corners
-    for (size_t i = 0; i < corners.size(); i++){
-        circle(crop, corners[i], 4, cv::Scalar(0, 255, 0), 2, 8, 0);
-    }
-
-    // Displaying the result
-    cv::imshow("Output Shi-Tomasi", crop);
-    cv::waitKey();
 }
 
 cv::Mat ImageProcessing::rotateImg(cv::Mat img) {
