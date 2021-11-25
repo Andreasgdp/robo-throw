@@ -18,11 +18,12 @@ void ImageProcessing::calibrate()
     input = "";
     imgAmt = 1;
     std::vector<cv::Point> tempPoints;
-    cv::Mat tmp = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
+//    cv::Mat tmp = this->pylonPic()[0];
+    cv::Mat tmp = cv::imread("../app/imageProcessing/images/calibratedImage.jpg");
+//    cv::imwrite("../app/imageProcessing/images/calibratedImage.jpg", tmp);
     this->cornersHoughCircles(tmp);
-//    tmp = this->cropImg(tmp);
-//    tmp = this->rotateImg(tmp);
-
+    tmp = this->cropImg(tmp);
+    tmp = this->rotateImg(tmp);
 }
 
 std::vector<double> ImageProcessing::getBallCoords() {
@@ -37,8 +38,6 @@ std::vector<double> ImageProcessing::getBallCoords() {
             cv::Mat img = cv::imread("../app/imageProcessing/images/cornerDetection.jpg"); //this->pylonPic()[0].clone();
             cv::Mat crop = this->cropImg(img);
             cv::Mat rot = this->rotateImg(crop);
-            this->cornersHoughCircles(rot);
-            this->rotateImg(rot);
             cv::Point imgPoints = this->ballDetection(crop);
             while(imgPoints.x == -1 && imgPoints.y==-1){
                 std::cout<<"take new image when ready, press p"<<std::endl;
@@ -434,6 +433,8 @@ void ImageProcessing::lastStand(cv::Mat img)
 
 cv::Mat ImageProcessing::rotateImg(cv::Mat img)
 {
+    cv::imshow("to rotate", img);
+    cv::waitKey();
     double pi = 3.14159265358979323846;
     double x1=cropCornerPoints[0].x, x2 = cropCornerPoints[1].x, y1 = cropCornerPoints[0].y, y2 = cropCornerPoints[1].y;
     double a = (y2-y1)/(x2-x1), b = y1 -x1 * a;
@@ -453,9 +454,10 @@ cv::Mat ImageProcessing::rotateImg(cv::Mat img)
     double theta1 = acos((a1*a1+b1*b1-c1*c1)/(2*b1*a1))*180/pi;
     double theta2 = acos((a1*a1+b2*b2-c2*c2)/(2*b2*a1))*180/pi;
 
-    cv::Mat rMatrix = cv::getRotationMatrix2D(C,theta1-theta2,1), rImage;
+    cv::Mat rMatrix = cv::getRotationMatrix2D(C,(theta1-theta2)/2,1), rImage;
     cv::warpAffine(img,rImage,rMatrix,img.size());
     cv::destroyAllWindows();
+    cv::imwrite("../app/imageProcessing/images/rotatedImg.jpg", rImage);
     cv::imshow("rotated", rImage);
     cv::waitKey();
     return rImage;
@@ -620,13 +622,12 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
 
     cropCornerPoints.push_back(points.at(maxYIndx));
     if(cropCornerPoints.size()>2){
-
-    cropCornerPoints.at(0).x -= 20;
-    cropCornerPoints.at(0).y -= 20;
-    cropCornerPoints.at(1).x += 20;
-    cropCornerPoints.at(1).y -= 20;
-    cropCornerPoints.at(2).x += 20;
-    cropCornerPoints.at(2).y += 20;
+        cropCornerPoints.at(0).x -= 20;
+        cropCornerPoints.at(0).y -= 20;
+        cropCornerPoints.at(1).x += 20;
+        cropCornerPoints.at(1).y -= 20;
+        cropCornerPoints.at(2).x += 20;
+        cropCornerPoints.at(2).y += 20;
     }else {
         //std::cout<<"not enough nips found, press enter to continue";
         cv::imshow("not enough corners found, press enter to continue", image_bgr);

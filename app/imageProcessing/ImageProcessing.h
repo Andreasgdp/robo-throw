@@ -36,7 +36,7 @@ private:
     bool autoImg = true; //
 
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
-    int imgAmt = 10; // Ammount of images to take
+    int imgAmt = 30; // Ammount of images to take
     bool showimg = false; //show images at every step
     std::vector<cv::Mat> _calibrationMat; //vector of calibration Mat's
 
