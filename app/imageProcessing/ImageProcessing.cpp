@@ -20,11 +20,8 @@ void ImageProcessing::calibrate()
     std::vector<cv::Point> tempPoints;
     cv::Mat tmp = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
     this->cornersHoughCircles(tmp);
-    tmp = this->cropImg(tmp);
-    tmp = this->rotateImg(tmp);
-
-    cv::imshow("croppedImage", tmp);
-    cv::waitKey();
+//    tmp = this->cropImg(tmp);
+//    tmp = this->rotateImg(tmp);
 
 }
 
@@ -37,8 +34,11 @@ std::vector<double> ImageProcessing::getBallCoords() {
         std::cin >> input;
 
         if (input == "y") {
-            cv::Mat img = this->pylonPic()[0].clone();
+            cv::Mat img = cv::imread("../app/imageProcessing/images/cornerDetection.jpg"); //this->pylonPic()[0].clone();
             cv::Mat crop = this->cropImg(img);
+            cv::Mat rot = this->rotateImg(crop);
+            this->cornersHoughCircles(rot);
+            this->rotateImg(rot);
             cv::Point imgPoints = this->ballDetection(crop);
             while(imgPoints.x == -1 && imgPoints.y==-1){
                 std::cout<<"take new image when ready, press p"<<std::endl;
@@ -438,6 +438,7 @@ cv::Mat ImageProcessing::rotateImg(cv::Mat img)
     double x1=cropCornerPoints[0].x, x2 = cropCornerPoints[1].x, y1 = cropCornerPoints[0].y, y2 = cropCornerPoints[1].y;
     double a = (y2-y1)/(x2-x1), b = y1 -x1 * a;
 
+
     double fWidth = a*img.cols+b;
     cv::Point2f A1(0,b);
     cv::Point2f A2(img.cols,fWidth);
@@ -454,6 +455,7 @@ cv::Mat ImageProcessing::rotateImg(cv::Mat img)
 
     cv::Mat rMatrix = cv::getRotationMatrix2D(C,theta1-theta2,1), rImage;
     cv::warpAffine(img,rImage,rMatrix,img.size());
+    cv::destroyAllWindows();
     cv::imshow("rotated", rImage);
     cv::waitKey();
     return rImage;
@@ -547,9 +549,8 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     std::cout<<"make new corner callibration? [y/n]"<<std::endl;
     std::string tmp;
     std::cin>> tmp;
-//    if(tmp == "y")
-//        std::cout<<"test" << std::endl;//cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", src);
-//    else
+    cropCornerPoints.clear();
+    if(tmp == "n")
         src = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
 
     std::vector<cv::Point> points;
@@ -577,7 +578,7 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     }
 
     double minX{-1}, maxY{-1};
-    int minXIndx{}, maxYIndx{-1};
+    int minXIndx{-1}, maxYIndx{-1};
 
     for (unsigned int i = 0; i < points.size(); i++) {
         if (minX > points.at(i).x) {
@@ -596,14 +597,29 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
 
     cropCornerPoints.push_back(points.at(minXIndx));
 
-    if ((minXIndx == 0 && maxYIndx == 1) || (minXIndx == 1 && maxYIndx == 0))
+    if (points.size() < 3) {
+        //std::cout<<"not enough nips found, press enter to continue";
+        cv::imshow("not enough corners found, press enter to continue", image_bgr);
+        cv::waitKey();
+        cv::destroyAllWindows();
+        this->cornersHoughCircles(this->pylonPic()[0]);
+    }
+    else if((minXIndx == 0 && maxYIndx == 1) || (minXIndx == 1 && maxYIndx == 0))
         cropCornerPoints.push_back(points.at(2));
     else if ((minXIndx == 1 && maxYIndx == 2) || (minXIndx == 2 && maxYIndx == 1))
         cropCornerPoints.push_back(points.at(0));
     else if ((minXIndx == 2 && maxYIndx == 0) || (minXIndx == 0 && maxYIndx == 2))
         cropCornerPoints.push_back(points.at(1));
+    else if (minXIndx > 2 || maxYIndx > 2) {
+        //std::cout<<"not enough nips found, press enter to continue";
+        cv::imshow("not enough corners found, press enter to continue", image_bgr);
+        cv::waitKey();
+        cv::destroyAllWindows();
+        this->cornersHoughCircles(this->pylonPic()[0]);
+    }
 
     cropCornerPoints.push_back(points.at(maxYIndx));
+    if(cropCornerPoints.size()>2){
 
     cropCornerPoints.at(0).x -= 20;
     cropCornerPoints.at(0).y -= 20;
@@ -611,7 +627,11 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     cropCornerPoints.at(1).y -= 20;
     cropCornerPoints.at(2).x += 20;
     cropCornerPoints.at(2).y += 20;
-
-    cv::imshow("found corners", image_bgr);
-    cv::waitKey();
+    }else {
+        //std::cout<<"not enough nips found, press enter to continue";
+        cv::imshow("not enough corners found, press enter to continue", image_bgr);
+        cv::waitKey();
+        cv::destroyAllWindows();
+        this->cornersHoughCircles(this->pylonPic()[0]);
+    }
 }
