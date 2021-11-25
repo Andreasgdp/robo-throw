@@ -14,7 +14,7 @@ public:
     ImageProcessing();
     void calibrate();
     std::vector<double> getBallCoords();
-    std::vector<cv::Mat> pylonPic();
+    std::vector<cv::Mat> pylonPic(int imgAmt);
     cv::Point ballDetection(cv::Mat src);
     void chessboardDetection(std::vector<cv::Mat> imgVec);
     std::vector<cv::Mat> loadLocalImg();
@@ -34,9 +34,7 @@ private:
     int _camHeight = 139, _camWith =80; //cm
     std::vector<cv::Point> cropCornerPoints;
     bool autoImg = true; //
-
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
-    int imgAmt = 30; // Ammount of images to take
     bool showimg = false; //show images at every step
     std::vector<cv::Mat> _calibrationMat; //vector of calibration Mat's
 

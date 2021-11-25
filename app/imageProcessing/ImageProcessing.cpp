@@ -1,63 +1,91 @@
 #include "ImageProcessing.h"
 
-ImageProcessing::ImageProcessing(){}
+ImageProcessing::ImageProcessing(){
+    std::cout << "Imageprocessing app started" << std::endl;
+    std::cout << "Loading settings...";
+
+    cv::Mat calibrationImage = cv::imread("../app/imageProcessing/images/calibration29.jpg");
+    cv::Mat cornerDetectionImage = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
+
+    if (calibrationImage.empty()) {
+        std::cout << "You have no chessboard calibration images." << std::endl;
+        std::cout << "When ready to run calibration press enter.";
+        std::cin.get();
+        this->chessboardDetection(this->pylonPic(30));
+    } else {
+        this->chessboardDetection(this->loadLocalImg());
+    }
+
+    if (cornerDetectionImage.empty()) {
+        std::cout << "You have no corner calibration image." << std::endl;
+        std::cout << "Place the red dots on the table and press enter.";
+        std::cin.get();
+        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", this->pylonPic(1)[0]);
+        this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+    } else {
+        this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+    }
+
+    while (true) {
+        std::cout << std::endl;
+        std::cout << "You can perform following actions:" << std::endl;
+        std::cout << "1: Run new calibration(s)" << std::endl;
+        std::cout << "2: Find objects" << std::endl;
+        std::cout << "Press q to quit" << std::endl;
+        std::cout << "Choose one: ";
+        std::string input;
+        std::cin >> input;
+
+        if (input == "1") {
+            this->calibrate();
+        } else if (input == "2") {
+            this->getBallCoords();
+        } else if (input == "q")
+            break;
+    }
+}
 
 void ImageProcessing::calibrate()
 {
     std::string input;
-    std::cout<<"Run new calibration? [y/n]";
-    std::cin>> input;
+    std::cout << std::endl;
+    std::cout << "Select the desired calibration: " << std::endl;
+    std::cout << "1: Run new chessboard calibration" << std::endl;
+    std::cout << "2: run new corner calibration" << std::endl;
+    std::cout << "Input number and press enter: ";
+    std::cin  >> input;
 
-    if(input=="y"){
-        this->chessboardDetection(this->pylonPic());
-        std::cout << "Ready for cropping? (y)" << std::endl;
-        std::cin >> input;
-    } else if(input=="n")
-        this->chessboardDetection(this->loadLocalImg());
-
-    input = "";
-    imgAmt = 1;
-    std::vector<cv::Point> tempPoints;
-//    cv::Mat tmp = this->pylonPic()[0];
-    cv::Mat tmp = cv::imread("../app/imageProcessing/images/calibratedImage.jpg");
-//    cv::imwrite("../app/imageProcessing/images/calibratedImage.jpg", tmp);
-    this->cornersHoughCircles(tmp);
-    tmp = this->cropImg(tmp);
-    tmp = this->rotateImg(tmp);
+    if (input == "1") {
+        std::cout << "When ready to run calibration press enter.";
+        std::cin.get();
+        this->chessboardDetection(this->pylonPic(30));
+    } else if (input == "2") {
+        std::cout << "Place the red dots on the table and press enter.";
+        std::cin.get();
+        cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", this->pylonPic(1)[0]);
+        this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+    }
 }
 
 std::vector<double> ImageProcessing::getBallCoords() {
-    std::string input;
-    std::vector<double> realCoords{0};
-    cv::destroyAllWindows();
-    while (true){
-        std::cout <<"ready for ball finding? (y)" <<std::endl;
-        std::cin >> input;
+    cv::Mat newImage    = this->rotateImg(this->cropImg(this->pylonPic(1)[0]));
+    cv::Point imgPoints = this->ballDetection(newImage);
 
-        if (input == "y") {
-            cv::Mat img = cv::imread("../app/imageProcessing/images/cornerDetection.jpg"); //this->pylonPic()[0].clone();
-            cv::Mat crop = this->cropImg(img);
-            cv::Mat rot = this->rotateImg(crop);
-            cv::Point imgPoints = this->ballDetection(crop);
-            while(imgPoints.x == -1 && imgPoints.y==-1){
-                std::cout<<"take new image when ready, press p"<<std::endl;
-                if(cv::waitKey()=='p'){
-                    imgPoints = this->ballDetection(this->cropImg(this->pylonPic()[0]));
-                }
-            }
-            realCoords = this->coordConvert(imgPoints,crop);
-            break;
+    while(imgPoints.x == -1 || imgPoints.y==-1){
+        std::cout << "take new image when ready, press p" << std::endl;
+
+        if(cv::waitKey()=='p'){
+            newImage    = this->rotateImg(this->cropImg(this->pylonPic(1)[0]));
+            imgPoints   = this->ballDetection(newImage);
         }
     }
 
-    std::cout << "realCoords" << std::endl;
-    std::cout << realCoords.at(0) << std::endl;
-    std::cout << realCoords.at(1) << std::endl << std::endl;
+    std::vector<double> realCoords = this->coordConvert(imgPoints, newImage);
 
     return realCoords;
 }
 
-std::vector<cv::Mat> ImageProcessing::pylonPic(){
+std::vector<cv::Mat> ImageProcessing::pylonPic(int imgAmt){
     std::vector<cv::Mat> imgVector;
     imgVector.clear();
     int myExposure = 20000;
@@ -245,15 +273,10 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
             cv::CALIB_ZERO_TANGENT_DIST + cv::CALIB_FIX_PRINCIPAL_POINT;
     cv::Size frameSize(1440,1080);
 
-    std::cout << "Calibrating..." << std::endl;
     // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
     // and output parameters as declared above...
 
     float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
-
-    std::cout << "Reprojection error = " << error << "\nK =\n"
-              << K << "\nk=\n"
-              << k << std::endl;
 
     // Precompute lens correction interpolation
     cv::Mat mapX, mapY;
@@ -277,8 +300,7 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     _calibrationMat.push_back(mapY);
 }
 
-std::vector<cv::Mat> ImageProcessing::loadLocalImg()
-{
+std::vector<cv::Mat> ImageProcessing::loadLocalImg() {
     std::vector<cv::Mat> imgVec;
     std::vector<cv::String> fileNames;
     cv::glob("../app/imageProcessing/images/calibration*.jpg", fileNames, false);
@@ -393,10 +415,7 @@ std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
     points.push_back(x2/100);
     points.push_back(y2/100);
 
-    std::cout << "unscaled x = " << std::to_string(x1) << ", unscaled y = " << std::to_string(y1);
-    std::cout << ", which means the hypotenuse = " << std::to_string(z1) << std::endl;
-    std::cout << "scaled x = " << std::to_string(x2) << ", unscaled y = " << std::to_string(y2);
-    std::cout << ", which means the hypotenuse = " << std::to_string(z2) << std::endl;
+    std::cout << "coordinates for the object is: (" << std::to_string(x2) << "; " << std::to_string(y2) << ")" << std::endl;
 
     return points;
 }
@@ -431,35 +450,25 @@ void ImageProcessing::lastStand(cv::Mat img)
     cv::waitKey();
 }
 
-cv::Mat ImageProcessing::rotateImg(cv::Mat img)
-{
-    cv::imshow("to rotate", img);
-    cv::waitKey();
+cv::Mat ImageProcessing::rotateImg(cv::Mat img) {
     double pi = 3.14159265358979323846;
     double x1=cropCornerPoints[0].x, x2 = cropCornerPoints[1].x, y1 = cropCornerPoints[0].y, y2 = cropCornerPoints[1].y;
     double a = (y2-y1)/(x2-x1), b = y1 -x1 * a;
-
-
     double fWidth = a*img.cols+b;
     cv::Point2f A1(0,b);
     cv::Point2f A2(img.cols,fWidth);
     cv::Point2f B(img.cols/2,img.rows);
     cv::Point2f C(img.cols/2,img.rows/2);
 
-
     double b1 = cv::norm(cv::Mat(A1),cv::Mat(C)), b2 = cv::norm(cv::Mat(A2),cv::Mat(C));
     double c1 = cv::norm(cv::Mat(A1),cv::Mat(B)), c2 = cv::norm(cv::Mat(A2),cv::Mat(B));
     double a1 = cv::norm(cv::Mat(B),cv::Mat(C));
-
     double theta1 = acos((a1*a1+b1*b1-c1*c1)/(2*b1*a1))*180/pi;
     double theta2 = acos((a1*a1+b2*b2-c2*c2)/(2*b2*a1))*180/pi;
 
     cv::Mat rMatrix = cv::getRotationMatrix2D(C,(theta1-theta2)/2,1), rImage;
     cv::warpAffine(img,rImage,rMatrix,img.size());
-    cv::destroyAllWindows();
     cv::imwrite("../app/imageProcessing/images/rotatedImg.jpg", rImage);
-    cv::imshow("rotated", rImage);
-    cv::waitKey();
     return rImage;
 }
 
@@ -521,22 +530,24 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
         bufferImages.push_back(src_grey.clone());
     }
     if(points.size() > 1) {
+        std::cout << "There have been found " << bufferImages.size() << " balls, press enter to show the pictures";
+        std::cin.get(); std::cin.get(); // <- It works.. Don't question this!
+
         for (unsigned int i = 0; i < bufferImages.size(); i++) {
             cv::imshow("showImage" + std::to_string(i), bufferImages.at(i));
             cv::waitKey();
-            cv::destroyWindow("showImage" + std::to_string(i));
         }
-        std::cout << "Put in the correct picture number: ";
+
+        cv::destroyAllWindows();
+        std::cout << "The correct picture number is: ";
         std::string input;
         std::cin >> input;
-        std::cout << "Picture number " + input + " have been selected" << std::endl;
 
         return points.at(std::stoi(input));
     } else if (points.size() == 1){
-
-        cv::imshow("testo", src_grey);
+        cv::imshow("Ball found", src_grey);
         cv::waitKey();
-
+        cv::destroyAllWindows();
 
         return points.at(0);
     } else {
@@ -548,12 +559,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat src) {
 }
 
 void ImageProcessing::cornersHoughCircles(cv::Mat src){
-    std::cout<<"make new corner callibration? [y/n]"<<std::endl;
-    std::string tmp;
-    std::cin>> tmp;
     cropCornerPoints.clear();
-    if(tmp == "n")
-        src = cv::imread("../app/imageProcessing/images/cornerDetection.jpg");
 
     std::vector<cv::Point> points;
     cv::Mat image_hsv, image_bgr;
@@ -604,7 +610,7 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
         cv::imshow("not enough corners found, press enter to continue", image_bgr);
         cv::waitKey();
         cv::destroyAllWindows();
-        this->cornersHoughCircles(this->pylonPic()[0]);
+        this->cornersHoughCircles(this->pylonPic(1)[0]);
     }
     else if((minXIndx == 0 && maxYIndx == 1) || (minXIndx == 1 && maxYIndx == 0))
         cropCornerPoints.push_back(points.at(2));
@@ -617,7 +623,7 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
         cv::imshow("not enough corners found, press enter to continue", image_bgr);
         cv::waitKey();
         cv::destroyAllWindows();
-        this->cornersHoughCircles(this->pylonPic()[0]);
+        this->cornersHoughCircles(this->pylonPic(1)[0]);
     }
 
     cropCornerPoints.push_back(points.at(maxYIndx));
@@ -633,6 +639,6 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
         cv::imshow("not enough corners found, press enter to continue", image_bgr);
         cv::waitKey();
         cv::destroyAllWindows();
-        this->cornersHoughCircles(this->pylonPic()[0]);
+        this->cornersHoughCircles(this->pylonPic(1)[0]);
     }
 }
