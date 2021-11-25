@@ -29,9 +29,6 @@ public:
 
 
 private:
-    int _sim = false;
-    const cv::Size BoardSize{6,9};
-    int _camHeight = 139, _camWith =80; //cm
     std::vector<cv::Point> cropCornerPoints;
     bool autoImg = true; //
     std::vector<std::vector<cv::Point3f>> Q; //Checkerboard voordinates
