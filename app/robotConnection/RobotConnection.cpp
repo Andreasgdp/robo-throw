@@ -17,11 +17,21 @@ RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_reciev
     homeJointPos <<    2.1324,-2.03589,2.31485,-1.86485,-1.55212,-1.37831;
     setHomePosJoints(homeJointPos);
 
+
+
+//    VectorXd throwPos(6);
+//    throwPos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
+//    setThrowPosCoords(homePos);
+//    VectorXd throwJointPos(6);
+//    throwJointPos <<  1.0122, -2.10508, 1.79123, -2.7, -0.5, 0;
+//    setThrowPosJoints(throwJointPos);
+
+
     VectorXd throwPos(6);
-    throwPos <<  0.201235, -0.228194, 0.572373, 2.21299, -1.48019, 0.800135;
+    throwPos << 0.1228,-0.408126,0.672076,1.50048,-1.0043,1.45269;
     setThrowPosCoords(homePos);
     VectorXd throwJointPos(6);
-    throwJointPos <<  1.0122, -2.10508, 1.79123, -2.7, -0.5, 0;
+    throwJointPos << 1.51869,-1.71815,1.54207,-2.94377,-1.14478,-1.59808;
     setThrowPosJoints(throwJointPos);
 
 }
