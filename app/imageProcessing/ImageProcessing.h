@@ -7,6 +7,7 @@
 #include "vector"
 #include <pylon/PylonIncludes.h>
 #include <algorithm>
+#include <unistd.h>
 
 class ImageProcessing
 {
@@ -15,10 +16,11 @@ public:
     void calibrate();
     void cornersHoughCircles(cv::Mat src);
     void chessboardDetection(std::vector<cv::Mat> imgVec);
+    cv::Mat   getImage();
     cv::Mat   cropImg(cv::Mat img);
     cv::Mat   rotateImg(cv::Mat img);
     cv::Point ballDetection(cv::Mat img);
-    cv::Point liveHoughCircles(cv::Mat img);
+    cv::Point liveHoughCircles();
     std::vector<double>    getBallCoords();
     std::vector<double>    coordConvert(cv::Point imgPos, cv::Mat img);
     std::vector<cv::Mat>   grabImage(int imgAmt);
@@ -26,6 +28,7 @@ public:
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
 
 private:
+    int _deleteThis = 0;
     std::vector<cv::Mat>   _calibrationMat;
     std::vector<cv::Point> _cropCornerPoints;   // Coordinates for table corners
     std::vector<std::vector<cv::Point3f>>  Q;   //Checkerboard voordinates

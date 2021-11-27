@@ -52,6 +52,10 @@ void ImageProcessing::calibrate() {
     }
 }
 
+cv::Mat ImageProcessing::getImage() {
+    return this->grabImage(1)[0];
+}
+
 std::vector<double> ImageProcessing::getBallCoords() {
     cv::Mat   newImage  = this->rotateImg(this->cropImg(this->grabImage(1)[0]));
     cv::Point imgPoints = this->ballDetection(newImage);
@@ -77,7 +81,12 @@ std::vector<cv::Mat> ImageProcessing::grabImage(int imgAmt){
 
     if (imgAmt == 1) {
         std::vector<cv::Mat> temp;
-        temp.push_back(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+        if (_deleteThis == 0)
+            temp.push_back(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+        else
+            temp.push_back(cv::imread("../app/imageProcessing/images/rotatedImg.jpg"));
+
+        _deleteThis++;
         return temp;
     }
 
@@ -437,38 +446,46 @@ cv::Point ImageProcessing::ballDetection(cv::Mat img) {
     }
 }
 
-cv::Point ImageProcessing::liveHoughCircles(cv::Mat img) {
+cv::Point ImageProcessing::liveHoughCircles() {
     std::vector<cv::Point> points;
-    std::vector<cv::Mat> bufferImages;
-    cv::Mat img_grey;
-    cvtColor(img, img_grey, cv::COLOR_BGR2GRAY);
-    cv::medianBlur(img_grey, img_grey, 5);
     std::vector<cv::Vec3f> balls;
     std::vector<cv::Vec3f> circles;
-    HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 15, 29); // The last two parameters is min & max radius
-    HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 30, 40); // The last two parameters is min & max radius
+    std::vector<cv::Mat>   bufferImages;
     cv::Point center;
+    cv::Mat   img_grey;
 
-    for( size_t i = 0; i < balls.size(); i++ ) {
-        cv::Vec3i c = balls[i];
-        center = cv::Point(c[0], c[1]);
-        points.push_back(center);
-        cv::putText(img_grey, "ball", cv::Point(center.x - 20, center.y - 20), cv::FONT_HERSHEY_DUPLEX, 0.5, cv::Scalar(0, 120, 0));
-        circle( img_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
-        circle( img_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
-        bufferImages.push_back(img_grey.clone());
+    while (!(cv::waitKey(50) == 'p')) {
+        cv::Mat liveImage = this->getImage();
+        cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);
+        cv::medianBlur(img_grey, img_grey, 5);
+        HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 15, 29); // The last two parameters is min & max radius
+        HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 30, 40); // The last two parameters is min & max radius
+
+        for( size_t i = 0; i < balls.size(); i++ ) {
+            cv::Vec3i c = balls[i];
+            center = cv::Point(c[0], c[1]);
+            points.push_back(center);
+            cv::putText(img_grey, "Ball", cv::Point(center.x - 30, center.y + 45), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(255, 255, 255));
+            circle( img_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
+            circle( img_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
+            bufferImages.push_back(img_grey.clone());
+        }
+
+        for( size_t i = 0; i < circles.size(); i++ ) {
+            cv::Vec3i c = circles[i];
+            center = cv::Point(c[0], c[1]);
+            points.push_back(center);
+            cv::putText(img_grey, "Target", cv::Point(center.x - 20, center.y - 20), cv::FONT_HERSHEY_DUPLEX, 0.5, cv::Scalar(0, 120, 0));
+            circle( img_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
+            circle( img_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
+            bufferImages.push_back(img_grey.clone());
+        }
+
+        cv::imshow("Press \"p\" when Ball and Target is marked", img_grey);
+        usleep(100000); //100ms
     }
 
-    for( size_t i = 0; i < circles.size(); i++ ) {
-        cv::Vec3i c = circles[i];
-        center = cv::Point(c[0], c[1]);
-        points.push_back(center);
-        cv::putText(img_grey, "circle", cv::Point(center.x - 20, center.y - 20), cv::FONT_HERSHEY_DUPLEX, 0.5, cv::Scalar(0, 120, 0));
-        circle( img_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
-        circle( img_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
-        bufferImages.push_back(img_grey.clone());
-    }
-
+    cv::destroyAllWindows();
     return center;
 }
 
