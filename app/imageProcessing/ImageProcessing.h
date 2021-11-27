@@ -26,8 +26,9 @@ public:
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
 
 private:
+    std::vector<cv::Mat>   _calibrationMat;
     std::vector<cv::Point> _cropCornerPoints;   // Coordinates for table corners
-    std::vector<std::vector<cv::Point3f>> Q;    //Checkerboard voordinates
+    std::vector<std::vector<cv::Point3f>>  Q;   //Checkerboard voordinates
 };
 
 #endif // IMAGEPROCESSING_H

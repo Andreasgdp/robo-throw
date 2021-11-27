@@ -71,139 +71,136 @@ std::vector<double> ImageProcessing::getBallCoords() {
 }
 
 std::vector<cv::Mat> ImageProcessing::grabImage(int imgAmt){
-    Pylon::CInstantCamera camera;
+    std::vector<cv::Mat> imgVector;
+    imgVector.clear();
+    int myExposure = 20000;
 
-    if (camera.IsCameraLink() == false) {
-        std::vector<cv::Mat> localImg;
-        localImg.push_back(cv::imread("../app/imageProcessing/images/localImg.jpg"));
-        return localImg;
-    } else {
+    if (imgAmt == 1) {
+        std::vector<cv::Mat> temp;
+        temp.push_back(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+        return temp;
+    }
 
-        std::vector<cv::Mat> imgVector;
-        imgVector.clear();
-        int myExposure = 20000;
+    // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
+    // is initialized during the lifetime of this object.
+    Pylon::PylonAutoInitTerm autoInitTerm;
 
-        // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
-        // is initialized during the lifetime of this object.
-        Pylon::PylonAutoInitTerm autoInitTerm;
+    try
+    {
+        // Create an instant camera object with the camera device found first.
+        Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
 
-        try
-        {
-            // Create an instant camera object with the camera device found first.
-            Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
+        // Get a camera nodemap in order to access camera parameters.
+        GenApi::INodeMap& nodemap= camera.GetNodeMap();
 
-            // Get a camera nodemap in order to access camera parameters.
-            GenApi::INodeMap& nodemap= camera.GetNodeMap();
+        // Open the camera before accessing any parameters.
+        camera.Open();
+        // Create pointers to access the camera Width and Height parameters.
+        GenApi::CIntegerPtr width= nodemap.GetNode("Width");
+        GenApi::CIntegerPtr height= nodemap.GetNode("Height");
 
-            // Open the camera before accessing any parameters.
-            camera.Open();
-            // Create pointers to access the camera Width and Height parameters.
-            GenApi::CIntegerPtr width= nodemap.GetNode("Width");
-            GenApi::CIntegerPtr height= nodemap.GetNode("Height");
+        // The parameter MaxNumBuffer can be used to control the count of buffers
+        // allocated for grabbing. The default value of this parameter is 10.
+        //camera.MaxNumBuffer = 5;
 
-            // The parameter MaxNumBuffer can be used to control the count of buffers
-            // allocated for grabbing. The default value of this parameter is 10.
-            //camera.MaxNumBuffer = 5;
+        // Create a pylon ImageFormatConverter object.
+        Pylon::CImageFormatConverter formatConverter;
+        // Specify the output pixel format.
+        formatConverter.OutputPixelFormat= Pylon::PixelType_BGR8packed;
+        // Create a PylonImage that will be used to create OpenCV images later.
+        Pylon::CPylonImage pylonImage;
 
-            // Create a pylon ImageFormatConverter object.
-            Pylon::CImageFormatConverter formatConverter;
-            // Specify the output pixel format.
-            formatConverter.OutputPixelFormat= Pylon::PixelType_BGR8packed;
-            // Create a PylonImage that will be used to create OpenCV images later.
-            Pylon::CPylonImage pylonImage;
+        // Create an OpenCV image.
+        cv::Mat openCvImage;
 
-            // Create an OpenCV image.
-            cv::Mat openCvImage;
+        // Set exposure to manual
+        GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
+        if ( GenApi::IsWritable( exposureAuto)){
+            exposureAuto->FromString("Off");
+            //            std::cout << "Exposure auto disabled." << std::endl;
+        }
 
-            // Set exposure to manual
-            GenApi::CEnumerationPtr exposureAuto( nodemap.GetNode( "ExposureAuto"));
-            if ( GenApi::IsWritable( exposureAuto)){
-                exposureAuto->FromString("Off");
-                //            std::cout << "Exposure auto disabled." << std::endl;
-            }
-
-            // Set custom exposure
-            GenApi::CFloatPtr exposureTime = nodemap.GetNode("ExposureTime");
-            //        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
-            if(exposureTime.IsValid()) {
-                if(myExposure >= exposureTime->GetMin() && myExposure <= exposureTime->GetMax()) {
-                    exposureTime->SetValue(myExposure);
-                }else {
-                    exposureTime->SetValue(exposureTime->GetMin());
-                    std::cout << ">> Exposure has been set with the minimum available value." << std::endl;
-                    std::cout << ">> The available exposure range is [" << exposureTime->GetMin() << " - " << exposureTime->GetMax() << "] (us)" << std::endl;
-                }
+        // Set custom exposure
+        GenApi::CFloatPtr exposureTime = nodemap.GetNode("ExposureTime");
+        //        std::cout << "Old exposure: " << exposureTime->GetValue() << std::endl;
+        if(exposureTime.IsValid()) {
+            if(myExposure >= exposureTime->GetMin() && myExposure <= exposureTime->GetMax()) {
+                exposureTime->SetValue(myExposure);
             }else {
-
-                std::cout << ">> Failed to set exposure value." << std::endl;
-
+                exposureTime->SetValue(exposureTime->GetMin());
+                std::cout << ">> Exposure has been set with the minimum available value." << std::endl;
+                std::cout << ">> The available exposure range is [" << exposureTime->GetMin() << " - " << exposureTime->GetMax() << "] (us)" << std::endl;
             }
+        }else {
 
-            // Start the grabbing of c_countOfImagesToGrab images.
-            // The camera device is parameterized with a default configuration which
-            // sets up free-running continuous acquisition.
-            camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);
+            std::cout << ">> Failed to set exposure value." << std::endl;
 
-            // This smart pointer will receive the grab result data.
-            Pylon::CGrabResultPtr ptrGrabResult;
+        }
 
-            while ( camera.IsGrabbing() && imgVector.size()<imgAmt)
+        // Start the grabbing of c_countOfImagesToGrab images.
+        // The camera device is parameterized with a default configuration which
+        // sets up free-running continuous acquisition.
+        camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly);
+
+        // This smart pointer will receive the grab result data.
+        Pylon::CGrabResultPtr ptrGrabResult;
+
+        while ( camera.IsGrabbing() && imgVector.size()<imgAmt)
+        {
+            // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
+            camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+
+
+            // Image grabbed successfully?
+            if (ptrGrabResult->GrabSucceeded())
             {
-                // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
-                camera.RetrieveResult( 5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+                if(imgVector.size()>=imgAmt || cv::waitKey(1) == 'q'){
+                    camera.Close();
+                    break;
+                }
+                // Convert the grabbed buffer to a pylon image.
+                formatConverter.Convert(pylonImage, ptrGrabResult);
+                // Create an OpenCV image from a pylon image.
+                openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
+                //If calibration has run _calibrationMat will be bigger than 0 and this code runs
+                if(_calibrationMat.size()>0){
+                    cv::Mat mapX, mapY;
+                    mapX = _calibrationMat[0].clone();
+                    mapY = _calibrationMat[1].clone();
+                    cv::Mat imgUndistorted;
+                    cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+                    //cv::Mat crop = this->cropImg(imgUndistorted).clone();
 
-
-                // Image grabbed successfully?
-                if (ptrGrabResult->GrabSucceeded())
-                {
-                    if(imgVector.size()>=imgAmt || cv::waitKey(1) == 'q'){
+                    //cv::Mat tmp=imgUndistorted.clone();
+                    imgVector.push_back(imgUndistorted);
+                    if(imgVector.size()>=imgAmt){
                         camera.Close();
                         break;
                     }
-                    // Convert the grabbed buffer to a pylon image.
-                    formatConverter.Convert(pylonImage, ptrGrabResult);
-                    // Create an OpenCV image from a pylon image.
-                    openCvImage= cv::Mat(ptrGrabResult->GetHeight(), ptrGrabResult->GetWidth(), CV_8UC3, (uint8_t *) pylonImage.GetBuffer());
-
-                    cv::Mat mapX, mapY;
-                    mapX = cv::imread("../app/imageProcessing/images/mapX.jpg");
-                    mapY = cv::imread("../app/imageProcessing/images/mapY.jpg");
-
-                    if (!(mapX.empty() && mapY.empty())) {
-
-                        cv::Mat imgUndistorted;
-                        cv::remap(openCvImage, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-                        imgVector.push_back(imgUndistorted);
-                        if(imgVector.size()>=imgAmt){
-                            camera.Close();
-                            break;
-                        }
-                    }
-
-                    //If not calibrated take X amount op pics
-                    else{
-                        cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
-                    if(cv::waitKey(50) == 'p'){
-                        cv::Mat tmp=openCvImage.clone();
-                        imgVector.push_back(tmp);
-                        cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
-                    }
-
                 }
-                else
-                {
-                    std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
+                //If not calibrated take X amount op pics
+                else{
+                    cv::imshow( "myWindow"+std::to_string(imgVector.size()), openCvImage);}
+                if(cv::waitKey(50) == 'p'){
+                    cv::Mat tmp=openCvImage.clone();
+                    imgVector.push_back(tmp);
+                    cv::destroyWindow("myWindow"+std::to_string(imgVector.size()-1));
                 }
+
+            }
+            else
+            {
+                std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << std::endl;
             }
         }
-        catch (GenICam::GenericException &e)
-        {
-            // Error handling.
-            std::cerr << "An exception occurred." << std::endl
-                      << e.GetDescription() << std::endl;
-        }
-        return imgVector;
     }
+    catch (GenICam::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+    }
+    return imgVector;
 }
 
 void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
@@ -278,6 +275,8 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     }
 
     cv::destroyAllWindows();
+    _calibrationMat.push_back(mapX);
+    _calibrationMat.push_back(mapY);
 }
 
 std::vector<cv::Mat> ImageProcessing::loadCalibImages() {
