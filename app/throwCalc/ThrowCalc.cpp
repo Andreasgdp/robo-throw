@@ -77,7 +77,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
-    double a = 10;
+    double a = 80;
     int t = 0;
     VectorXd velocityXYZ(6);
 
@@ -97,7 +97,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // The general speed
     int signX = (x >= 0) ? 1 : -1;
 
-    v0x = (signX * 0.70771 * x * sqrt(-g / (z-tan(angle) * x))) / (cos(angle));
+    v0x = (signX * 0.70771 * x * sqrt(abs(-g / (z-tan(angle) * x)))) / (cos(angle));
     // The speed in x and the speed in z
     vx = v0x * cos(angle);
     vzx = v0x * sin(angle) - g * t;    
@@ -105,15 +105,21 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // In the y,z plane
     // The general speed
     int signY = (y <= 0) ? 1: -1;
-    v0y = (signY * 0.70771 * y * sqrt(-g / (z-tan(angle) * y))) / (cos(angle));
+
+    v0y = (signY * 0.70771 * y * sqrt(abs(-g / (z-tan(angle) * y)))) / (cos(angle));
     // The speed in x and the speed in z
     vy = v0y * cos(angle);
     vzy = v0y * sin(angle) - g*t;
 
     // adding the two z speeds
-    double vz = vzx + vzy;
+    double vz = abs(vzx) + abs(vzy);
+    cout << "vzx: " << vzx << endl << endl;
+    cout << "vzy: " << vzy << endl << endl;
+
 
     velocityXYZ << vx, vy, vz, 0, 0, 0;
+
+    cout << "Vel Vec: " << velocityXYZ << endl << endl;
 
     return velocityXYZ;
 }

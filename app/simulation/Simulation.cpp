@@ -47,27 +47,27 @@ bool Simulation::jointPoseReached(const Eigen::VectorXd &jointPose, double offse
 
 bool Simulation::executeMoveLSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endPos) {
     // Move to start
-    _roboConn.moveJ(startJointPos);
+    _roboConn.moveJ(startJointPos, 3.14, 40);
 
     // Move to destination
-    _roboConn.moveL(endPos);
+    _roboConn.moveL(endPos, 2, 10);
 
     return (!protectiveStop() && destinationReached(endPos));
 }
 
 bool Simulation::executeMoveJSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos) {
     // Move to start
-    _roboConn.moveJ(startJointPos);
+    _roboConn.moveJ(startJointPos, 3.14, 40);
 
     // Move to destination
-    _roboConn.moveJ(endJointPos);
+    _roboConn.moveJ(endJointPos, 3.14, 40);
 
     return (!protectiveStop() && jointPoseReached(endJointPos));
 }
 
 bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos, const std::vector<Eigen::VectorXd> &jointVelocities) {
     // Move to start
-    _roboConn.moveJ(startJointPos);
+    _roboConn.moveJ(startJointPos, 3.14, 40);
 
     for (int i = 0; i < jointVelocities.size(); i++)
     {

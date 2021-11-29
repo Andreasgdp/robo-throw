@@ -12,7 +12,7 @@ Api::Api()
 {
     _db = QSqlDatabase::addDatabase("QMYSQL");
     _db.setHostName("localhost");
-    _db.setDatabaseName("test2");
+    _db.setDatabaseName("test3");
     _db.setUserName("user1");
     _db.setPassword("password1");
     createDatabase();

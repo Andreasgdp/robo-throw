@@ -55,6 +55,8 @@ private:
     Api _api;
 //    Logger _log;
     ThrowCalc _throwCalc;
+
+    void openGripper(double time);
 };
 
 #endif // APP_H

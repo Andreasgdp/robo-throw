@@ -28,10 +28,10 @@ RobotConnection::RobotConnection(std::string IP) : rtde_control(IP), rtde_reciev
 
 
     VectorXd throwPos(6);
-    throwPos << 0.1228,-0.408126,0.672076,1.50048,-1.0043,1.45269;
+    throwPos <<   0.1228,-0.40813,0.672062,1.49425,-1.02221,1.46689;
     setThrowPosCoords(homePos);
     VectorXd throwJointPos(6);
-    throwJointPos << 1.51869,-1.71815,1.54207,-2.94377,-1.14478,-1.59808;
+    throwJointPos <<  1.51869,-1.71814,1.54209,-2.94384,-1.14473,-1.57783;
     setThrowPosJoints(throwJointPos);
 
 }
