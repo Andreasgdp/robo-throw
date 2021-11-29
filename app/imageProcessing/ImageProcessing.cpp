@@ -456,7 +456,7 @@ cv::Point ImageProcessing::liveHoughCircles() {
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);
         cv::medianBlur(img_grey, img_grey, 5);
         HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 15, 29); // The last two parameters is min & max radius
-        HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 30, 40); // The last two parameters is min & max radius
+        HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 35, 40); // The last two parameters is min & max radius
 
         for( size_t i = 0; i < balls.size(); i++ ) {
             cv::Vec3i c = balls[i];
