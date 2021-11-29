@@ -52,10 +52,6 @@ void ImageProcessing::calibrate() {
     }
 }
 
-cv::Mat ImageProcessing::getImage() {
-    return this->grabImage(1)[0];
-}
-
 std::vector<double> ImageProcessing::getBallCoords() {
     cv::Mat   newImage  = this->rotateImg(this->cropImg(this->grabImage(1)[0]));
     cv::Point imgPoints = this->ballDetection(newImage);
@@ -79,16 +75,16 @@ std::vector<cv::Mat> ImageProcessing::grabImage(int imgAmt){
     imgVector.clear();
     int myExposure = 20000;
 
-    if (imgAmt == 1) {
-        std::vector<cv::Mat> temp;
-        if (_deleteThis == 0)
-            temp.push_back(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
-        else
-            temp.push_back(cv::imread("../app/imageProcessing/images/rotatedImg.jpg"));
+//    if (imgAmt == 1) {
+//        std::vector<cv::Mat> temp;
+//        if (_deleteThis == 0)
+//            temp.push_back(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+//        else
+//            temp.push_back(cv::imread("../app/imageProcessing/images/rotatedImg.jpg"));
 
-        _deleteThis++;
-        return temp;
-    }
+//        _deleteThis++;
+//        return temp;
+//    }
 
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
@@ -454,8 +450,9 @@ cv::Point ImageProcessing::liveHoughCircles() {
     cv::Point center;
     cv::Mat   img_grey;
 
-    while (!(cv::waitKey(50) == 'p')) {
-        cv::Mat liveImage = this->getImage();
+    while (!(cv::waitKey(500) == 'p')) {
+        points.clear();
+        cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);
         cv::medianBlur(img_grey, img_grey, 5);
         HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 15, 29); // The last two parameters is min & max radius
@@ -475,14 +472,14 @@ cv::Point ImageProcessing::liveHoughCircles() {
             cv::Vec3i c = circles[i];
             center = cv::Point(c[0], c[1]);
             points.push_back(center);
-            cv::putText(img_grey, "Target", cv::Point(center.x - 20, center.y - 20), cv::FONT_HERSHEY_DUPLEX, 0.5, cv::Scalar(0, 120, 0));
+            cv::putText(img_grey, "Target", cv::Point(center.x - 50, center.y + 75), cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(255, 255, 255));
             circle( img_grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA); // Draws center
             circle( img_grey, center, c[2], cv::Scalar(255,0,255), 3, cv::LINE_AA); // Draws radius
             bufferImages.push_back(img_grey.clone());
         }
 
         cv::imshow("Press \"p\" when Ball and Target is marked", img_grey);
-        usleep(100000); //100ms
+//        usleep(100000); //100ms
     }
 
     cv::destroyAllWindows();

@@ -16,7 +16,6 @@ public:
     void calibrate();
     void cornersHoughCircles(cv::Mat src);
     void chessboardDetection(std::vector<cv::Mat> imgVec);
-    cv::Mat   getImage();
     cv::Mat   cropImg(cv::Mat img);
     cv::Mat   rotateImg(cv::Mat img);
     cv::Point ballDetection(cv::Mat img);
