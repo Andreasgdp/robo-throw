@@ -270,8 +270,8 @@ void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     cv::Mat mapX, mapY;
     cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1, mapX, mapY);
     // Show lens corrected images
-    cv::imwrite("../app/imageProcessing/images/mapX.jpg", mapX);
-    cv::imwrite("../app/imageProcessing/images/mapY.jpg", mapY);
+//    cv::imwrite("../app/imageProcessing/images/mapX.jpg", mapX);
+//    cv::imwrite("../app/imageProcessing/images/mapY.jpg", mapY);
     for (auto const &f : imgVec) {
         cv::Mat img = f.clone();
         cv::Mat imgUndistorted;
