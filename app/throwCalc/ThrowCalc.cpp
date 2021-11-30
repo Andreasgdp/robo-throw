@@ -77,7 +77,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
-    double a = 80;
+    double a = 10;
     int t = 0;
     VectorXd velocityXYZ(6);
 
@@ -123,3 +123,35 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     return velocityXYZ;
 }
+
+double ThrowCalc::TCPAngleCalc(double targetX, double targetY, Eigen::VectorXd throwpos) {
+    double a = abs(throwpos[1] - targetY);
+    double b = throwpos[0] - targetX;
+    double c = sqrt(pow(a,2)+pow(b,2));
+    double C = (90 * M_PI)/180;;
+    double v = asin((sin(C)*a) / (c));
+    int signV = (targetY > throwpos[1]) ? -1 : 1;
+    v = v * signV;
+    cout << "(-65.59 * M_PI)/180): " << (-65.59 * M_PI)/180 << endl;
+    cout << "v: " << v << endl;
+    if (((-65.59 * M_PI)/180) + v < (-90 * M_PI)/180) {
+        v = ((-90 + 65.59) * M_PI)/180;
+    }
+    return v;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

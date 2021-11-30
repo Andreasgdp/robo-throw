@@ -86,15 +86,32 @@ void App::throwObject()
     if (!simSuccess) return;
     _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
-    Vector3d goalPos = Vector3d(0.15,0.4,0.15);
+    Vector3d goalPos = Vector3d(0.1,0.7,0.15);
 
+    // move to throw angle
+    VectorXd actualTCP(6);
+    actualTCP = _roboConn.getActualTCPPose();
+    Vector3d tcpInTable = _coordTrans.computeTablePointCoords(actualTCP[0], actualTCP[1], actualTCP[2]);
+
+    double v = _throwCalc.TCPAngleCalc(goalPos[0], goalPos[1], tcpInTable);
+
+    VectorXd newPos(6);
+    newPos << _roboConn.getActualJointPoses();
+    newPos[4] += v;
+
+    simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), newPos);
+    if (!simSuccess) return;
+    _roboConn.moveJ(newPos, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
+
+
+    // something something
     VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose());
 
     VectorXd q_end = _roboConn.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
     // Find acceleration vector
     VectorXd accVector(6);
-    double t = 0.1;
+    double t = 0.2;
     accVector = dq_end / t;
 
     // Starting pos for throw
@@ -103,7 +120,6 @@ void App::throwObject()
 
     // Move from home to start of throw
     simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), q_start);
-    simSuccess = false;
     if (!simSuccess) return;
     _roboConn.moveJ(q_start, 1, 1);
 

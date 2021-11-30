@@ -64,9 +64,46 @@ int main(int argc, char *argv[])
 //    }
 //    _roboConn.speedStop(40);
 
+
+
+
     App app("192.168.100.49", "192.168.100.11", false);
     app.findAndGrabObject();
     app.throwObject();
+
+
+
+//    RobotConnection robConn("192.168.100.49");
+//    //robConn.moveHome(1,1);
+//    robConn.moveThrowPos(1,1);
+//    cout << robConn.getActualJointPoses() << endl << endl;
+
+//    Api _api;
+//    CoordinateTranslator _coordTrans;
+//    vector<CalibPoint> calibPoints = _api.getCalibPoint(1);
+//    vector<Vector3d> P_robot;
+//    vector<Vector3d> P_table;
+//    for (int i = 0; i < calibPoints.size(); i++) {
+//        P_robot.push_back(calibPoints[i].pointRobot);
+//        P_table.push_back(calibPoints[i].pointTable);
+//    }
+//    _coordTrans.setPointSets(P_robot, P_table);
+//    _coordTrans.calibrateRobotToTable();
+
+//    VectorXd actualTCP(6);
+//    actualTCP = robConn.getActualTCPPose();
+//    Vector3d tcpInTable = _coordTrans.computeTablePointCoords(actualTCP[0], actualTCP[1], actualTCP[2]);
+
+//    ThrowCalc t;
+//    double v = t.TCPAngleCalc(0.1, 0.1, tcpInTable);
+
+//    VectorXd newPos(6);
+//    newPos << robConn.getActualJointPoses();
+//    newPos[4] += v;
+
+//    robConn.moveJ(newPos);
+
+
 
 
 

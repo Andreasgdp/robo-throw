@@ -17,6 +17,7 @@ public:
     Eigen::VectorXd linearFitFunction(double t, const Eigen::VectorXd &q_start,const Eigen::VectorXd &accVector);
     std::vector<Eigen::VectorXd> getJointVelocities(double endTime, const Eigen::VectorXd &q_end, const Eigen::VectorXd &q_start, const Eigen::VectorXd &dx, Eigen::VectorXd &accVector);
     Eigen::VectorXd velocityCalc(double xWorld, double yWorld, double zWorld, Eigen::VectorXd throwpos);
+    double TCPAngleCalc(double targetX, double targetY, Eigen::VectorXd throwpos);
 
 private:
 };
