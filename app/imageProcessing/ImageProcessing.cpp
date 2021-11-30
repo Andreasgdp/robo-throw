@@ -295,13 +295,17 @@ std::vector<cv::Mat> ImageProcessing::loadCalibImages() {
 }
 
 
-cv::Mat ImageProcessing::cropImg(cv::Mat img)
-{
-    // first upper left
-    //seckond upper right
-    int y = (_cropCornerPoints[0].y+_cropCornerPoints[1].y)/2; // Average Y height
-    int x = (_cropCornerPoints[1].x+_cropCornerPoints[2].x)/2;// Average x with
-    cv::Mat crop = img(cv::Range(y,_cropCornerPoints[2].y),cv::Range(_cropCornerPoints[0].x, x)).clone(); // Slicing to crop the image
+cv::Mat ImageProcessing::cropImg(cv::Mat img) {
+    int c = 5; //constant
+    int deltaY = _cropCornerPoints[0].y - _cropCornerPoints[1].y;
+    int deltaX = _cropCornerPoints[1].x - _cropCornerPoints[2].x;
+
+    int x1 = _cropCornerPoints[0].x + deltaX + c;
+    int x2 = (_cropCornerPoints[1].x+_cropCornerPoints[2].x)/2 + c; // Average x with
+    int y1 = (_cropCornerPoints[0].y+_cropCornerPoints[1].y)/2 - c; // Average Y height
+    int y2 = _cropCornerPoints[2].y + deltaY + c;
+
+    cv::Mat crop = img(cv::Range(y1, y2),cv::Range(x1, x2)).clone(); // Slicing to crop the image
 
     return crop;
 }
@@ -450,13 +454,13 @@ cv::Point ImageProcessing::liveHoughCircles() {
     cv::Point center;
     cv::Mat   img_grey;
 
-    while (!(cv::waitKey(500) == 'p')) {
+    while (!(cv::waitKey(50) == 'p')) {
         points.clear();
         cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);
         cv::medianBlur(img_grey, img_grey, 5);
-        HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 15, 29); // The last two parameters is min & max radius
-        HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 35, 40); // The last two parameters is min & max radius
+        HoughCircles(img_grey, balls, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 16, 27); // The last two parameters is min & max radius
+        HoughCircles(img_grey, circles, cv::HOUGH_GRADIENT, 1, img_grey.rows/16, 100, 30, 42, 44); // The last two parameters is min & max radius
 
         for( size_t i = 0; i < balls.size(); i++ ) {
             cv::Vec3i c = balls[i];
@@ -482,6 +486,8 @@ cv::Point ImageProcessing::liveHoughCircles() {
 //        usleep(100000); //100ms
     }
 
+    cv::imwrite("../app/imageProcessing/images/targetDetecion.jpg", img_grey);
+
     cv::destroyAllWindows();
     return center;
 }
@@ -504,7 +510,7 @@ void ImageProcessing::cornersHoughCircles(cv::Mat src){
     cv::GaussianBlur(red_hue_image, red_hue_image, cv::Size(9, 9), 2, 2);
 
     std::vector<cv::Vec3f> circles;
-    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/16, 100, 30, 15, 30); // The last two parameters is min & max radius
+    cv::HoughCircles(red_hue_image, circles, cv::HOUGH_GRADIENT, 1, red_hue_image.rows/16, 100, 30, 15, 27); // The last two parameters is min & max radius
 
     if(circles.size() == 0) std::exit(-1);
     for(size_t current_circle = 0; current_circle < circles.size(); ++current_circle) {
