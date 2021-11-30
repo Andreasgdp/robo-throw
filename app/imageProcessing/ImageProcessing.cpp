@@ -296,14 +296,14 @@ std::vector<cv::Mat> ImageProcessing::loadCalibImages() {
 
 
 cv::Mat ImageProcessing::cropImg(cv::Mat img) {
-    int c = 5; //constant
+    int c = 10; //constant
     int deltaY = _cropCornerPoints[0].y - _cropCornerPoints[1].y;
     int deltaX = _cropCornerPoints[1].x - _cropCornerPoints[2].x;
 
-    int x1 = _cropCornerPoints[0].x + deltaX + c;
+    int x1 = _cropCornerPoints[0].x + deltaX/2 - c;
     int x2 = (_cropCornerPoints[1].x+_cropCornerPoints[2].x)/2 + c; // Average x with
     int y1 = (_cropCornerPoints[0].y+_cropCornerPoints[1].y)/2 - c; // Average Y height
-    int y2 = _cropCornerPoints[2].y + deltaY + c;
+    int y2 = _cropCornerPoints[2].y + deltaY/2 + c;
 
     cv::Mat crop = img(cv::Range(y1, y2),cv::Range(x1, x2)).clone(); // Slicing to crop the image
 
@@ -356,7 +356,7 @@ cv::Mat ImageProcessing::rotateImg(cv::Mat img) {
 
     cv::Mat rMatrix = cv::getRotationMatrix2D(C,(theta1-theta2)/2,1), rImage;
     cv::warpAffine(img,rImage,rMatrix,img.size());
-    cv::imwrite("../app/imageProcessing/images/rotatedImg.jpg", rImage);
+//    cv::imwrite("../app/imageProcessing/images/rotatedImg.jpg", rImage);
     return rImage;
 }
 
@@ -483,10 +483,9 @@ cv::Point ImageProcessing::liveHoughCircles() {
         }
 
         cv::imshow("Press \"p\" when Ball and Target is marked", img_grey);
-//        usleep(100000); //100ms
     }
 
-    cv::imwrite("../app/imageProcessing/images/targetDetecion.jpg", img_grey);
+//    cv::imwrite("../app/imageProcessing/images/targetDetecion.jpg", img_grey);
 
     cv::destroyAllWindows();
     return center;
