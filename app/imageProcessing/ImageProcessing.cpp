@@ -65,7 +65,7 @@ std::vector<double> ImageProcessing::getBallCoords() {
         }
     }
 
-    std::vector<double> realCoords = this->coordConvert(imgPoints, newImage);
+    std::vector<double> realCoords = this->ballCoordConvert(imgPoints, newImage);
 
     return realCoords;
 }
@@ -310,14 +310,40 @@ cv::Mat ImageProcessing::cropImg(cv::Mat img) {
     return crop;
 }
 
-std::vector<double> ImageProcessing::coordConvert(cv::Point imgPos, cv::Mat img)
-{
+std::vector<double> ImageProcessing::ballCoordConvert(cv::Point imgPos, cv::Mat img) {
     //cam height 139 cm
     float x1, x2, y1, y2, z1, z2, maxZ, theta;
     float xWidth = img.cols, yWidth = img.rows;
     float realX = 80, realY = 75; //cm
-    float lengthPerPixelX = realX/xWidth;
-    float lengthPerPixelY = realY/yWidth;
+    float lengthPerPixelX = realX/xWidth - 20; // minus the double constants we subtract in cropImage
+    float lengthPerPixelY = realY/yWidth - 20; // minus the double constants we subtract in cropImage
+
+    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
+    x1 = imgPos.x*lengthPerPixelX;
+    y1 = imgPos.y*lengthPerPixelY;
+    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
+
+    theta = acos(x1/z1);
+    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
+    x2 = cos(theta) * z2;
+    y2 = sin(theta) * z2;
+
+    std::vector<double> points;
+    points.push_back(x2/100);
+    points.push_back(y2/100);
+
+    std::cout << "coordinates for the object is: (" << std::to_string(x2) << "; " << std::to_string(y2) << ")" << std::endl;
+
+    return points;
+}
+
+std::vector<double> ImageProcessing::targetCoordConvert(cv::Point imgPos, cv::Mat img) {
+    //cam height 139 cm
+    float x1, x2, y1, y2, z1, z2, maxZ, theta;
+    float xWidth = img.cols, yWidth = img.rows;
+    float realX = 80, realY = 75; //cm
+    float lengthPerPixelX = realX/xWidth - 20; // minus the double constants we subtract in cropImage
+    float lengthPerPixelY = realY/yWidth - 20; // minus the double constants we subtract in cropImage
 
     maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
     x1 = imgPos.x*lengthPerPixelX;
@@ -446,7 +472,7 @@ cv::Point ImageProcessing::ballDetection(cv::Mat img) {
     }
 }
 
-cv::Point ImageProcessing::liveHoughCircles() {
+std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     std::vector<cv::Point> points;
     std::vector<cv::Vec3f> balls;
     std::vector<cv::Vec3f> circles;
@@ -488,7 +514,11 @@ cv::Point ImageProcessing::liveHoughCircles() {
 //    cv::imwrite("../app/imageProcessing/images/targetDetecion.jpg", img_grey);
 
     cv::destroyAllWindows();
-    return center;
+
+    std::vector<double> ballcoords   = this->ballCoordConvert(points[0], img_grey);
+    std::vector<double> targetcoords = this->targetCoordConvert(points[1], img_grey);
+
+    return {ballcoords, targetcoords};
 }
 
 void ImageProcessing::cornersHoughCircles(cv::Mat src){
