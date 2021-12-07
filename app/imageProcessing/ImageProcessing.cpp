@@ -10,9 +10,9 @@ ImageProcessing::ImageProcessing(){
         std::cout << "You have no chessboard calibration images." << std::endl;
         std::cout << "When ready to run calibration press enter.";
         std::cin.get();
-        this->chessboardDetection(this->grabImage(30));
+        this->chessboardDetection(this->grabImage(30), true);
     } else {
-        this->chessboardDetection(this->loadCalibImages());
+        this->chessboardDetection(this->loadCalibImages(), false);
     }
 
     if (cornerDetectionImage.empty()) {
@@ -40,7 +40,7 @@ void ImageProcessing::calibrate() {
         if (input == "1") {
             std::cout << "When ready to run calibration press enter.";
             std::cin.get();
-            this->chessboardDetection(this->grabImage(30));
+            this->chessboardDetection(this->grabImage(30), true);
         } else if (input == "2") {
             std::cout << "Place the red dots on the table and press enter.";
             std::cin.get();
@@ -208,12 +208,14 @@ std::vector<cv::Mat> ImageProcessing::grabImage(int imgAmt){
     return imgVector;
 }
 
-void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
+void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec, bool newCalib) {
     const cv::Size BoardSize{6,9};
 
-//    for(int i = 0; i<imgVec.size();i++){
-//        cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
-//    }
+    if (newCalib) {
+        for(int i = 0; i<imgVec.size();i++){
+            cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
+        }
+    }
 
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
     std::vector<std::vector<cv::Point3f>> Q;
@@ -315,8 +317,9 @@ std::vector<double> ImageProcessing::ballCoordConvert(cv::Point imgPos, cv::Mat 
     float x1, x2, y1, y2, z1, z2, maxZ, theta;
     float xWidth = img.cols, yWidth = img.rows;
     float realX = 80, realY = 75; //cm
-    float lengthPerPixelX = realX/xWidth - 20; // minus the double constants we subtract in cropImage
-    float lengthPerPixelY = realY/yWidth - 20; // minus the double constants we subtract in cropImage
+    float offset = 0;
+    float lengthPerPixelX = realX/(xWidth - offset); // minus the double constants we subtract in cropImage
+    float lengthPerPixelY = realY/(yWidth - offset); // minus the double constants we subtract in cropImage
 
     maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
     x1 = imgPos.x*lengthPerPixelX;
@@ -329,10 +332,10 @@ std::vector<double> ImageProcessing::ballCoordConvert(cv::Point imgPos, cv::Mat 
     y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x2/1000000);
-    points.push_back(y2/1000000);
+    points.push_back(x2/100);
+    points.push_back(y2/100);
 
-    std::cout << "coordinates for the object is: (" << std::to_string(x2/1000000) << "; " << std::to_string(y2/1000000) << ")" << std::endl;
+    std::cout << "coordinates for the object is: (" << std::to_string(x2/100) << "; " << std::to_string(y2/100) << ")" << std::endl;
 
     return points;
 }
@@ -342,24 +345,25 @@ std::vector<double> ImageProcessing::targetCoordConvert(cv::Point imgPos, cv::Ma
     float x1, x2, y1, y2, z1, z2, maxZ, theta;
     float xWidth = img.cols, yWidth = img.rows;
     float realX = 80, realY = 75; //cm
-    float lengthPerPixelX = realX/xWidth - 20; // minus the double constants we subtract in cropImage
-    float lengthPerPixelY = realY/yWidth - 20; // minus the double constants we subtract in cropImage
+    float offset = 0;
+    float lengthPerPixelX = realX/(xWidth - offset); // minus the double constants we subtract in cropImage
+    float lengthPerPixelY = realY/(yWidth - offset); // minus the double constants we subtract in cropImage
 
-    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
+//    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
     x1 = imgPos.x*lengthPerPixelX;
     y1 = imgPos.y*lengthPerPixelY;
-    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
+//    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
 
-    theta = acos(x1/z1);
-    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
-    x2 = cos(theta) * z2;
-    y2 = sin(theta) * z2;
+//    theta = acos(x1/z1);
+//    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
+//    x2 = cos(theta) * z2;
+//    y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x2/1000000);
-    points.push_back(y2/1000000);
+    points.push_back(y1/100);
+    points.push_back(x1/100);
 
-    std::cout << "coordinates for the object is: (" << std::to_string(x2/1000000) << "; " << std::to_string(y2/1000000) << ")" << std::endl;
+    std::cout << "coordinates for the object is: (" << std::to_string(x1/100) << "; " << std::to_string(y1/100) << ")" << std::endl;
 
     return points;
 }
@@ -479,7 +483,7 @@ std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     cv::Point center;
     cv::Mat   img_grey;
 
-    while (!(cv::waitKey(1000) == 'p')) {
+    while (!(cv::waitKey(500) == 'p')) {
         points.clear();
         cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);

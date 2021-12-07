@@ -15,7 +15,12 @@ Simulation::Simulation(std::string IP) : _roboConn(IP) {
 //}
 
 bool Simulation::protectiveStop() {
-    return _roboConn.isProtectiveStopped();
+    bool isProtectiveStopped = _roboConn.isProtectiveStopped();
+    if (isProtectiveStopped) {
+        _roboConn.disconnect();
+        _roboConn.reconnect();
+    }
+    return isProtectiveStopped;
 }
 
 bool Simulation::withinOffset(const VectorXd &actualPos, const VectorXd &withinOffsetPos, double offset) {
@@ -47,7 +52,7 @@ bool Simulation::jointPoseReached(const Eigen::VectorXd &jointPose, double offse
 
 bool Simulation::executeMoveLSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endPos) {
     // Move to start
-    _roboConn.moveJ(startJointPos, 3.14, 40);
+    _roboConn.moveJ(startJointPos, 2, 20);
 
     // Move to destination
     _roboConn.moveL(endPos, 2, 10);
@@ -57,26 +62,36 @@ bool Simulation::executeMoveLSimulation(const Eigen::VectorXd &startJointPos, co
 
 bool Simulation::executeMoveJSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos) {
     // Move to start
-    _roboConn.moveJ(startJointPos, 3.14, 40);
+    _roboConn.moveJ(startJointPos, 2, 20);
 
     // Move to destination
-    _roboConn.moveJ(endJointPos, 3.14, 40);
+    _roboConn.moveJ(endJointPos, 2, 20);
 
     return (!protectiveStop() && jointPoseReached(endJointPos));
 }
 
 bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos, const std::vector<Eigen::VectorXd> &jointVelocities) {
     // Move to start
-    _roboConn.moveJ(startJointPos, 3.14, 40);
+    _roboConn.moveJ(startJointPos, 2, 20);
 
     for (int i = 0; i < jointVelocities.size(); i++)
     {
         _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
         this_thread::sleep_for(chrono::milliseconds(8));
     }
-    bool posReached = jointPoseReached(endJointPos, 0.3);
+    bool posReached = jointPoseReached(endJointPos, 2);
     _roboConn.speedStop(20);
-//    bool posReached = jointPoseReached(endJointPos, 0.3);
+//    bool posReached = jointPoseReached(endJointPos, 0.5);
     return (!protectiveStop() && posReached);
+}
+
+VectorXd Simulation::getActualJointPoses()
+{
+    return _roboConn.getActualJointPoses();
+}
+
+VectorXd Simulation::getActualTCPPose()
+{
+    return _roboConn.getActualTCPPose();
 }
 

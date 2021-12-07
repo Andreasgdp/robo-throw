@@ -19,8 +19,7 @@ using namespace ur_rtde;
 int main(int argc, char *argv[])
 {
 //    RobotConnection r("192.168.100.49");
-//    RobotConnection r("127.0.0.1");
-//    r.moveHome(3, 40);
+////    r.moveThrowPos(1, 1);
 //    cout << r.getActualJointPoses() << endl << endl;
 //    cout << r.getActualTCPPose() << endl << endl;
 
@@ -70,8 +69,21 @@ int main(int argc, char *argv[])
 
 
     App app("192.168.100.49", "192.168.100.11", false);
-    app.findAndGrabObject();
-    app.throwObject();
+    bool wannaThrow = true;
+
+    while (wannaThrow) {
+        app.findAndGrabObject();
+        app.throwObject();
+
+        string answer;
+        cout << "Wanna throw again?: ";
+        cin >> answer;
+        if (answer != "y") {
+            wannaThrow = false;
+        }
+    }
+
+
 
 
 

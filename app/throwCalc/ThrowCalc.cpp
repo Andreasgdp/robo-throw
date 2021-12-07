@@ -90,7 +90,7 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
     // Initialise the "variables"
     double v0x, vzx, vx, v0y, vzy, vy, x, y, z;
     double g = 9.82;
-    double a = 35;
+    double a = 25;
     int t = 0;
     VectorXd velocityXYZ(6);
 
@@ -99,12 +99,12 @@ VectorXd ThrowCalc::velocityCalc(double xWorld, double yWorld, double zWorld, Ve
 
     // Convert world coordinates to robot coordinates
     CoordinateTranslator coordinateTranslator;
-    Vector3d posOfBallInRobotCoord = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
+    Vector3d posOfTargetInRobotCoord = coordinateTranslator.computeRobotPointCoords(xWorld, yWorld, zWorld);
 
     // Translate 0.0.0 to the throwpos
-    x = posOfBallInRobotCoord[0] - throwpos[0];
-    y = posOfBallInRobotCoord[1] - throwpos[1];
-    z = posOfBallInRobotCoord[2] - throwpos[2];
+    x = posOfTargetInRobotCoord[0] - throwpos[0];
+    y = posOfTargetInRobotCoord[1] - throwpos[1];
+    z = posOfTargetInRobotCoord[2] - throwpos[2];
 
     // In the x,z plane
     // The general speed

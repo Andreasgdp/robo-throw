@@ -40,17 +40,19 @@ App::App(std::string robotIP,
 
 void App::findAndGrabObject()
 {
+    moveHome();
+    _doneThrow = false;
     bool simSuccess = false;
-    this->moveHome();
+    _gripper.open();
 
     // use imageProcessing to get coordinates to object in relation to the table from image
 //    vector<double> imgBallCoords = _imgProcessor.getBallCoords();
     vector<vector<double>> positions = _imgProcessor.liveHoughCircles();
-    vector<double> _imgBallCoords = positions.at(0);
-    vector<double> _imgTargetCoords = positions.at(1);
+    _imgBallCoords = positions.at(0);
+    _imgTargetCoords = positions.at(1);
 
     // translate the coordinates to the object in relation to table to robot base coordinates
-    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(_imgBallCoords[1], _imgBallCoords[0], 0.195); // TODO: Check for hardcoded z
+    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(_imgBallCoords[1], _imgBallCoords[0], 0.194); // TODO: Check for hardcoded z
 
     VectorXd homePos = _roboConn.getHomePosCoords();
 
@@ -90,12 +92,14 @@ void App::throwObject()
     // move to throw angle
     VectorXd actualTCP(6);
     actualTCP = _roboConn.getActualTCPPose();
+//    actualTCP = _simulator.getActualTCPPose();
     Vector3d tcpInTable = _coordTrans.computeTablePointCoords(actualTCP[0], actualTCP[1], actualTCP[2]);
 
     double v = _throwCalc.TCPAngleCalc(_imgTargetCoords[0], _imgTargetCoords[1], tcpInTable);
 
     VectorXd newPos(6);
     newPos << _roboConn.getActualJointPoses();
+//    newPos << _simulator.getActualJointPoses();
     newPos[4] += v;
 
     simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), newPos);
@@ -104,13 +108,14 @@ void App::throwObject()
 
 
     // something something
-    VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], _imgTargetCoords[2], _roboConn.getActualTCPPose()) * 0.5;
+    VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], 0.15, _simulator.getActualTCPPose());
+//    VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], _imgTargetCoords[2], _roboConn.getActualTCPPose()) * 0.5;
 
-    VectorXd q_end = _roboConn.getActualJointPoses();
+    VectorXd q_end = _simulator.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
     // Find acceleration vector
     VectorXd accVector(6);
-    double t = 0.16;
+    double t = 0.2;
     accVector = dq_end / t;
 
     // Starting pos for throw
@@ -120,7 +125,7 @@ void App::throwObject()
     // Move from home to start of throw
     simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), q_start);
     if (!simSuccess) return;
-    _roboConn.moveJ(q_start, 1, 1);
+    _roboConn.moveJ(q_start, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
     vector<VectorXd> jointVelocities = _throwCalc.getJointVelocities(t, q_end, q_start, dx, accVector);
 
@@ -141,12 +146,12 @@ void App::throwObject()
         _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
         this_thread::sleep_for(chrono::milliseconds(8));
     }
-    // TODO: figure out when to release gripper.
-    _roboConn.speedStop(20);
+    _roboConn.speedStop(40);
 
     throwThread.join();
 
     this->moveHome();
+    _doneThrow = true;
 }
 
 void App::moveHome()
@@ -155,4 +160,14 @@ void App::moveHome()
     simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getHomePosJoints());
     if (!simSuccess) return;
     _roboConn.moveJ(_roboConn.getHomePosJoints(), _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
+}
+
+bool App::doneThrow() const
+{
+    return _doneThrow;
+}
+
+void App::setDoneThrow(bool newDoneThrow)
+{
+    _doneThrow = newDoneThrow;
 }

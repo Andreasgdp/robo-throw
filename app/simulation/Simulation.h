@@ -23,6 +23,8 @@ public:
     bool executeMoveLSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endPos);
     bool executeMoveJSimulation(const Eigen::VectorXd &startJointPos, const Eigen::VectorXd &endJointPos);
     bool executeThrowSimulation(const Eigen::VectorXd &startPos, const Eigen::VectorXd &endJointPos, const std::vector<Eigen::VectorXd> &jointSpeeds);
+    Eigen::VectorXd getActualJointPoses();
+    Eigen::VectorXd getActualTCPPose();
 
 private:
     RobotConnection _roboConn;
