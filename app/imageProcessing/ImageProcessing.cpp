@@ -386,8 +386,7 @@ cv::Mat ImageProcessing::rotateImg(cv::Mat img) {
     return rImage;
 }
 
-std::vector<cv::Point> ImageProcessing::cornersTempleMatching(cv::Mat img)
-{
+std::vector<cv::Point> ImageProcessing::cornersTempleMatching(cv::Mat img) {
     std::vector<cv::Mat> results, tpl;
     std::vector<cv::Point> points;
     cv::Mat res, gref, gtpl;
