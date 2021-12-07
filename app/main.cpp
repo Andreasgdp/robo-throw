@@ -19,6 +19,8 @@ using namespace ur_rtde;
 int main(int argc, char *argv[])
 {
 //    RobotConnection r("192.168.100.49");
+//    RobotConnection r("127.0.0.1");
+//    r.moveHome(3, 40);
 //    cout << r.getActualJointPoses() << endl << endl;
 //    cout << r.getActualTCPPose() << endl << endl;
 

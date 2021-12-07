@@ -37,7 +37,7 @@ App::App(std::string robotIP,
 
     moveHome();
 
-    _gripper.open();
+//    _gripper.open();
 }
 
 void App::findAndGrabObject()
@@ -86,7 +86,7 @@ void App::throwObject()
     if (!simSuccess) return;
     _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
-    Vector3d goalPos = Vector3d(0.1,0.7,0.15);
+    Vector3d goalPos = Vector3d(0.1,0.4,0.15);
 
     // move to throw angle
     VectorXd actualTCP(6);
@@ -105,13 +105,13 @@ void App::throwObject()
 
 
     // something something
-    VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose());
+    VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose()) * 0.5;
 
     VectorXd q_end = _roboConn.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
     // Find acceleration vector
     VectorXd accVector(6);
-    double t = 0.2;
+    double t = 0.16;
     accVector = dq_end / t;
 
     // Starting pos for throw
@@ -143,7 +143,7 @@ void App::throwObject()
         this_thread::sleep_for(chrono::milliseconds(8));
     }
     // TODO: figure out when to release gripper.
-    _roboConn.speedStop(40);
+    _roboConn.speedStop(20);
 
     throwThread.join();
 

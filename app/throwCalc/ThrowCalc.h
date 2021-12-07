@@ -12,6 +12,7 @@ public:
     ThrowCalc(/* args */);
     ~ThrowCalc();
     Matrix6d jacobian(double q1, double q2, double q3, double q4, double q5, double q6);
+    Matrix6d jacobian2(double q1, double q2, double q3, double q4, double q5, double q6);
     Matrix6d jacobianInverse(double q1, double q2, double q3, double q4, double q5, double q6);
 //    Eigen::VectorXd linearFitFunction(double t, double startTime, const Eigen::VectorXd &dq_end,const Eigen::VectorXd &dq_start, double endTime);
     Eigen::VectorXd linearFitFunction(double t, const Eigen::VectorXd &q_start,const Eigen::VectorXd &accVector);

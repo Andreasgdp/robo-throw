@@ -74,8 +74,9 @@ bool Simulation::executeThrowSimulation(const Eigen::VectorXd &startJointPos, co
         _roboConn.speedJ(jointVelocities.at(i), 40, 0.008);
         this_thread::sleep_for(chrono::milliseconds(8));
     }
-    _roboConn.speedStop(40);
     bool posReached = jointPoseReached(endJointPos, 0.3);
+    _roboConn.speedStop(20);
+//    bool posReached = jointPoseReached(endJointPos, 0.3);
     return (!protectiveStop() && posReached);
 }
 
