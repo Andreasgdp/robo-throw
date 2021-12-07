@@ -211,9 +211,9 @@ std::vector<cv::Mat> ImageProcessing::grabImage(int imgAmt){
 void ImageProcessing::chessboardDetection(std::vector<cv::Mat> imgVec) {
     const cv::Size BoardSize{6,9};
 
-    for(int i = 0; i<imgVec.size();i++){
-        cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
-    }
+//    for(int i = 0; i<imgVec.size();i++){
+//        cv::imwrite("../app/imageProcessing/images/calibration" + std::to_string(i) + ".jpg", imgVec.at(i));
+//    }
 
     std::vector<std::vector<cv::Point2f>> q(imgVec.size());
     std::vector<std::vector<cv::Point3f>> Q;
@@ -329,10 +329,10 @@ std::vector<double> ImageProcessing::ballCoordConvert(cv::Point imgPos, cv::Mat 
     y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x2/100);
-    points.push_back(y2/100);
+    points.push_back(x2/1000000);
+    points.push_back(y2/1000000);
 
-    std::cout << "coordinates for the object is: (" << std::to_string(x2) << "; " << std::to_string(y2) << ")" << std::endl;
+    std::cout << "coordinates for the object is: (" << std::to_string(x2/1000000) << "; " << std::to_string(y2/1000000) << ")" << std::endl;
 
     return points;
 }
@@ -356,10 +356,10 @@ std::vector<double> ImageProcessing::targetCoordConvert(cv::Point imgPos, cv::Ma
     y2 = sin(theta) * z2;
 
     std::vector<double> points;
-    points.push_back(x2/100);
-    points.push_back(y2/100);
+    points.push_back(x2/1000000);
+    points.push_back(y2/1000000);
 
-    std::cout << "coordinates for the object is: (" << std::to_string(x2) << "; " << std::to_string(y2) << ")" << std::endl;
+    std::cout << "coordinates for the object is: (" << std::to_string(x2/1000000) << "; " << std::to_string(y2/1000000) << ")" << std::endl;
 
     return points;
 }
@@ -479,7 +479,7 @@ std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     cv::Point center;
     cv::Mat   img_grey;
 
-    while (!(cv::waitKey(50) == 'p')) {
+    while (!(cv::waitKey(1000) == 'p')) {
         points.clear();
         cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);

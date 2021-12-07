@@ -22,8 +22,6 @@ App::App(std::string robotIP,
     if (!_roboConn.isConnected())
         throw std::invalid_argument("Connection could not be established with ip: " + _IP);
 
-    _imgProcessor.calibrate();
-
     vector<CalibPoint> calibPoints = _api.getCalibPoint(1);
     vector<Vector3d> P_robot;
     vector<Vector3d> P_table;
@@ -37,7 +35,7 @@ App::App(std::string robotIP,
 
     moveHome();
 
-//    _gripper.open();
+    _gripper.open();
 }
 
 void App::findAndGrabObject()
@@ -46,10 +44,13 @@ void App::findAndGrabObject()
     this->moveHome();
 
     // use imageProcessing to get coordinates to object in relation to the table from image
-    vector<double> imgBallCoords = _imgProcessor.getBallCoords();
+//    vector<double> imgBallCoords = _imgProcessor.getBallCoords();
+    vector<vector<double>> positions = _imgProcessor.liveHoughCircles();
+    vector<double> _imgBallCoords = positions.at(0);
+    vector<double> _imgTargetCoords = positions.at(1);
 
     // translate the coordinates to the object in relation to table to robot base coordinates
-    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(imgBallCoords[1], imgBallCoords[0], 0.195); // TODO: Check for hardcoded z
+    Vector3d robotObjectPoint = _coordTrans.computeRobotPointCoords(_imgBallCoords[1], _imgBallCoords[0], 0.195); // TODO: Check for hardcoded z
 
     VectorXd homePos = _roboConn.getHomePosCoords();
 
@@ -86,14 +87,12 @@ void App::throwObject()
     if (!simSuccess) return;
     _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
-    Vector3d goalPos = Vector3d(0.1,0.4,0.15);
-
     // move to throw angle
     VectorXd actualTCP(6);
     actualTCP = _roboConn.getActualTCPPose();
     Vector3d tcpInTable = _coordTrans.computeTablePointCoords(actualTCP[0], actualTCP[1], actualTCP[2]);
 
-    double v = _throwCalc.TCPAngleCalc(goalPos[0], goalPos[1], tcpInTable);
+    double v = _throwCalc.TCPAngleCalc(_imgTargetCoords[0], _imgTargetCoords[1], tcpInTable);
 
     VectorXd newPos(6);
     newPos << _roboConn.getActualJointPoses();
@@ -105,7 +104,7 @@ void App::throwObject()
 
 
     // something something
-    VectorXd dx = _throwCalc.velocityCalc(goalPos[0], goalPos[1], goalPos[2], _roboConn.getActualTCPPose()) * 0.5;
+    VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], _imgTargetCoords[2], _roboConn.getActualTCPPose()) * 0.5;
 
     VectorXd q_end = _roboConn.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;

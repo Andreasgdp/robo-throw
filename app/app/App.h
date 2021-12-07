@@ -50,6 +50,8 @@ private:
     Simulation _simulator;
     Eigen::VectorXd _goalPos;
     Eigen::VectorXd _objectPos;
+    std::vector<double> _imgBallCoords;
+    std::vector<double> _imgTargetCoords;
 //    GripperController _gripper;
     CoordinateTranslator _coordTrans;
     Api _api;

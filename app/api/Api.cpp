@@ -10,7 +10,13 @@ int qstate;
 
 Api::Api()
 {
-    _db = QSqlDatabase::addDatabase("QMYSQL");
+    stringstream ss;
+    ss<<_dbNr;
+    _dbNr++;
+    string s;
+    ss>>s;
+    string dbName = "api" + s;
+    _db = QSqlDatabase::addDatabase("QMYSQL", QString::fromStdString(dbName));
     _db.setHostName("localhost");
     _db.setDatabaseName("test3");
     _db.setUserName("user1");
