@@ -318,6 +318,40 @@ void RobotConnection::setThrowPosJoints(const Eigen::VectorXd &newThrowPosJoints
     _throwPosJoints = newThrowPosJoints;
 }
 
+VectorXd RobotConnection::convertToEigenVector(std::vector<double> vector)
+{
+    VectorXd tcpPoses(6);
+    tcpPoses << vector.at(0), vector.at(1), vector.at(2), vector.at(3), vector.at(4), vector.at(5);
+    return tcpPoses;
+}
+
+std::vector<double> RobotConnection::convertToVectorDouble(Eigen::VectorXd vector)
+{
+    std::vector<double> x_pos = {
+        vector[0],
+        vector[1],
+        vector[2],
+        vector[3],
+        vector[4],
+        vector[5]};
+    return x_pos;
+}
+
+Vector3d RobotConnection::convertToEigenVector3d(std::vector<double> vector)
+{
+    return Vector3d(vector.at(0), vector.at(1), vector.at(2));
+}
+
+std::vector<double> RobotConnection::convertToVectorDouble(Eigen::Vector3d vector)
+{
+    std::vector<double> x_pos = {
+        vector[0],
+        vector[1],
+        vector[2],
+    };
+    return x_pos;
+}
+
 RobotConnection::~RobotConnection()
 {
     this->disconnect();

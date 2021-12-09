@@ -83,6 +83,7 @@ bool Api::createDatabase()
         success = query.exec("CREATE TABLE IF NOT EXISTS throw( "
                              "id INT NOT NULL AUTO_INCREMENT, "
                              "success BOOL, "
+                             "testType VARCHAR(1024), "
                              "failedAt VARCHAR(1024), "
                              "deviation FLOAT, "
                              "objPos INT, "
@@ -194,11 +195,12 @@ bool Api::createCalibPoint(CalibPoint c)
     return success;
 }
 
-bool Api::createThrow(Throw t)
+int Api::createThrow(Throw t)
 {
     bool success = false;
     int objPosId = -1;
     int goalPosId = -1;
+    int throwId = -1;
     int robotStartConfigId = -1;
     if (_db.open())
     {
@@ -263,6 +265,7 @@ bool Api::createThrow(Throw t)
 
         query.prepare("INSERT INTO throw ("
                       "success, "
+                      "testType, "
                       "failedAt, "
                       "deviation, "
                       "objPos, "
@@ -278,6 +281,7 @@ bool Api::createThrow(Throw t)
                       ")"
                       " VALUES  ("
                       ":success, "
+                      ":testType, "
                       ":failedAt, "
                       ":deviation, "
                       ":objPos, "
@@ -292,6 +296,7 @@ bool Api::createThrow(Throw t)
                       ":apiLogTime"
                       ")");
         query.bindValue(":success", t.success);
+        query.bindValue(":testType", QString::fromStdString(t.testType));
         query.bindValue(":failedAt", QString::fromStdString(t.failedAt));
         query.bindValue(":deviation", t.deviation);
         query.bindValue(":objPos", objPosId);
@@ -304,6 +309,35 @@ bool Api::createThrow(Throw t)
         query.bindValue(":grabTime", t.grabTime);
         query.bindValue(":throwTime", t.throwTime);
         query.bindValue(":apiLogTime", t.apiLogTime);
+        success = query.exec();
+
+        if (!success) {
+            qDebug() << query.lastError();
+            _db.rollback();
+        }
+
+        query.exec("SELECT LAST_INSERT_ID();");
+        if (query.next())
+        {
+            throwId = query.value(0).toInt();
+        }
+
+
+    }
+
+    return throwId;
+}
+
+bool Api::updateThrowWLogTime(double logTime, int id)
+{
+    bool success = false;
+    if (_db.open())
+    {
+        QSqlQuery query(_db); // if multiple connections used, without the `db` in constructor will cause the query to use the default database (first opened and available one)
+
+        query.prepare("UPDATE throw SET apiLogTime = :logTime WHERE id = :throwID;");
+        query.bindValue(":logTime", logTime);
+        query.bindValue(":throwID", id);
         success = query.exec();
         if (!success) {
             qDebug() << query.lastError();

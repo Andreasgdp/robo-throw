@@ -69,6 +69,11 @@ public:
     const Eigen::VectorXd &getThrowPosJoints() const;
     void setThrowPosJoints(const Eigen::VectorXd &newThrowPosJoints);
 
+    Eigen::VectorXd convertToEigenVector(std::vector<double> vector);
+    std::vector<double> convertToVectorDouble(Eigen::VectorXd vector);
+    Eigen::Vector3d convertToEigenVector3d(std::vector<double> vector);
+    std::vector<double> convertToVectorDouble(Eigen::Vector3d vector);
+
 private:
     std::string IP;
     ur_rtde::RTDEControlInterface rtde_control;

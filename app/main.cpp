@@ -71,16 +71,16 @@ int main(int argc, char *argv[])
     App app("192.168.100.49", "192.168.100.11", false);
     bool wannaThrow = true;
 
-    while (wannaThrow) {
+    while (true) {
         app.findAndGrabObject();
         app.throwObject();
 
-        string answer;
-        cout << "Wanna throw again?: ";
-        cin >> answer;
-        if (answer != "y") {
-            wannaThrow = false;
-        }
+//        string answer;
+//        cout << "Wanna throw again?: ";
+//        cin >> answer;
+//        if (answer != "y") {
+//            wannaThrow = false;
+//        }
     }
 
 

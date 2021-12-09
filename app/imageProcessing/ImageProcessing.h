@@ -8,6 +8,7 @@
 #include <pylon/PylonIncludes.h>
 #include <algorithm>
 #include <unistd.h>
+#include "../api/Logger.h"
 
 class ImageProcessing
 {
@@ -26,12 +27,14 @@ public:
     std::vector<cv::Mat>   loadCalibImages();
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
     std::vector<std::vector<double>> liveHoughCircles();
+    bool hasHitTarget();
 
 private:
     int _deleteThis = 0;
     std::vector<cv::Mat>   _calibrationMat;
     std::vector<cv::Point> _cropCornerPoints;   // Coordinates for table corners
     std::vector<std::vector<cv::Point3f>>  Q;   //Checkerboard voordinates
+    Logger _log;
 };
 
 #endif // IMAGEPROCESSING_H

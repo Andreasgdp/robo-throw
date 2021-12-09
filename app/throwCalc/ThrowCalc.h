@@ -2,6 +2,7 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include "../coordinateTranslator/CoordinateTranslator.h"
+#include "../api/Logger.h"
 
 typedef Eigen::Matrix<double, 6, 6> Matrix6d;
 
@@ -21,5 +22,6 @@ public:
     double TCPAngleCalc(double targetX, double targetY, Eigen::VectorXd throwpos);
 
 private:
+    Logger _log;
 };
 

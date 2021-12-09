@@ -35,9 +35,7 @@ public:
     void moveHome();
 
     const Eigen::VectorXd &getHomePosCoords() const;
-
-    bool doneThrow() const;
-    void setDoneThrow(bool newDoneThrow);
+    bool checkIfInputYes(std::string input);
 
 private:
     // Member variables
@@ -60,7 +58,6 @@ private:
     Api _api;
 //    Logger _log;
     ThrowCalc _throwCalc;
-    bool _doneThrow = false;
 
     void openGripper(double time);
 };

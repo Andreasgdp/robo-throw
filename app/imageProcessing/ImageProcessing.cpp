@@ -40,12 +40,16 @@ void ImageProcessing::calibrate() {
         if (input == "1") {
             std::cout << "When ready to run calibration press enter.";
             std::cin.get();
+            _log.startTime();
             this->chessboardDetection(this->grabImage(30), true);
+            _log.addToLog(_log.setCalibImgTime, false, "Calibration: chessboardDetection");
         } else if (input == "2") {
             std::cout << "Place the red dots on the table and press enter.";
             std::cin.get();
             cv::imwrite("../app/imageProcessing/images/cornerDetection.jpg", this->grabImage(1)[0]);
+            _log.startTime();
             this->cornersHoughCircles(cv::imread("../app/imageProcessing/images/cornerDetection.jpg"));
+            _log.addToLog(_log.setCalibImgTime, false, "Calibration: cornersHoughCircles");
         } else if (input == "q") {
             break;
         }
@@ -349,15 +353,8 @@ std::vector<double> ImageProcessing::targetCoordConvert(cv::Point imgPos, cv::Ma
     float lengthPerPixelX = realX/(xWidth - offset); // minus the double constants we subtract in cropImage
     float lengthPerPixelY = realY/(yWidth - offset); // minus the double constants we subtract in cropImage
 
-//    maxZ = sqrt(pow(realX,2.0)+pow(realY,2.0));
     x1 = imgPos.x*lengthPerPixelX;
     y1 = imgPos.y*lengthPerPixelY;
-//    z1 = sqrt(pow(x1,2.0)+pow(y1,2.0));
-
-//    theta = acos(x1/z1);
-//    z2 = z1 * (1 + 0.009 * (z1 / maxZ)); // times the scaling times the percent of max length
-//    x2 = cos(theta) * z2;
-//    y2 = sin(theta) * z2;
 
     std::vector<double> points;
     points.push_back(y1/100);
@@ -483,6 +480,8 @@ std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     cv::Point center;
     cv::Mat   img_grey;
 
+    _log.startTime();
+
     while (!(cv::waitKey(500) == 'p')) {
         points.clear();
         cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
@@ -521,7 +520,16 @@ std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     std::vector<double> ballcoords   = this->ballCoordConvert(points[0], img_grey);
     std::vector<double> targetcoords = this->targetCoordConvert(points[1], img_grey);
 
+    _log.addToLog(_log.setFindObjTime, false, "ImageProcessor: Find object and target");
     return {ballcoords, targetcoords};
+}
+
+bool ImageProcessing::hasHitTarget()
+{
+    std::vector<std::vector<double>> positions = liveHoughCircles();
+
+    return (sqrt(pow(positions.at(1).at(1) - positions.at(0).at(0), 2) +
+                pow(positions.at(1).at(0) - positions.at(0).at(1), 2) * 1.0) < 0.12);
 }
 
 void ImageProcessing::cornersHoughCircles(cv::Mat src){
