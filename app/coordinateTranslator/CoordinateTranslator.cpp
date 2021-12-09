@@ -88,6 +88,13 @@ Vector3d CoordinateTranslator::computeRobotPointCoords(double x, double y, doubl
     return robotPoint3d;
 }
 
+Vector3d CoordinateTranslator::computeTablePointCoords(double x, double y, double z) {
+    Vector4d inputPoint = {x, y, z, 1};
+    Vector4d tablePoint4d = _transformationMatrix * inputPoint;
+    Vector3d tablePoint3d = {tablePoint4d(0), tablePoint4d(1), tablePoint4d(2)};
+    return tablePoint3d;
+}
+
 void CoordinateTranslator::setPointSets(const std::vector<Eigen::Vector3d> &newRobotPointSet, const std::vector<Eigen::Vector3d> &newWorldPointSet) {
     _robotPointSet = newRobotPointSet;
     _worldPointSet = newWorldPointSet;

@@ -66,6 +66,7 @@ public:
 
 private:
     QSqlDatabase _db;
+    static inline int _dbNr = 0;
 };
 
 #endif // API_H

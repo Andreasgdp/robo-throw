@@ -25,6 +25,7 @@ public:
 
     // Computation of the point seen from {W} to {R}
     Eigen::Vector3d computeRobotPointCoords(double x, double y, double z);
+    Eigen::Vector3d computeTablePointCoords(double x, double y, double z);
 
 
 private:

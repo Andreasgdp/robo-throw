@@ -36,6 +36,9 @@ public:
 
     const Eigen::VectorXd &getHomePosCoords() const;
 
+    bool doneThrow() const;
+    void setDoneThrow(bool newDoneThrow);
+
 private:
     // Member variables
     //TODO: when all member variables are created, create getters and setters (automatic)
@@ -50,11 +53,16 @@ private:
     Simulation _simulator;
     Eigen::VectorXd _goalPos;
     Eigen::VectorXd _objectPos;
-    GripperController _gripper;
+    std::vector<double> _imgBallCoords;
+    std::vector<double> _imgTargetCoords;
+//    GripperController _gripper;
     CoordinateTranslator _coordTrans;
     Api _api;
 //    Logger _log;
     ThrowCalc _throwCalc;
+    bool _doneThrow = false;
+
+    void openGripper(double time);
 };
 
 #endif // APP_H

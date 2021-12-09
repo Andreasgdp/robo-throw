@@ -78,8 +78,8 @@ private:
     Eigen::VectorXd _homePosJoints;
     Eigen::VectorXd _throwPosCoords;
     Eigen::VectorXd _throwPosJoints;
-    double defaultSpeed = 1;
-    double defaultAcceleration = 1;
+    double defaultSpeed = 1.5;
+    double defaultAcceleration = 5;
 };
 
 #endif // ROBOTCONNECTION_H
