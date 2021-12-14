@@ -16,7 +16,6 @@ App::App(std::string robotIP,
                           _coordTrans(),
                           _api()
 {
-    _log.setTestType("Ping Pong Ball");
     _localEnv = localEnv;
     // Sets the ip of the "robot" to the ip provided or to 127.0.0.1 if in local environment
     _IP = (!_localEnv) ? robotIP : "127.0.0.1";
@@ -43,6 +42,7 @@ App::App(std::string robotIP,
 
 void App::findAndGrabObject()
 {
+    _log.setTestType("Consistency test: Golfball");
     moveHome();
     bool simSuccess = false;
     _gripper.open();
@@ -95,10 +95,17 @@ void App::findAndGrabObject()
     simSuccess = _simulator.executeMoveLSimulation(_roboConn.getActualJointPoses(), endPosAboveObject);
     if (!simSuccess) return;
     _roboConn.moveL(endPosAboveObject, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
-    cout << "Did we grip the ball? (y/n): ";
-    string ans1;
-    cin >> ans1;
-    _log.addToLog(_log.setGrabTime, !checkIfInputYes(ans1), "Grabbing object");
+    moveHome();
+    VectorXd currJointPoses = _roboConn.getActualJointPoses();
+    currJointPoses[4] += 1;
+    simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), currJointPoses);
+    if (!simSuccess){
+        return;
+    };
+    _roboConn.moveJ(currJointPoses, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
+    bool ballMoved = _imgProcessor.ballPickedUp();
+    _log.addToLog(_log.setGrabTime, !ballMoved, "Grabbing object");
+    moveHome();
 }
 
 void App::throwObject()
@@ -106,28 +113,23 @@ void App::throwObject()
     bool simSuccess = false;
     simSuccess = _simulator.executeMoveJSimulation(_roboConn.getActualJointPoses(), _roboConn.getThrowPosJoints());
     if (!simSuccess) return;
-//    _roboConn.moveThrowPos(_roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
     // move to throw angle
     VectorXd actualTCP(6);
-//    actualTCP = _roboConn.getActualTCPPose();
     actualTCP = _simulator.getActualTCPPose();
     Vector3d tcpInTable = _coordTrans.computeTablePointCoords(actualTCP[0], actualTCP[1], actualTCP[2]);
 
     double v = _throwCalc.TCPAngleCalc(_imgTargetCoords[0], _imgTargetCoords[1], tcpInTable);
 
     VectorXd newPos(6);
-//    newPos << _roboConn.getActualJointPoses();
     newPos << _simulator.getActualJointPoses();
     newPos[4] += v;
 
     simSuccess = _simulator.executeMoveJSimulation(_simulator.getActualJointPoses(), newPos);
     if (!simSuccess) return;
-//    _roboConn.moveJ(newPos, _roboConn.getDefaultSpeed(), _roboConn.getDefaultAcceleration());
 
     _log.startTime();
     VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], 0.15, _simulator.getActualTCPPose());
-//    VectorXd dx = _throwCalc.velocityCalc(_imgTargetCoords[0], _imgTargetCoords[1], _imgTargetCoords[2], _roboConn.getActualTCPPose()) * 0.5;
 
     VectorXd q_end = _simulator.getActualJointPoses();
     VectorXd dq_end = _throwCalc.jacobianInverse(q_end[0], q_end[1], q_end[2], q_end[3], q_end[4], q_end[5]) * dx;
