@@ -465,10 +465,20 @@ cv::Point ImageProcessing::ballDetection(cv::Mat img) {
 
         return points.at(0);
     } else {
-        std::cout << "No table tennis ball found!" << std::endl;
-        cv::imshow("PointsNotFound", src_grey);
-        cv::waitKey();
+//        std::cout << "No table tennis ball found!" << std::endl;
+//        cv::imshow("PointsNotFound", src_grey);
+//        cv::waitKey();
         return cv::Point(-1, -1);
+    }
+}
+
+bool ImageProcessing::ballPickedUp() {
+    cv::Mat   newImage  = this->rotateImg(this->cropImg(this->grabImage(1)[0]));
+    cv::Point imgPoints = this->ballDetection(newImage);
+    if (imgPoints.x == -1 && imgPoints.y == -1) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -477,13 +487,16 @@ std::vector<std::vector<double>> ImageProcessing::liveHoughCircles() {
     std::vector<cv::Vec3f> balls;
     std::vector<cv::Vec3f> circles;
     std::vector<cv::Mat>   bufferImages;
-    cv::Point center;
     cv::Mat   img_grey;
 
     _log.startTime();
 
     while (!(cv::waitKey(500) == 'p')) {
+        circles.clear();
+        balls.clear();
         points.clear();
+        bufferImages.clear();
+        cv::Point center;
         cv::Mat liveImage =  this->rotateImg(this->cropImg(this->grabImage(1)[0]));
         cvtColor(liveImage, img_grey, cv::COLOR_BGR2GRAY);
         cv::medianBlur(img_grey, img_grey, 5);

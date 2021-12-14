@@ -28,6 +28,7 @@ public:
     std::vector<cv::Point> cornersTempleMatching(cv::Mat ref);
     std::vector<std::vector<double>> liveHoughCircles();
     bool hasHitTarget();
+    bool ballPickedUp();
 
 private:
     int _deleteThis = 0;
