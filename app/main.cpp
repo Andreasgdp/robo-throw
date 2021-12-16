@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
 //    c.setPointSets(P_robot, P_table);
 //    c.calibrateRobotToTable();
 
+//    cout << c.computeTablePointCoords(0.1228,-0.40813,0.672062) << endl;
+
 //    RobotConnection _roboConn("127.0.0.1");
 //    ThrowCalc _throwCalc;
 //    _roboConn.moveThrowPos(1, 1);
@@ -74,13 +76,6 @@ int main(int argc, char *argv[])
     while (true) {
         app.findAndGrabObject();
         app.throwObject();
-
-//        string answer;
-//        cout << "Wanna throw again?: ";
-//        cin >> answer;
-//        if (answer != "y") {
-//            wannaThrow = false;
-//        }
     }
 
 

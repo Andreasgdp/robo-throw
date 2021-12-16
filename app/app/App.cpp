@@ -7,7 +7,6 @@ using namespace std;
 using namespace Eigen;
 
 GripperController _gripper("192.168.100.11");
-Logger _log;
 
 App::App(std::string robotIP,
          std::string gripperIP,
