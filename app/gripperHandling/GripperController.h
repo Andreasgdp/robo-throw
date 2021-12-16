@@ -8,11 +8,11 @@ class GripperController
 public:
     //TODO: Go over the default values and make them relevant to this project.
     GripperController(
-            const std::string &address="192.168.100.10",
-            const unsigned short int &port=1000,
-            const float &acceleration=3.0f,
-            const float &forceLimit=65.0,
-            const unsigned int &period=10);
+        const std::string &address = "192.168.100.10",
+        const unsigned short int &port = 1000,
+        const float &acceleration = 3.0f,
+        const float &forceLimit = 65.0,
+        const unsigned int &period = 10);
 
     ~GripperController();
 
@@ -38,11 +38,6 @@ public:
     void open(const float &speed = 10);
 
     /*
-     * @brief Move gripper to home posistion, fully opened
-     */
-    void moveHome();
-
-    /*
      * @brief Gets the state of the gripper
      * @return the name of the grasping state
      */
@@ -54,24 +49,9 @@ public:
     void setAcceleration(const float &acceleration);
 
     /*
-     * @return Acceleration of the gripper
-     */
-    float getAcceleration();
-
-    /*
      * @brief Sets the forcelimit of the gripper
      */
     void setForceLimit(const float &force);
-
-    /*
-     * @return Forcelimit of the gripper
-     */
-    float getForceLimit();
-
-    /*
-     * @brief Sets the softlimits of the gripper
-     */
-    void setSoftLimits(const float &limitMinus, const float &limitPlus);
 
 private:
     rl::hal::WeissWsg50 _gripper;

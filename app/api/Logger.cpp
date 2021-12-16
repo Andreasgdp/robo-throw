@@ -24,7 +24,6 @@ double Logger::_grabTime = -1;
 double Logger::_throwTime = -1;
 double Logger::_apiLogTime = -1;
 
-
 std::chrono::high_resolution_clock::time_point Logger::getStart()
 {
     return _start;
@@ -210,9 +209,10 @@ void Logger::endTimeToComplete()
     setTotalThrowTime(getTimeDelta(_timeToCompleteStart));
 }
 
-double Logger::getTimeDelta(std::chrono::high_resolution_clock::time_point start) { // log function
+double Logger::getTimeDelta(std::chrono::high_resolution_clock::time_point start)
+{ // log function
     chrono::high_resolution_clock::time_point cur = chrono::high_resolution_clock::now();
-    return chrono::duration_cast<chrono::nanoseconds>(cur - start).count()/1000000.0;  // delta time since program start
+    return chrono::duration_cast<chrono::nanoseconds>(cur - start).count() / 1000000.0; // delta time since program start
 }
 
 bool Logger::logThrow()
@@ -237,12 +237,14 @@ bool Logger::logThrow()
     startTime();
     bool transactionSuccess = false;
     int throwId = _api.createThrow(t);
-    if (throwId != -1) {
+    if (throwId != -1)
+    {
         transactionSuccess = true;
     }
     endTime(setApiLogTime);
 
-    if (transactionSuccess) {
+    if (transactionSuccess)
+    {
         transactionSuccess = _api.updateThrowWLogTime(_apiLogTime, throwId);
     }
 
@@ -280,7 +282,8 @@ void Logger::addToLog(std::string deviation)
 void Logger::addToLog(void (*timeSetter)(double), bool failedACtion, std::string failedAt)
 {
     endTime(timeSetter);
-    if (failedACtion) {
+    if (failedACtion)
+    {
         setFailedAt(failedAt);
         logThrow();
     }

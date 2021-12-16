@@ -9,14 +9,13 @@
 #include "../gripperHandling/GripperController.h"
 #include "../coordinateTranslator/CoordinateTranslator.h"
 #include "../api/Api.h"
-//#include "../api/Logger.h"
+#include "../api/Logger.h"
 #include "../throwCalc/ThrowCalc.h"
-
 
 class App
 {
 public:
-    App(std::string IP, std::string gripperIP = "192.168.1.20", bool localEnv = false);
+    App(std::string IP);
 
     /*
         @brief Finds and grabs an object with the robot after simulation move.
@@ -34,13 +33,8 @@ public:
     */
     void moveHome();
 
-    const Eigen::VectorXd &getHomePosCoords() const;
-    bool checkIfInputYes(std::string input);
-
 private:
     // Member variables
-    bool _localEnv;
-
     std::string _IP;
     Eigen::VectorXd _jointPoses;
     ImageProcessing _imgProcessor;

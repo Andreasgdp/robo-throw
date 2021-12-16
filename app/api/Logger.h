@@ -12,9 +12,10 @@
 
 class Logger
 {
-    static std::chrono::high_resolution_clock::time_point _start; // program start
+    static std::chrono::high_resolution_clock::time_point _start;               // program start
     static std::chrono::high_resolution_clock::time_point _timeToCompleteStart; // program start
     static double _deltaTime;
+
 public:
     Logger();
     void startTime();
