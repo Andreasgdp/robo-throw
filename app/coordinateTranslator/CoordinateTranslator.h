@@ -4,7 +4,6 @@
 #include <vector>
 #include <Eigen/Eigen>
 
-
 class CoordinateTranslator
 {
 public:
@@ -27,7 +26,6 @@ public:
     Eigen::Vector3d computeRobotPointCoords(double x, double y, double z);
     Eigen::Vector3d computeTablePointCoords(double x, double y, double z);
 
-
 private:
     int _numberOfPoints = 0;
 
@@ -35,7 +33,6 @@ private:
     std::vector<Eigen::Vector3d> _robotPointSet;
     std::vector<Eigen::Vector3d> _worldPointSet;
 
-    // TODO: Find better soltion than using inline
     static inline Eigen::Matrix4d _transformationMatrix;
     static inline Eigen::Matrix4d _inverseTransformationMatrix;
 };

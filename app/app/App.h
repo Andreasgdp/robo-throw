@@ -9,14 +9,13 @@
 #include "../gripperHandling/GripperController.h"
 #include "../coordinateTranslator/CoordinateTranslator.h"
 #include "../api/Api.h"
-//#include "../api/Logger.h"
+#include "../api/Logger.h"
 #include "../throwCalc/ThrowCalc.h"
-
 
 class App
 {
 public:
-    App(std::string IP, std::string gripperIP = "192.168.1.20", bool localEnv = false);
+    App(std::string IP);
 
     /*
         @brief Finds and grabs an object with the robot after simulation move.
@@ -34,18 +33,8 @@ public:
     */
     void moveHome();
 
-    const Eigen::VectorXd &getHomePosCoords() const;
-
-    bool doneThrow() const;
-    void setDoneThrow(bool newDoneThrow);
-
 private:
     // Member variables
-    //TODO: when all member variables are created, create getters and setters (automatic)
-
-    // localEnv is a variable, that desides weather to run the program using local files or live camera.
-    bool _localEnv;
-
     std::string _IP;
     Eigen::VectorXd _jointPoses;
     ImageProcessing _imgProcessor;
@@ -55,14 +44,10 @@ private:
     Eigen::VectorXd _objectPos;
     std::vector<double> _imgBallCoords;
     std::vector<double> _imgTargetCoords;
-//    GripperController _gripper;
     CoordinateTranslator _coordTrans;
     Api _api;
-//    Logger _log;
+    Logger _log;
     ThrowCalc _throwCalc;
-    bool _doneThrow = false;
-
-    void openGripper(double time);
 };
 
 #endif // APP_H

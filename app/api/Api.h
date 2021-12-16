@@ -28,6 +28,7 @@ class Throw
 public:
     int id;
     bool success;
+    std::string testType;
     std::string failedAt;
     double deviation;
     Eigen::Vector3d objPos;
@@ -58,7 +59,8 @@ public:
     bool createDatabase();
     Eigen::Vector3d getPoint(int id = -1);
     bool createCalibPoint(CalibPoint c);
-    bool createThrow(Throw t);
+    int createThrow(Throw t);
+    bool updateThrowWLogTime(double logTime, int id);
     std::vector<CalibPoint> getCalibPoint(int robotId = -1);
     RobotConfig getRobotConfig(int id = -1);
     Throw getThrow(int id = -1);

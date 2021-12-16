@@ -12,13 +12,17 @@
 
 class Logger
 {
-    static std::chrono::high_resolution_clock::time_point _start; // program start
+    static std::chrono::high_resolution_clock::time_point _start;               // program start
+    static std::chrono::high_resolution_clock::time_point _timeToCompleteStart; // program start
     static double _deltaTime;
+
 public:
     Logger();
     void startTime();
+    void startTimeToComplete();
     void endTime(void (*timeSetter)(double));
-    double getTimeDelta();
+    void endTimeToComplete();
+    double getTimeDelta(std::chrono::high_resolution_clock::time_point start = _start);
     bool logThrow();
     void resetState();
 
@@ -53,9 +57,19 @@ public:
     static double getApiLogTime();
     static void setApiLogTime(double newApiLogTime);
 
+    static std::chrono::high_resolution_clock::time_point getTimeToCompleteStart();
+    static void setTimeToCompleteStart(std::chrono::high_resolution_clock::time_point newThrowStart);
+    void addToLog(std::string deviation);
+    void addToLog(void (*timeSetter)(double), bool failedACtion, std::string failedAt);
+    void addToLog(Eigen::VectorXd startJointPoses, Eigen::VectorXd startTCP);
+
+    static const std::string &getTestType();
+    static void setTestType(const std::string &newTestType);
+
 private:
     static inline Api _api;
     static bool _success;
+    static std::string _testType;
     static std::string _failedAt;
     static double _deviation;
     static Eigen::Vector3d _objPos;

@@ -6,9 +6,11 @@ using namespace Eigen;
 
 // setting default values (nothing)
 std::chrono::high_resolution_clock::time_point Logger::_start = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point Logger::_timeToCompleteStart = std::chrono::high_resolution_clock::now();
 double Logger::_deltaTime = 0;
 
 bool Logger::_success = false;
+std::string Logger::_testType = "";
 std::string Logger::_failedAt = "";
 double Logger::_deviation = -1;
 Eigen::Vector3d Logger::_objPos = Vector3d();
@@ -21,7 +23,6 @@ double Logger::_pathCalcTime = -1;
 double Logger::_grabTime = -1;
 double Logger::_throwTime = -1;
 double Logger::_apiLogTime = -1;
-
 
 std::chrono::high_resolution_clock::time_point Logger::getStart()
 {
@@ -173,9 +174,19 @@ void Logger::setApiLogTime(double newApiLogTime)
     _apiLogTime = newApiLogTime;
 }
 
+std::chrono::high_resolution_clock::time_point Logger::getTimeToCompleteStart()
+{
+    return _timeToCompleteStart;
+}
+
+void Logger::setTimeToCompleteStart(std::chrono::high_resolution_clock::time_point newThrowStart)
+{
+    _timeToCompleteStart = newThrowStart;
+}
+
 Logger::Logger()
 {
-
+    resetState();
 }
 
 void Logger::startTime()
@@ -183,14 +194,25 @@ void Logger::startTime()
     setStart(chrono::high_resolution_clock::now());
 }
 
+void Logger::startTimeToComplete()
+{
+    setTimeToCompleteStart(chrono::high_resolution_clock::now());
+}
+
 void Logger::endTime(void (*timeSetter)(double))
 {
     timeSetter(getTimeDelta());
 }
 
-double Logger::getTimeDelta() { // log function
+void Logger::endTimeToComplete()
+{
+    setTotalThrowTime(getTimeDelta(_timeToCompleteStart));
+}
+
+double Logger::getTimeDelta(std::chrono::high_resolution_clock::time_point start)
+{ // log function
     chrono::high_resolution_clock::time_point cur = chrono::high_resolution_clock::now();
-    return chrono::duration_cast<chrono::nanoseconds>(cur - _start).count()/1000000.0;  // delta time since program start
+    return chrono::duration_cast<chrono::nanoseconds>(cur - start).count() / 1000000.0; // delta time since program start
 }
 
 bool Logger::logThrow()
@@ -198,6 +220,7 @@ bool Logger::logThrow()
     Throw t;
 
     t.success = _success;
+    t.testType = _testType;
     t.failedAt = _failedAt;
     t.deviation = _deviation;
     t.objPos = _objPos;
@@ -211,7 +234,19 @@ bool Logger::logThrow()
     t.throwTime = _throwTime;
     t.apiLogTime = _apiLogTime;
 
-    bool transactionSuccess = _api.createThrow(t);
+    startTime();
+    bool transactionSuccess = false;
+    int throwId = _api.createThrow(t);
+    if (throwId != -1)
+    {
+        transactionSuccess = true;
+    }
+    endTime(setApiLogTime);
+
+    if (transactionSuccess)
+    {
+        transactionSuccess = _api.updateThrowWLogTime(_apiLogTime, throwId);
+    }
 
     resetState();
 
@@ -223,6 +258,7 @@ void Logger::resetState()
     startTime();
     _deltaTime = 0;
     _success = false;
+    _testType = "";
     _failedAt = "";
     _deviation = -1;
     _objPos = Vector3d();
@@ -235,4 +271,48 @@ void Logger::resetState()
     _grabTime = -1;
     _throwTime = -1;
     _apiLogTime = -1;
+}
+
+void Logger::addToLog(std::string deviation)
+{
+    double num_double = std::stod(deviation);
+    setDeviation(num_double);
+}
+
+void Logger::addToLog(void (*timeSetter)(double), bool failedACtion, std::string failedAt)
+{
+    endTime(timeSetter);
+    if (failedACtion)
+    {
+        setFailedAt(failedAt);
+        logThrow();
+    }
+}
+
+void Logger::addToLog(Eigen::VectorXd startJointPoses, Eigen::VectorXd startTCP)
+{
+    RobotConfig r;
+    r.j1 = startJointPoses[0];
+    r.j2 = startJointPoses[1];
+    r.j3 = startJointPoses[2];
+    r.j4 = startJointPoses[3];
+    r.j5 = startJointPoses[4];
+    r.j6 = startJointPoses[5];
+    r.x = startTCP[0];
+    r.y = startTCP[1];
+    r.z = startTCP[2];
+    r.q1 = startTCP[3];
+    r.q2 = startTCP[4];
+    r.q3 = startTCP[5];
+    setRobotStartConfig(r);
+}
+
+const std::string &Logger::getTestType()
+{
+    return _testType;
+}
+
+void Logger::setTestType(const std::string &newTestType)
+{
+    _testType = newTestType;
 }

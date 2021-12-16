@@ -24,12 +24,6 @@ public:
     void disconnect();
     bool isConnected();
     void reconnect();
-    bool setPayload(double mass, const Eigen::VectorXd &cog);
-    Eigen::VectorXd getActualJointPositionHistory(int steps = 0);
-    bool setTcp(const Eigen::VectorXd &tcp_offset);
-    bool isPoseWithinSafetyLimits(const Eigen::VectorXd &pose);
-    bool isJointsWithinSafetyLimits(const Eigen::VectorXd &q);
-    Eigen::VectorXd getTCPOffset();
 
     /*
     Calculate the forward kinematic transformation (joint space -> tool space) using the calibrated robot kinematics.
@@ -68,6 +62,11 @@ public:
 
     const Eigen::VectorXd &getThrowPosJoints() const;
     void setThrowPosJoints(const Eigen::VectorXd &newThrowPosJoints);
+
+    Eigen::VectorXd convertToEigenVector(std::vector<double> vector);
+    std::vector<double> convertToVectorDouble(Eigen::VectorXd vector);
+    Eigen::Vector3d convertToEigenVector3d(std::vector<double> vector);
+    std::vector<double> convertToVectorDouble(Eigen::Vector3d vector);
 
 private:
     std::string IP;
