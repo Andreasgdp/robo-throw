@@ -13,12 +13,13 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.optimize import curve_fit
 
 
 def deviation_corrector(deviation: float):
     if deviation <= 0:
         return deviation
-    return deviation + 2.5
+    return deviation + 4.5
 
 
 # Get data from csv file
@@ -71,16 +72,20 @@ def generate_deviation_graphs_for_each_object(segmented_data):
         if "Ping Pong Ball" in key:
             for row in value["failed_list"]:
                 deviation = deviation_corrector(float(row[4]))
+                if deviation <= 0:
+                    continue
                 analyzed_data["Ping Pong Ball"]["deviations"].append(deviation)
 
         if "Golfball" in key:
             for row in value["failed_list"]:
                 deviation = deviation_corrector(float(row[4]))
+                if deviation <= 0:
+                    continue
                 analyzed_data["Golfball"]["deviations"].append(deviation)
 
     # plot the deviation for Ping Pong Ball and Golfball
     plt.figure()
-    plt.title("Ping Pong Ball and Golfball deviation on failed throws")
+    plt.title("Deviation on failed throws")
     plt.xlabel("id")
     plt.ylabel("deviation [cm]")
     plt.scatter(
@@ -143,7 +148,7 @@ def generate_graph_over_deviation_of_target_related_to_distance_of_throw(data):
     throw_pos_coords = (0.498719, 0.41015)
     data.pop(0)
     plt.figure()
-    plt.title("Distance of throw in relation to deviation from target")
+    plt.title("Deviation from target in relation to distance of throw")
     plt.xlabel("distance from throw pos [cm]")
     plt.ylabel("deviation [cm]")
     deviations = []
@@ -172,9 +177,25 @@ def generate_graph_over_deviation_of_target_related_to_distance_of_throw(data):
     plt.plot(distances, deviations, "o")
 
     # calc the trendline
-    z = np.polyfit(distances, deviations, 1)
-    p = np.poly1d(z)
-    plt.plot(distances, p(distances), "r--")
+    # z = np.polyfit(distances, deviations, 1)
+    # p = np.poly1d(z)
+    # plt.plot(np.linspace(distances[0], distances[-1], 159), p(distances), "r--")
+
+    # define the true objective function
+    def objective(x, a, b, c):
+        return a * x + b * x ** 2 + c
+
+    # curve fit
+    popt, _ = curve_fit(objective, distances, deviations)
+    # summarize the parameter values
+    a, b, c = popt
+    print("y = %.5f * x + %.5f * x^2 + %.5f" % (a, b, c))
+    # define a sequence of inputs between the smallest and largest known inputs
+    x_line = np.arange(min(distances), max(distances), 1)
+    # calculate the output for the range
+    y_line = objective(x_line, a, b, c)
+    # create a line plot for the mapping function
+    plt.plot(x_line, y_line, "--", color="red")
 
 
 def calculate_grab_object_success_rate(data):
@@ -258,7 +279,7 @@ def calculate_avg_time_for_each_event(data):
         + avg_time_for_each_event["throwTime"]
     )
 
-    avg_time_for_each_event["calibImgTime"] = 4 * 60
+    avg_time_for_each_event["calibImgTime"] = 10
 
     # sort the avg_time_for_each_event
     avg_time_for_each_event = {
@@ -277,6 +298,11 @@ def calculate_avg_time_for_each_event(data):
     )
 
     print(avg_time_for_each_event)
+
+
+def remove_data_containing_object(data, object: str):
+    data = [row for row in data if object not in row[2]]
+    return data
 
 
 if __name__ == "__main__":
@@ -309,7 +335,14 @@ if __name__ == "__main__":
 
     generate_deviation_graphs_for_each_object(segmented_data)
     generate_graphs_for_success_rate_for_each_object(segmented_data)
+
     generate_graph_over_deviation_of_target_related_to_distance_of_throw(data)
+    generate_graph_over_deviation_of_target_related_to_distance_of_throw(
+        remove_data_containing_object(data, "Golfball")
+    )
+    generate_graph_over_deviation_of_target_related_to_distance_of_throw(
+        remove_data_containing_object(data, "Ping Pong Ball")
+    )
     calculate_grab_object_success_rate(data)
     calculate_avg_time_for_each_event(data)
 
