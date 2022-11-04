@@ -19,7 +19,7 @@ every movement is tested before they are send to the robot. All this is being lo
 in MySQL through out the program.
 
 <p align="center"> 
-<img src="https://user-images.githubusercontent.com/39928082/200008203-6aefe037-1afe-4fd9-b082-2203290b54da.png" alt="Throw" title="Throw" width="30%" height="30%"/> 
+<img src="https://user-images.githubusercontent.com/39928082/200008203-6aefe037-1afe-4fd9-b082-2203290b54da.png" alt="Throw" title="Throw" width="15%" height="15%"/> 
 </p>
 
 
